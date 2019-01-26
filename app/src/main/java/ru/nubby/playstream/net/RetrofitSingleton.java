@@ -9,22 +9,24 @@ import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
+import retrofit2.http.Url;
 import ru.nubby.playstream.model.GsonScheme;
 import ru.nubby.playstream.model.Stream;
-import ru.nubby.playstream.sensitivekey.SensitiveStorage;
+import ru.nubby.playstream.SensitiveStorage;
+import ru.nubby.playstream.model.Token;
+import ru.nubby.playstream.net.retrofitinterfaces.RawJsonService;
+import ru.nubby.playstream.net.retrofitinterfaces.TwitchStreamUrl;
+import ru.nubby.playstream.net.retrofitinterfaces.TwitchStreamsService;
 
 public class RetrofitSingleton {
 
     private static RetrofitSingleton mInstance;
-    private static final String BASE_URL = "https://api.twitch.tv/helix/";
+    private static final String BASE_URL_HELIX = "https://api.twitch.tv/helix/";
+    private static final String BASE_URL_API = "https://api.twitch.tv/api/";
     private Retrofit mRetrofit;
 
     private RetrofitSingleton() {
-        mRetrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
     }
 
     public static synchronized RetrofitSingleton getInstance() {
@@ -35,6 +37,13 @@ public class RetrofitSingleton {
     }
 
     public Observable<List<Stream>> getStreamsTest() {
+
+        mRetrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL_HELIX)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build();
+
         TwitchStreamsService service = mRetrofit.create(TwitchStreamsService.class);
 
         return service.gsonScheme(SensitiveStorage.getClientApiKey())
@@ -44,13 +53,34 @@ public class RetrofitSingleton {
 
     }
 
-    public Observable<List<Stream>> getStreamUrl() {
-        TwitchStreamsService service = mRetrofit.create(TwitchStreamsService.class);
+    public Observable<Token> getStreamUrl(Stream stream) {
 
-        return service.gsonScheme(SensitiveStorage.getClientApiKey())
+        mRetrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL_API)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build();
+
+        TwitchStreamUrl service = mRetrofit.create(TwitchStreamUrl.class);
+
+        return service.token(SensitiveStorage.getClientApiKey(), stream.getStreamerName())
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .map(GsonScheme::getData);
+                .observeOn(AndroidSchedulers.mainThread());
+
+    }
+
+    public Observable<String> getRawJson(String url) {
+        mRetrofit = new Retrofit.Builder()
+                .baseUrl(url)
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build();
+
+        RawJsonService service = mRetrofit.create(RawJsonService.class);
+
+        return service.rawJson()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
 
     }
 

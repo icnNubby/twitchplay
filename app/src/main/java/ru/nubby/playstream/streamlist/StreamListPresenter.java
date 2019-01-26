@@ -2,11 +2,9 @@ package ru.nubby.playstream.streamlist;
 
 import android.util.Log;
 
-import java.util.List;
-
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.model.Stream;
-import ru.nubby.playstream.net.InternetList;
+import ru.nubby.playstream.net.RemoteStreamList;
 import ru.nubby.playstream.net.Repository;
 
 public class StreamListPresenter implements StreamListContract.Presenter {
@@ -20,7 +18,7 @@ public class StreamListPresenter implements StreamListContract.Presenter {
 
     @Override
     public void addMoreStreams() {
-        Repository internet = new InternetList(); //TODO INJECT
+        Repository internet = new RemoteStreamList(); //TODO INJECT
         mDisposable = internet.getStreams()
                 .subscribe(x -> mStreamListView.displayStreamList(x),
                         e -> Log.e("STREAM PRESENTER", "Error while fetching streams", e));
@@ -29,6 +27,11 @@ public class StreamListPresenter implements StreamListContract.Presenter {
     @Override
     public void updateStreams() {
             //TODO
+    }
+
+    @Override
+    public void showStream(Stream stream) {
+
     }
 
     @Override

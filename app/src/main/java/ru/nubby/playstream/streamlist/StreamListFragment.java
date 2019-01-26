@@ -1,9 +1,13 @@
 package ru.nubby.playstream.streamlist;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.google.gson.Gson;
 
 import java.util.List;
 
@@ -15,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.stream.StreamActivity;
 
 public class StreamListFragment extends Fragment implements StreamListContract.View {
 
@@ -38,12 +43,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
         mStreamListRecyclerView = fragmentView.findViewById(R.id.stream_list_recycler_view);
         mStreamListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mSwipeRefreshLayout = fragmentView.findViewById(R.id.stream_list_swipe_refresh);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mPresenter.addMoreStreams();
-            }
-        });
+        mSwipeRefreshLayout.setOnRefreshListener(() -> mPresenter.addMoreStreams());
         mPresenter.addMoreStreams();
         return fragmentView;
     }
@@ -75,6 +75,29 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
         mPresenter = presenter;
     }
 
+    private class StreamListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private Stream mStream;
+        private TextView mTextViewStreamDescription;
+
+        public void bind(Stream stream) {
+            mStream = stream;
+            mTextViewStreamDescription.setText(stream.getStreamerName() + "___"  + stream.getTitle());
+        }
+
+        public StreamListViewHolder(@NonNull View itemView) {
+            super(itemView);
+            mTextViewStreamDescription = itemView.findViewById(R.id.stream_description);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Intent startStream = new Intent(getContext(), StreamActivity.class);
+            //TODO fix to some constant
+            startStream.putExtra("stream_json", new Gson().toJson(mStream)); // SLOW, YES
+            startActivity(startStream );
+        }
+    }
+
     private class StreamListAdapter extends RecyclerView.Adapter<StreamListViewHolder> {
         private List<Stream> mStreamsList;
 
@@ -87,6 +110,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
         public StreamListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.stream_list_element, parent, false);
             StreamListViewHolder listViewHolder = new StreamListViewHolder(view);
+            view.setOnClickListener(listViewHolder);
             return listViewHolder;
         }
 

@@ -1,4 +1,4 @@
-package ru.nubby.playstream.net;
+package ru.nubby.playstream.net.retrofitinterfaces;
 
 
 import io.reactivex.Observable;

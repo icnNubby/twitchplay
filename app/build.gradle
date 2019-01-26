@@ -35,7 +35,8 @@ dependencies {
     implementation dependencies.rxandroid
     implementation dependencies.rxjava
     implementation dependencies.retrofit
-    implementation dependencies.retrofit_converters
+    implementation dependencies.retrofit_converter_gson
+    implementation dependencies.retrofit_converter_scalar
     implementation dependencies.retrofit_rxjava_adapter
     implementation dependencies.gson
 

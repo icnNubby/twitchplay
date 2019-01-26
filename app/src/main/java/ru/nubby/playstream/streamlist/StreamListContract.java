@@ -15,6 +15,7 @@ public interface StreamListContract {
     interface Presenter extends BasePresenter {
         void addMoreStreams();
         void updateStreams();
+        void showStream(Stream stream);
     }
 
 }

@@ -11,7 +11,7 @@ public class Stream { //TODO implement all models + GSON convertation obv
 
     @SerializedName("user_name")
     @Expose
-    private String streamer_name;
+    private String streamerName;
 
 
     private String description;
@@ -32,11 +32,11 @@ public class Stream { //TODO implement all models + GSON convertation obv
         this.description = description;
     }
 
-    public String getStreamer_name() {
-        return streamer_name;
+    public String getStreamerName() {
+        return streamerName;
     }
 
-    public void setStreamer_name(String streamer_name) {
-        this.streamer_name = streamer_name;
+    public void setStreamerName(String streamerName) {
+        this.streamerName = streamerName;
     }
 }
