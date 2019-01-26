@@ -1,14 +1,17 @@
 package ru.nubby.playstream.streamlist;
 
+import android.util.Log;
+
 import java.util.List;
 
+import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.net.InternetList;
 import ru.nubby.playstream.net.Repository;
-import ru.nubby.playstream.net.ResponceListener;
 
-public class StreamListPresenter implements StreamListContract.Presenter, ResponceListener {
+public class StreamListPresenter implements StreamListContract.Presenter {
     private StreamListContract.View mStreamListView;
+    private Disposable mDisposable;
 
     public StreamListPresenter(StreamListContract.View streamListView) {
         this.mStreamListView = streamListView;
@@ -18,7 +21,9 @@ public class StreamListPresenter implements StreamListContract.Presenter, Respon
     @Override
     public void addMoreStreams() {
         Repository internet = new InternetList(); //TODO INJECT
-        internet.getStreams(this);
+        mDisposable = internet.getStreams()
+                .subscribe(x -> mStreamListView.displayStreamList(x),
+                        e -> Log.e("STREAM PRESENTER", "Error while fetching streams", e));
     }
 
     @Override
@@ -33,11 +38,6 @@ public class StreamListPresenter implements StreamListContract.Presenter, Respon
 
     @Override
     public void unsubscribe() {
-        //TODO
-    }
-
-    @Override
-    public void callback(List<Stream> list) {
-        mStreamListView.displayStreamList(list);
+        if (mDisposable != null) mDisposable.dispose();
     }
 }

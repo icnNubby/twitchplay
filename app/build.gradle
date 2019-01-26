@@ -16,6 +16,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
 }
 
 dependencies {
@@ -32,6 +36,7 @@ dependencies {
     implementation dependencies.rxjava
     implementation dependencies.retrofit
     implementation dependencies.retrofit_converters
+    implementation dependencies.retrofit_rxjava_adapter
     implementation dependencies.gson
 
     testImplementation 'junit:junit:4.12'
