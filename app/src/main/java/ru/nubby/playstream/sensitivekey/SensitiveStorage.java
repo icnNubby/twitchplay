@@ -6,4 +6,5 @@ public final class SensitiveStorage {
     public static String getClientApiKey() {
         return clientApiKey;
     }
+
 }
