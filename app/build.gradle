@@ -31,6 +31,7 @@ dependencies {
     implementation dependencies.cardview
     implementation dependencies.design
     implementation dependencies.okhttp
+    implementation dependencies.okhttp_interceptor
     implementation dependencies.constraint
     implementation dependencies.rxandroid
     implementation dependencies.rxjava

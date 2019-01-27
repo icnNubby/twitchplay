@@ -9,6 +9,6 @@ import ru.nubby.playstream.model.Token;
 
 public interface TwitchStreamUrl {
     @GET("channels/{streamId}/access_token")
-    Observable<Token> token(@Header("Client-ID") String clientId, @Path("streamId") String streamId);
+    Observable<Token> token(@Header("client-id") String clientId, @Path("streamId") String streamId);
 }
 

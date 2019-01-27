@@ -38,7 +38,7 @@ public class StreamPresenter implements StreamContract.Presenter {
         RemoteStreamFullInfo info = new RemoteStreamFullInfo();
         mDisposable = info.getVideoUrl(stream)
                 .subscribe(x -> mStreamView.displayStream(x),
-                        e -> Log.e("StreamPresenter", "Error while fetching ", e));
+                        e -> Log.e("StreamPresenter", "Error while fetching " + e, e));
     }
 
     @Override

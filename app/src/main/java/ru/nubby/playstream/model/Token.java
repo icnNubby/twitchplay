@@ -13,7 +13,7 @@ public class Token {
     @Expose
     private String sig;
 
-    @SerializedName("mobileRestricted")
+    @SerializedName("mobile_restricted")
     @Expose
     private boolean mobileRestricted;
 
