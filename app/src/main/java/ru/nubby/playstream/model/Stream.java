@@ -11,7 +11,7 @@ public class Stream { //TODO implement all models + GSON convertation obv
 
     @SerializedName("user_name")
     @Expose
-    private String streamerName;
+    private String streamerName; //TODO deal with chinese streams
 
 
     private String description;

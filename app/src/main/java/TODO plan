@@ -1,0 +1,12 @@
+// TODO !!!!LIST!!!!
+implement chat fragment
+implement stream fragment + chat fragment together in 1 activity (should work correctly in landscape
+and portrait mode)
+    3 modes (fullscreen and chat+video and chatonly)
+    controls on player: fullscreen button, sleepmode button, goback button
+    dont destroy player on rotation!
+implement authorization via twitch oAuth.
+    update local caches w favourite streams
+
+implement custom setting
+    ex default quality, prob w list of nonstandart qualities if set for concrete streamer

@@ -1,6 +1,8 @@
 package ru.nubby.playstream.stream;
 
+import android.app.ActionBar;
 import android.os.Bundle;
+import android.view.View;
 
 import com.google.gson.Gson;
 
@@ -36,6 +38,12 @@ public class StreamActivity extends AppCompatActivity {
             jsonStream = extras.getString("stream_json");
         }
         Stream currentStream = new Gson().fromJson(jsonStream, Stream.class);
+
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) actionBar.hide();
 
         mPresenter = new StreamPresenter(fragmentStreamList, currentStream);
 

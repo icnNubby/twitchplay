@@ -40,6 +40,8 @@ dependencies {
     implementation dependencies.retrofit_converter_scalar
     implementation dependencies.retrofit_rxjava_adapter
     implementation dependencies.gson
+    implementation dependencies.m3u8parse
+    implementation dependencies.exoplayer
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

@@ -4,8 +4,8 @@ import android.util.Log;
 
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.model.Stream;
-import ru.nubby.playstream.net.RemoteStreamList;
-import ru.nubby.playstream.net.Repository;
+import ru.nubby.playstream.twitchapi.RemoteStreamList;
+import ru.nubby.playstream.twitchapi.Repository;
 
 public class StreamListPresenter implements StreamListContract.Presenter {
     private StreamListContract.View mStreamListView;

@@ -1,4 +1,4 @@
-package ru.nubby.playstream.net.retrofitinterfaces;
+package ru.nubby.playstream.twitchapi.services;
 
 
 import io.reactivex.Observable;
@@ -10,5 +10,5 @@ import retrofit2.http.Url;
 
 public interface RawJsonService {
     @GET()
-    Observable<String> rawJson(@Header("client-id") String clientId,@Url String path);
+    Observable<String> getRawJsonFromPath(@Header("client-id") String clientId, @Url String path);
 }

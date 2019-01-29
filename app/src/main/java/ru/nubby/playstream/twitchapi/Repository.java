@@ -1,4 +1,4 @@
-package ru.nubby.playstream.net;
+package ru.nubby.playstream.twitchapi;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import ru.nubby.playstream.model.Stream;
 public interface Repository {
     /**
      * Gets stream list from remote or local(cached) repository
-     * @returns Observable(List(Stream))
+     * @return list of top streams
      */
     Observable<List<Stream>> getStreams();
 }

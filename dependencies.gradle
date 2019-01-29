@@ -23,6 +23,7 @@ ext {
     rxandroid_version = '2.1.0'
     retrofit_version = '2.5.0'
     gson_version = '2.8.5'
+    exoplayer_version = '2.9.3'
 
     // other
     okhttp_version = '3.11.0'
@@ -30,10 +31,13 @@ ext {
     // testing
     junit_version = '4.12'
 
+
     app_dependencies = [
             appcompat: "androidx.appcompat:appcompat:$support_version",
             cardview: "androidx.cardview:cardview:$support_version",
             design: "com.google.android.material:material:$design_version",
+            constraint: "androidx.constraintlayout:constraintlayout:$constraint_version",
+            //net
             okhttp: "com.squareup.okhttp3:okhttp:$okhttp_version",
             okhttp_interceptor: "com.squareup.okhttp3:logging-interceptor:$okhttp_version",
             retrofit: "com.squareup.retrofit2:retrofit:$retrofit_version",
@@ -41,7 +45,12 @@ ext {
             retrofit_converter_scalar: "com.squareup.retrofit2:converter-scalars:$retrofit_version",
             retrofit_rxjava_adapter: "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version",
             gson: "com.google.code.gson:gson:$gson_version",
-            constraint: "androidx.constraintlayout:constraintlayout:$constraint_version",
+            //rx
             rxandroid: "io.reactivex.rxjava2:rxjava:$rxjava_version",
-            rxjava: "io.reactivex.rxjava2:rxandroid:$rxandroid_version"]
+            rxjava: "io.reactivex.rxjava2:rxandroid:$rxandroid_version",
+            //parsing m3u8 playlists
+            m3u8parse: "io.lindstrom:m3u8-parser:0.6",
+            //exoplayer
+            exoplayer: "com.google.android.exoplayer:exoplayer:$exoplayer_version"
+    ]
 }

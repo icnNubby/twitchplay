@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">playstream</string>
+
+    <string-array name="quality_list">
+        <item string="quality_108060">1080x60</item>
+        <item string="quality_108030">1080x30</item>
+        <item string="quality_72060">720x60</item>
+        <item string="quality_72030">720x30</item>
+        <item string="quality_480">480</item>
+        <item string="quality_360">360</item>
+        <item string="quality_240">240</item>
+        <item string="quality_audio_only">audio only</item>
+        <item string="quality_default">default</item>
+    </string-array>
+
 </resources>
