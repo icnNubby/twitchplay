@@ -9,6 +9,7 @@ import ru.nubby.playstream.model.Stream;
 public interface StreamContract {
     interface View extends BaseView<Presenter> {
         void displayStream(String url);
+        boolean hasPresenterAttached();
     }
 
     interface Presenter extends BasePresenter {

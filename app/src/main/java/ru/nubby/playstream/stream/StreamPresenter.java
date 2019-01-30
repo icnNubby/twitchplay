@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.twitchapi.RemoteStreamFullInfo;
 import ru.nubby.playstream.utils.Quality;
 
-public class StreamPresenter implements StreamContract.Presenter {
+public class StreamPresenter implements StreamContract.Presenter, LifecycleObserver {
 
     private StreamContract.View mStreamView;
     private Stream mStream;
