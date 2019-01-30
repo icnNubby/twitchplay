@@ -1,9 +1,11 @@
 package ru.nubby.playstream.stream;
 
-import android.app.ActionBar;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import com.google.gson.Gson;
 
@@ -18,11 +20,17 @@ import ru.nubby.playstream.model.Stream;
  */
 public class StreamActivity extends AppCompatActivity {
 
+    private FrameLayout mChatContainer;
+    private FrameLayout mPlayerContainer;
+    private LinearLayout mStreamLinearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stream);
+        mChatContainer = findViewById(R.id.fragment_chat_container);
+        mPlayerContainer = findViewById(R.id.fragment_player_container);
+        mStreamLinearLayout = findViewById(R.id.fragment_stream_linear_layout);
 
 
         StreamFragment streamFragment = (StreamFragment) getSupportFragmentManager()
@@ -70,6 +78,7 @@ public class StreamActivity extends AppCompatActivity {
                         hideSystemUI();
                     }
                 });
+        setWindowMode(getResources().getConfiguration().orientation);
     }
 
 
@@ -96,13 +105,45 @@ public class StreamActivity extends AppCompatActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        //TODO think how to implement rotate without getting fucked by reattaching player to new surface
+        setWindowMode(newConfig.orientation);
     }
+
+
 
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
             hideSystemUI();
+        }
+    }
+
+    private void setWindowMode(int screenOrientation) {
+        switch (screenOrientation) {
+            case Configuration.ORIENTATION_LANDSCAPE:{
+                mStreamLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
+                mPlayerContainer.setLayoutParams(new LinearLayout.LayoutParams(
+                        0,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        5));
+                mChatContainer.setLayoutParams(new LinearLayout.LayoutParams(
+                        0,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        2));
+                mChatContainer.setVisibility(View.GONE);
+                break;
+            }
+            case Configuration.ORIENTATION_PORTRAIT: {
+                mStreamLinearLayout.setOrientation(LinearLayout.VERTICAL);
+                mPlayerContainer.setLayoutParams(new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        0));
+                mChatContainer.setLayoutParams(new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        0));
+                mChatContainer.setVisibility(View.VISIBLE);
+            }
         }
     }
 

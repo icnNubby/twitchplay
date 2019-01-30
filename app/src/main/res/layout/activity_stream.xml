@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
+    android:id="@+id/fragment_stream_linear_layout"
     tools:context=".stream.StreamActivity"
     android:baselineAligned="false">
 

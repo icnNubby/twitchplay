@@ -17,6 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".stream.StreamActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.AppCompat.NoActionBar"/>
     </application>
 
