@@ -5,6 +5,9 @@ and portrait mode)
     3 modes (fullscreen and chat+video and chatonly)
     controls on player: fullscreen button, sleepmode button, goback button
     dont destroy player on rotation!
+
+    think about player stretches to fix small emptyspaces on the sides/topbot in portrait and landscape modes
+
 implement authorization via twitch oAuth.
     update local caches w favourite streams
 

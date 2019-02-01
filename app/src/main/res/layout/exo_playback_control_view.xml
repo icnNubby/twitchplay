@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    >
+    android:id="@+id/exo_content_frame">
 
     <ImageButton android:id="@id/exo_play"
         android:layout_width="50dp"
@@ -25,6 +26,15 @@
         android:layout_margin="16dp"
         android:background="?android:selectableItemBackground"
         android:src="@drawable/exo_controls_fullscreen_enter"/>
+
+    <ImageButton
+        android:id="@+id/qualities_menu"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp"
+        android:background="?android:selectableItemBackground"
+        android:src="@android:drawable/ic_menu_help" />
 
 </FrameLayout>
 

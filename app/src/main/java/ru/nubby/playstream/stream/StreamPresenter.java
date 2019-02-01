@@ -3,6 +3,8 @@ package ru.nubby.playstream.stream;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -19,7 +21,7 @@ public class StreamPresenter implements StreamContract.Presenter, LifecycleObser
     private Stream mStream;
     private Disposable mDisposable;
     private HashMap<Quality, String> mQualityUrls;
-    private List<Quality> mQualities;
+    private ArrayList<Quality> mQualities;
 
     public StreamPresenter(StreamContract.View streamView, Stream stream) {
         this.mStreamView = streamView;
@@ -39,6 +41,12 @@ public class StreamPresenter implements StreamContract.Presenter, LifecycleObser
     }
 
     @Override
+    public void playChosenQuality(Quality quality) {
+        String url = mQualityUrls.get(quality);
+        mStreamView.displayStream(url);
+    }
+
+    @Override
     public void pauseStream() {
 
     }
@@ -50,6 +58,8 @@ public class StreamPresenter implements StreamContract.Presenter, LifecycleObser
                 .subscribe(fetchedQualityTable -> {
                             mQualityUrls = fetchedQualityTable;
                             mQualities = new ArrayList<>(mQualityUrls.keySet());
+                            Collections.sort(mQualities);
+                            mStreamView.setQualitiesMenu(mQualities);
                             int original = mQualities.indexOf(Quality.QUALITY72030); //TODO get from prefs
                             original = original >= 0? original:0;
                             if (!mQualities.isEmpty()) {

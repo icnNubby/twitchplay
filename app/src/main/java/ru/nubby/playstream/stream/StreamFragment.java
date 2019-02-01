@@ -1,48 +1,63 @@
 package ru.nubby.playstream.stream;
 
-import android.app.ActionBar;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.MediaController;
+import android.widget.PopupMenu;
 
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
-import com.google.android.exoplayer2.source.hls.playlist.DefaultHlsPlaylistParserFactory;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
+import java.util.HashMap;
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import ru.nubby.playstream.R;
+import ru.nubby.playstream.uihelpers.OnSwipeTouchListener;
+import ru.nubby.playstream.utils.Quality;
 
-public class StreamFragment extends Fragment implements StreamContract.View {
+public class StreamFragment extends Fragment implements StreamContract.View, PopupMenu.OnMenuItemClickListener {
 
-    private final static String BUNDLE_FULLSCREEN_ON = "fullscreen_on";
+
+    public interface StreamActivityCallbacks {
+        void toggleFullscreen(boolean fullscreenOn);
+        boolean getFullscreenState();
+    }
 
     private StreamContract.Presenter mPresenter;
     private PlayerView mVideoView;
     private ExoPlayer mExoPlayer;
     private ImageButton mFullscreenToggle;
-    private boolean fullscreenOn;
+    private ImageButton mQualityMenuButton;
+    private PopupMenu mResolutionsMenu;
 
+    private StreamActivityCallbacks mActivityCallbacks;
+
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        Quality quality = Quality.values()[item.getItemId()];
+        mPresenter.playChosenQuality(quality);
+        return true;
+    }
 
     public static StreamFragment newInstance() {
 
@@ -51,27 +66,6 @@ public class StreamFragment extends Fragment implements StreamContract.View {
         StreamFragment fragment = new StreamFragment();
         fragment.setArguments(args);
         return fragment;
-    }
-
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View fragmentView = inflater.inflate(R.layout.fragment_stream, container, false);
-        mVideoView = fragmentView.findViewById(R.id.stream_player);
-        if (mExoPlayer == null)
-            mExoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity());
-        mVideoView.setPlayer(mExoPlayer);
-        mFullscreenToggle = fragmentView.findViewById(R.id.fullscreen_toggle);
-        mFullscreenToggle.setOnClickListener(v -> {
-            toggleFullscreen(fullscreenOn);
-        });
-        if (savedInstanceState != null) {
-            fullscreenOn = savedInstanceState.getBoolean(BUNDLE_FULLSCREEN_ON);
-            redrawFullscreenButton();
-        }
-        setRetainInstance(true);
-        return fragmentView;
     }
 
     @Override
@@ -106,21 +100,59 @@ public class StreamFragment extends Fragment implements StreamContract.View {
     }
 
     @Override
+    public void setQualitiesMenu(List<Quality> qualities) {
+        mResolutionsMenu = new PopupMenu(getActivity(), mQualityMenuButton);
+        for (Quality quality: qualities)
+            mResolutionsMenu.getMenu().add(
+                    1,
+                    quality.ordinal(),
+                    0,
+                    quality.getQualityShortName(getActivity()));
+        mResolutionsMenu.setOnMenuItemClickListener(this);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View fragmentView = inflater.inflate(R.layout.fragment_stream, container, false);
+        mVideoView = fragmentView.findViewById(R.id.stream_player);
+        if (mExoPlayer == null)
+            mExoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity());
+        mVideoView.setPlayer(mExoPlayer);
+
+        mFullscreenToggle = fragmentView.findViewById(R.id.fullscreen_toggle);
+        mFullscreenToggle.setOnClickListener(v -> mActivityCallbacks.toggleFullscreen(!mActivityCallbacks.getFullscreenState()));
+
+        mQualityMenuButton = fragmentView.findViewById(R.id.qualities_menu);
+        mQualityMenuButton.setOnClickListener(v -> mResolutionsMenu.show());
+
+        setRetainInstance(true);
+        return fragmentView;
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
+        mExoPlayer.setPlayWhenReady(true);
+    }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mActivityCallbacks = (StreamActivityCallbacks) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mActivityCallbacks = null;
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mVideoView.onPause();
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(BUNDLE_FULLSCREEN_ON, fullscreenOn);
+        mExoPlayer.setPlayWhenReady(false);
     }
 
     @Override
@@ -134,23 +166,19 @@ public class StreamFragment extends Fragment implements StreamContract.View {
         mPresenter = presenter;
     }
 
-    private void toggleFullscreen(boolean fullscreenIsOn) {
-        if (!fullscreenIsOn) {
+    public void toggleFullscreen(boolean currentModeFullscreenOn) {
+        if (currentModeFullscreenOn) {
             //turn on fullscreen, rotate to landscape, hide chat
-            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
             mVideoView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
-
         } else {
             //turn off fullscreen
-            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
             mVideoView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
         }
-        fullscreenOn = !fullscreenOn;
-        redrawFullscreenButton();
+        redrawFullscreenButton(currentModeFullscreenOn);
     }
 
-    private void redrawFullscreenButton() {
-        if (fullscreenOn) {
+    private void redrawFullscreenButton(boolean currentModeFullscreenOn) {
+        if (currentModeFullscreenOn) {
             mFullscreenToggle.setImageDrawable(
                     getResources().getDrawable(R.drawable.exo_controls_fullscreen_exit));
         } else {
@@ -159,13 +187,3 @@ public class StreamFragment extends Fragment implements StreamContract.View {
         }
     }
 }
-/*
-* ТЗ
-    при включенном фуллскрине
-        Фрагмент чата справа(можно скрыть), ориентация залочена на лендскейп, включены повороты на 180 соответственно.
-    при выключенном фуллскрине
-        фрагмент чата снизу при портрете
-        фрагмент чата справа при лендскейпе(можно скрыть)
-        повороты по 90 градусов.
-    реализовать переход от сплитскрина на 2 фрагмента до фуллскрина в лендскейпе по свайпу + по кнопке справа.
-	*/

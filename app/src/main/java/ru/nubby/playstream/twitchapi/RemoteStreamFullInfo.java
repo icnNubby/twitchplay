@@ -47,7 +47,7 @@ public class RemoteStreamFullInfo {
                         .getInstance()
                         .getRawJsonService()
                         .getRawJsonFromPath(SensitiveStorage.getClientApiKey(), urlToGetStreamPlaylist)
-                        .map(playlist -> M3U8Parser.parseTwitchApiResponse(playlist))
+                        .map(M3U8Parser::parseTwitchApiResponse)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread()));
     }
