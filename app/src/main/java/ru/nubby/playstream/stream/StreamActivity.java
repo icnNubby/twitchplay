@@ -238,13 +238,13 @@ public class StreamActivity extends AppCompatActivity implements StreamFragment.
                 mPlayerContainer.setLayoutParams(
                         new LinearLayout.LayoutParams(
                                 ViewGroup.LayoutParams.MATCH_PARENT,
-                                0,
-                                1));
+                                ViewGroup.LayoutParams.WRAP_CONTENT,
+                                0));
                 mChatContainer.setLayoutParams(
                         new LinearLayout.LayoutParams(
                                 ViewGroup.LayoutParams.MATCH_PARENT,
-                                0,
-                                2));
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                0));
                 mChatContainer.setVisibility(View.VISIBLE);
             }
         }

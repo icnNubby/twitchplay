@@ -67,7 +67,7 @@ public class StreamPresenter implements StreamContract.Presenter, LifecycleObser
                             }
                         },
                         e -> Log.e("StreamPresenter", "Error while fetching quality urls " + e, e));
-        //todo error prosessiing in view
+        //todo error processing in view
     }
 
     @Override

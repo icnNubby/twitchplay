@@ -34,7 +34,7 @@
         android:layout_gravity="top|end"
         android:layout_margin="16dp"
         android:background="?android:selectableItemBackground"
-        android:src="@android:drawable/ic_menu_help" />
+        android:src="@drawable/settings" />
 
 </FrameLayout>
 

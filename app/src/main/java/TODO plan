@@ -4,12 +4,30 @@ implement stream fragment + chat fragment together in 1 activity (should work co
 and portrait mode)
     3 modes (fullscreen and chat+video and chatonly)
     controls on player: fullscreen button, sleepmode button, goback button
-    dont destroy player on rotation!
 
-    think about player stretches to fix small emptyspaces on the sides/topbot in portrait and landscape modes
+    think about player stretches to fix small emptyspaces on the sides/topbot
+    in portrait and landscape modes
+
+buffering show
+change backgrounds colors overall
+maybe implement chatfragment to overlap stream
+
+----------------------------------------------------------------------------------------------------
 
 implement authorization via twitch oAuth.
     update local caches w favourite streams
 
 implement custom setting
     ex default quality, prob w list of nonstandart qualities if set for concrete streamer
+
+pagination
+
+
+----------------------------------------------------------------------------------------------------
+far far away plans:
+    favourite streamers local and remote
+    sync them on authorize (?) and setting for that in settings
+
+    settings
+        pref quality
+
