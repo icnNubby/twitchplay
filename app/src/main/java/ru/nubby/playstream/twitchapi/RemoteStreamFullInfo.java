@@ -12,6 +12,7 @@ import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.utils.M3U8Parser;
 import ru.nubby.playstream.utils.Quality;
 
+//TODO rethink about transforming observable into single.
 public class RemoteStreamFullInfo {
 
     /**
@@ -28,7 +29,6 @@ public class RemoteStreamFullInfo {
                 .getAccessToken(SensitiveStorage.getClientApiKey(),
                         stream.getStreamerName().toLowerCase())
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .map(token -> String.format("%s.m3u8" +
                                 "?token=%s" +
                                 "&sig=%s" +
@@ -38,17 +38,18 @@ public class RemoteStreamFullInfo {
                                 "&type=any" +
                                 "&p=%s",
                         stream.getStreamerName().toLowerCase(),
-                        URLEncoder.encode(token.getToken(),"UTF-8")
-                                .replaceAll("%3A",":")
-                                .replaceAll("%2C",","),
+                        URLEncoder.encode(token.getToken(), "UTF-8")
+                                .replaceAll("%3A", ":")
+                                .replaceAll("%2C", ","),
                         token.getSig(),
                         "" + new Random().nextInt(6)))
                 .flatMap(urlToGetStreamPlaylist -> TwitchApi
                         .getInstance()
                         .getRawJsonService()
                         .getRawJsonFromPath(SensitiveStorage.getClientApiKey(), urlToGetStreamPlaylist)
-                        .map(M3U8Parser::parseTwitchApiResponse)
                         .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.computation())
+                        .map(M3U8Parser::parseTwitchApiResponse)
                         .observeOn(AndroidSchedulers.mainThread()));
     }
 

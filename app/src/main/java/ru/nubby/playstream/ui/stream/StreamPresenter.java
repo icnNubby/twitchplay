@@ -1,14 +1,11 @@
-package ru.nubby.playstream.stream;
+package ru.nubby.playstream.ui.stream;
 
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.model.Stream;
@@ -27,12 +24,11 @@ public class StreamPresenter implements StreamContract.Presenter, LifecycleObser
         this.mStreamView = streamView;
         mStream = stream;
         streamView.setPresenter(this);
-        playStream(mStream);
     }
 
     @Override
     public void subscribe() {
-        //TODO
+        playStream(mStream);
     }
 
     @Override
@@ -54,14 +50,18 @@ public class StreamPresenter implements StreamContract.Presenter, LifecycleObser
     @Override
     public void playStream(Stream stream) {
         RemoteStreamFullInfo info = new RemoteStreamFullInfo();
-        mDisposable = info.getVideoUrl(stream)
+        if (mDisposable != null && !mDisposable.isDisposed()) {
+            mDisposable.dispose();
+        }
+        mDisposable = info
+                .getVideoUrl(stream)
                 .subscribe(fetchedQualityTable -> {
                             mQualityUrls = fetchedQualityTable;
                             mQualities = new ArrayList<>(mQualityUrls.keySet());
                             Collections.sort(mQualities);
                             mStreamView.setQualitiesMenu(mQualities);
                             int original = mQualities.indexOf(Quality.QUALITY72030); //TODO get from prefs
-                            original = original >= 0? original:0;
+                            original = original >= 0? original: 0;
                             if (!mQualities.isEmpty()) {
                                 mStreamView.displayStream(mQualityUrls.get(mQualities.get(original)));
                             }

@@ -1,4 +1,4 @@
-package ru.nubby.playstream.streamlist;
+package ru.nubby.playstream.ui.streamlist;
 
 import android.util.Log;
 
@@ -8,6 +8,8 @@ import ru.nubby.playstream.twitchapi.RemoteStreamList;
 import ru.nubby.playstream.twitchapi.Repository;
 
 public class StreamListPresenter implements StreamListContract.Presenter {
+    private static final String TAG = "StreamListPresenter";
+
     private StreamListContract.View mStreamListView;
     private Disposable mDisposable;
 
@@ -20,8 +22,8 @@ public class StreamListPresenter implements StreamListContract.Presenter {
     public void addMoreStreams() {
         Repository internet = new RemoteStreamList(); //TODO INJECT
         mDisposable = internet.getStreams()
-                .subscribe(x -> mStreamListView.displayStreamList(x),
-                        e -> Log.e("STREAM PRESENTER", "Error while fetching streams", e));
+                .subscribe(streams -> mStreamListView.displayStreamList(streams),
+                        e -> Log.e(TAG, "Error while fetching streams", e));
     }
 
     @Override

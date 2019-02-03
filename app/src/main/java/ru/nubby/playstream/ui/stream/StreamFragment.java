@@ -1,7 +1,6 @@
-package ru.nubby.playstream.stream;
+package ru.nubby.playstream.ui.stream;
 
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 
@@ -24,14 +22,12 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
-import java.util.HashMap;
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.uihelpers.OnSwipeTouchListener;
 import ru.nubby.playstream.utils.Quality;
 
 public class StreamFragment extends Fragment implements StreamContract.View, PopupMenu.OnMenuItemClickListener {
@@ -124,7 +120,10 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
         mFullscreenToggle.setOnClickListener(v -> mActivityCallbacks.toggleFullscreen(!mActivityCallbacks.getFullscreenState()));
 
         mQualityMenuButton = fragmentView.findViewById(R.id.qualities_menu);
-        mQualityMenuButton.setOnClickListener(v -> mResolutionsMenu.show());
+        mQualityMenuButton.setOnClickListener(v -> {
+            if (mResolutionsMenu!=null)
+                mResolutionsMenu.show();
+        });
 
         setRetainInstance(true);
         return fragmentView;
@@ -133,6 +132,7 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
     @Override
     public void onResume() {
         super.onResume();
+        mPresenter.subscribe();
         mExoPlayer.setPlayWhenReady(true);
     }
 
@@ -151,6 +151,7 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
     @Override
     public void onPause() {
         super.onPause();
+        mPresenter.unsubscribe();
         mVideoView.onPause();
         mExoPlayer.setPlayWhenReady(false);
     }

@@ -1,10 +1,9 @@
-package ru.nubby.playstream.stream;
+package ru.nubby.playstream.ui.stream;
 
-import java.util.HashMap;
 import java.util.List;
 
-import ru.nubby.playstream.BasePresenter;
-import ru.nubby.playstream.BaseView;
+import ru.nubby.playstream.ui.BasePresenter;
+import ru.nubby.playstream.ui.BaseView;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.utils.Quality;
 

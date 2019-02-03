@@ -1,11 +1,10 @@
-package ru.nubby.playstream.streamlist;
+package ru.nubby.playstream.ui.streamlist;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -20,7 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.model.Stream;
-import ru.nubby.playstream.stream.StreamActivity;
+import ru.nubby.playstream.ui.stream.StreamActivity;
 
 public class StreamListFragment extends Fragment implements StreamListContract.View {
 
@@ -56,8 +55,8 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onDestroy() {
+        super.onDestroy();
         mPresenter.unsubscribe();
     }
 

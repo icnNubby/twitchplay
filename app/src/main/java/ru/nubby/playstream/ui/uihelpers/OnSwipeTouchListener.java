@@ -1,4 +1,4 @@
-package ru.nubby.playstream.uihelpers;
+package ru.nubby.playstream.ui.uihelpers;
 
 import android.content.Context;
 import android.util.Log;
@@ -6,7 +6,6 @@ import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 
 public class OnSwipeTouchListener implements View.OnTouchListener  {
 

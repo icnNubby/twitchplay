@@ -1,4 +1,4 @@
-package ru.nubby.playstream.stream;
+package ru.nubby.playstream.ui.stream;
 
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -16,10 +16,10 @@ import com.google.gson.Gson;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.chat.ChatFragment;
-import ru.nubby.playstream.chat.ChatPresenter;
+import ru.nubby.playstream.ui.chat.ChatFragment;
+import ru.nubby.playstream.ui.chat.ChatPresenter;
 import ru.nubby.playstream.model.Stream;
-import ru.nubby.playstream.uihelpers.OnSwipeTouchListener;
+import ru.nubby.playstream.ui.uihelpers.OnSwipeTouchListener;
 
 /**
  * Should be called with extra JSON : gsonned model.Stream object
@@ -102,7 +102,7 @@ public class StreamActivity extends AppCompatActivity implements StreamFragment.
             new StreamPresenter(streamFragment, currentStream);
         }
         if (!chatFragment.hasPresenterAttached()) {
-            new ChatPresenter(chatFragment);
+            new ChatPresenter(chatFragment, currentStream);
         }
 
         View decorView = getWindow().getDecorView();

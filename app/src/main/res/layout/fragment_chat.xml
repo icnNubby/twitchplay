@@ -3,10 +3,12 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <TextView
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="CHAT"
-        android:gravity="center"
-        android:textSize="30sp"/>
+        android:id="@+id/chat_messages_recyclerview"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp">
+
+    </androidx.recyclerview.widget.RecyclerView>
 </LinearLayout>

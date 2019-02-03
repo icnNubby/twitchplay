@@ -1,4 +1,4 @@
-package ru.nubby.playstream.streamlist;
+package ru.nubby.playstream.ui.streamlist;
 
 import android.os.Bundle;
 

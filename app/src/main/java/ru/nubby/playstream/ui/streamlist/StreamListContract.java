@@ -1,9 +1,9 @@
-package ru.nubby.playstream.streamlist;
+package ru.nubby.playstream.ui.streamlist;
 
 import java.util.List;
 
-import ru.nubby.playstream.BasePresenter;
-import ru.nubby.playstream.BaseView;
+import ru.nubby.playstream.ui.BasePresenter;
+import ru.nubby.playstream.ui.BaseView;
 import ru.nubby.playstream.model.Stream;
 
 public interface StreamListContract {

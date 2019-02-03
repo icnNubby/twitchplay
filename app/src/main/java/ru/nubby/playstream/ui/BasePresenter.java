@@ -1,4 +1,4 @@
-package ru.nubby.playstream;
+package ru.nubby.playstream.ui;
 
 public interface BasePresenter {
 
