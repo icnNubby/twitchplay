@@ -3,6 +3,9 @@ package ru.nubby.playstream.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Token info, we need it to get the M3U8 playlist
+ */
 public class Token {
 
     @SerializedName("token")

@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.model.Stream;
-import ru.nubby.playstream.ui.stream.StreamActivity;
+import ru.nubby.playstream.ui.stream.StreamChatActivity;
 
 public class StreamListFragment extends Fragment implements StreamListContract.View {
 
@@ -91,7 +91,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
 
         @Override
         public void onClick(View v) {
-            Intent startStream = new Intent(getContext(), StreamActivity.class);
+            Intent startStream = new Intent(getContext(), StreamChatActivity.class);
             //TODO fix to some constant
             startStream.putExtra("stream_json", new Gson().toJson(mStream)); // SLOW, YES
             startActivity(startStream );

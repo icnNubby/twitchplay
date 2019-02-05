@@ -1,13 +1,13 @@
-package ru.nubby.playstream.ui.chat;
+package ru.nubby.playstream.ui.stream.chat;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -19,9 +19,11 @@ import ru.nubby.playstream.R;
 import ru.nubby.playstream.model.ChatMessage;
 
 public class ChatFragment extends Fragment implements ChatContract.View {
+    private final int MESSAGE_CAPACITY = 100; // TODO get from prefs
+
     private ChatContract.Presenter mPresenter;
     private RecyclerView mChatRecyclerview;
-    private final int MESSAGE_CAPACITY = 100; // TODO get from prefs
+    private ProgressBar mProgressBar;
 
     public static ChatFragment newInstance() {
 
@@ -39,6 +41,7 @@ public class ChatFragment extends Fragment implements ChatContract.View {
         mChatRecyclerview = fragmentView.findViewById(R.id.chat_messages_recyclerview);
         mChatRecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
         mChatRecyclerview.setAdapter(new ChatMessagesAdapter(new ArrayList<>()));
+        mProgressBar = fragmentView.findViewById(R.id.stream_buffer_chat_progressbar);
         setRetainInstance(true);
         return fragmentView;
     }
@@ -69,6 +72,17 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     public void addChatMessage(ChatMessage message) {
         ChatMessagesAdapter chatMessagesAdapter = (ChatMessagesAdapter) mChatRecyclerview.getAdapter();
         if (chatMessagesAdapter!= null) chatMessagesAdapter.addNewMessage(message);
+    }
+
+    @Override
+    public void displayLoading(boolean loadingState) {
+        mProgressBar.setIndeterminate(loadingState);
+        if (loadingState) {
+            mProgressBar.setVisibility(View.VISIBLE);
+        }
+        else {
+            mProgressBar.setVisibility(View.GONE);
+        }
     }
 
     private class ChatMessagesViewHolder extends RecyclerView.ViewHolder {

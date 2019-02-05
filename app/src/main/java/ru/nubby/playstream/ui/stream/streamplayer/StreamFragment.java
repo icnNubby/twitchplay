@@ -1,4 +1,4 @@
-package ru.nubby.playstream.ui.stream;
+package ru.nubby.playstream.ui.stream.streamplayer;
 
 import android.content.Context;
 import android.graphics.PixelFormat;
@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -44,6 +45,7 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
     private ImageButton mFullscreenToggle;
     private ImageButton mQualityMenuButton;
     private PopupMenu mResolutionsMenu;
+    private ProgressBar mProgressBar;
 
     private StreamActivityCallbacks mActivityCallbacks;
 
@@ -107,6 +109,17 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
         mResolutionsMenu.setOnMenuItemClickListener(this);
     }
 
+    @Override
+    public void displayLoading(boolean loadingState) {
+        mProgressBar.setIndeterminate(loadingState);
+        if (loadingState) {
+            mProgressBar.setVisibility(View.VISIBLE);
+        }
+        else {
+            mProgressBar.setVisibility(View.GONE);
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -115,15 +128,18 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
         if (mExoPlayer == null)
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity());
         mVideoView.setPlayer(mExoPlayer);
+        mVideoView.setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS);
 
         mFullscreenToggle = fragmentView.findViewById(R.id.fullscreen_toggle);
         mFullscreenToggle.setOnClickListener(v -> mActivityCallbacks.toggleFullscreen(!mActivityCallbacks.getFullscreenState()));
 
         mQualityMenuButton = fragmentView.findViewById(R.id.qualities_menu);
         mQualityMenuButton.setOnClickListener(v -> {
-            if (mResolutionsMenu!=null)
+            if (mResolutionsMenu != null)
                 mResolutionsMenu.show();
         });
+
+        mProgressBar = fragmentView.findViewById(R.id.stream_buffer_playerview_progressbar);
 
         setRetainInstance(true);
         return fragmentView;

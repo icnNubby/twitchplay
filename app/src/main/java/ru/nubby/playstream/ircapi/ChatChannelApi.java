@@ -4,7 +4,6 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
@@ -13,7 +12,6 @@ import java.util.regex.Pattern;
 
 import io.reactivex.Observable;
 import ru.nubby.playstream.model.ChatMessage;
-import ru.nubby.playstream.model.Stream;
 
 public class ChatChannelApi {
     private final String TAG = getClass().getSimpleName();
@@ -22,21 +20,20 @@ public class ChatChannelApi {
     private final String twitchChatServer = "irc.twitch.tv";
     private final int twitchChatPort = 6667;
 
-    private static final Pattern stdVarPattern = Pattern.compile("color=(#?\\w*);display-name=(\\w+).*;mod=(0|1);room-id=\\d+;.*subscriber=(0|1);.*turbo=(0|1);.* PRIVMSG #\\S* :(.*)");
+    private static final Pattern stdVarPattern =
+            Pattern.compile("color=(#?\\w*);display-name=(\\w+).*;mod=(0|1);room-id=\\d+;.*subscriber=(0|1);.*turbo=(0|1);.* PRIVMSG #\\S* :(.*)");
 
     private String user;
-    private String oauth_key;
+    private String oauthKey;
     private String channelName;
     private Socket socket;
-
-    private boolean isStopping;
 
     private BufferedWriter writer;
     private BufferedReader reader;
 
     public ChatChannelApi(String user, String oauth_key, String channelName) {
         this.user = user;
-        this.oauth_key = oauth_key;
+        this.oauthKey = oauth_key;
         this.channelName = channelName.toLowerCase();
     }
 
@@ -49,13 +46,13 @@ public class ChatChannelApi {
                     writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                     reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-                    writer.write("PASS " + oauth_key + "\r\n");
+                    writer.write("PASS " + oauthKey + "\r\n");
                     writer.write("NICK " + user + "\r\n");
                     writer.write("USER " + user + " \r\n");
                     writer.flush();
                     String line;
                     boolean connected = false;
-                    while (!isStopping && !emitter.isDisposed() && (line = reader.readLine()) != null) {
+                    while (!emitter.isDisposed() && (line = reader.readLine()) != null) {
                         if (line.contains("376") && !connected) {
                             writer.write("CAP REQ :twitch.tv/tags twitch.tv/commands" + "\r\n");
                             writer.flush();

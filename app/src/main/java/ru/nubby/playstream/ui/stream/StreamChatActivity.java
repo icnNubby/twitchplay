@@ -10,21 +10,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import io.reactivex.Single;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.ui.chat.ChatFragment;
-import ru.nubby.playstream.ui.chat.ChatPresenter;
 import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.twitchapi.RemoteStreamFullInfo;
+import ru.nubby.playstream.ui.stream.chat.ChatFragment;
+import ru.nubby.playstream.ui.stream.chat.ChatPresenter;
+import ru.nubby.playstream.ui.stream.streamplayer.StreamFragment;
+import ru.nubby.playstream.ui.stream.streamplayer.StreamPresenter;
 import ru.nubby.playstream.ui.uihelpers.OnSwipeTouchListener;
 
 /**
  * Should be called with extra JSON : gsonned model.Stream object
  */
-public class StreamActivity extends AppCompatActivity implements StreamFragment.StreamActivityCallbacks {
+public class StreamChatActivity extends AppCompatActivity implements StreamFragment.StreamActivityCallbacks {
 
     private final static String BUNDLE_FULLSCREEN_ON = "fullscreen_on";
 
@@ -34,7 +39,6 @@ public class StreamActivity extends AppCompatActivity implements StreamFragment.
     private OnSwipeTouchListener mOnSwipeTouchListener;
 
     private StreamFragment mStreamFragment;
-    private ChatFragment mChatFragment;
 
     private boolean fullscreenOn;
 
@@ -89,20 +93,33 @@ public class StreamActivity extends AppCompatActivity implements StreamFragment.
                     .commit();
         }
 
-        mChatFragment = chatFragment;
-
         String jsonStream = null;
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             jsonStream = extras.getString("stream_json");
         }
+        if (jsonStream == null) {
+            Toast.makeText(this, "No stream info provided.", Toast.LENGTH_SHORT).show();
+            // TODO string res
+            finish(); //we cant start stream from nothing
+        }
+
         Stream currentStream = new Gson().fromJson(jsonStream, Stream.class); //TODO inject?
 
+        //TODO !THINK HOW TO DECOUPLE THAT
+        Single<Stream> currentStreamUpdate = new RemoteStreamFullInfo()
+                .getStreamerInfo(currentStream)
+                .map(updatedLogin -> {
+                    currentStream.setStreamerLogin(updatedLogin);
+                    return currentStream;
+                });
+        //TODO !THINK HOW TO DECOUPLE THAT
+
         if (!streamFragment.hasPresenterAttached()) {
-            new StreamPresenter(streamFragment, currentStream);
+            new StreamPresenter(streamFragment, currentStreamUpdate);
         }
         if (!chatFragment.hasPresenterAttached()) {
-            new ChatPresenter(chatFragment, currentStream);
+            new ChatPresenter(chatFragment, currentStreamUpdate);
         }
 
         View decorView = getWindow().getDecorView();

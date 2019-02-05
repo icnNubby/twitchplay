@@ -9,13 +9,19 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 import ru.nubby.playstream.twitchapi.services.RawJsonService;
-import ru.nubby.playstream.twitchapi.services.TwitchStreamsService;
+import ru.nubby.playstream.twitchapi.services.TwitchStreamsHelixService;
+import ru.nubby.playstream.twitchapi.services.TwitchStreamsApiService;
 
 //TODO prob extract repeating path from retrofit builder to some private method, and build upon it
+/**
+ * Some of requests will not work with helix API, some will not work with old api API.
+ * after building {@link TwitchStreamsApiService} object, you should know, which endpoint it
+ */
 public class TwitchApi {
 
     private static TwitchApi mInstance;
     private static final String BASE_URL_HELIX = "https://api.twitch.tv/helix/";
+    private static final String BASE_URL_KRAKEN = "https://api.twitch.tv/kraken/";
     private static final String BASE_URL_API = "https://api.twitch.tv/api/";
     private static final String BASE_URL_USHER_HLS = "https://usher.ttvnw.net/api/channel/hls/";
     private OkHttpClient mOkHttpClient;
@@ -31,7 +37,7 @@ public class TwitchApi {
         return mInstance;
     }
 
-    public TwitchStreamsService getStreamServiceHelix() {
+    public TwitchStreamsHelixService getStreamHelixService() {
 
         return new Retrofit.Builder()
                 .baseUrl(BASE_URL_HELIX)
@@ -39,11 +45,11 @@ public class TwitchApi {
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
-                .create(TwitchStreamsService.class);
+                .create(TwitchStreamsHelixService.class);
 
     }
 
-    public TwitchStreamsService getStreamServiceApi() {
+    public TwitchStreamsApiService getStreamApiService() {
 
         return new Retrofit.Builder()
                 .baseUrl(BASE_URL_API)
@@ -51,11 +57,11 @@ public class TwitchApi {
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
-                .create(TwitchStreamsService.class);
+                .create(TwitchStreamsApiService.class);
 
     }
 
-    public RawJsonService getRawJsonService() {
+    public RawJsonService getRawJsonHlsService() {
 
         return new Retrofit.Builder()
                 .baseUrl(BASE_URL_USHER_HLS)

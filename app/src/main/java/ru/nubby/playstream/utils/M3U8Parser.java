@@ -9,13 +9,22 @@ import io.lindstrom.m3u8.model.Variant;
 import io.lindstrom.m3u8.parser.MasterPlaylistParser;
 import io.lindstrom.m3u8.parser.PlaylistParserException;
 
+/**
+ * Helper class to make non standart parsing.
+ * Uses <a href = "https://github.com/carlanton/m3u8-parser">third party library.</a>
+ */
 public class M3U8Parser {
+
+    /**
+     * Parses kinda non standart twitch M3U8 playlist.
+     * Maps it to Hastable indexed by {@link Quality}, valued by {@link String} url of HLS resource.
+     */
     public static HashMap<Quality, String> parseTwitchApiResponse(String playlist) {
         String[] lines = playlist.split("\n");
         StringBuilder fixedPlaylist = new StringBuilder();
-        for (int i = 0; i < lines.length; i++)
-            if (!lines[i].contains("#EXT-X-TWITCH-INFO")) // yeye
-                fixedPlaylist.append(lines[i]).append("\n");
+        for (String line : lines)
+            if (!line.contains("#EXT-X-TWITCH-INFO")) // yeye
+                fixedPlaylist.append(line).append("\n");
         playlist = fixedPlaylist.toString();
         MasterPlaylist parsed = null;
         MasterPlaylistParser parser = new MasterPlaylistParser();

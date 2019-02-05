@@ -5,18 +5,23 @@
     android:layout_height="match_parent"
     android:id="@+id/exo_content_frame">
 
-    <ImageButton android:id="@id/exo_play"
+    <ImageButton
+        android:id="@id/exo_play"
+        style="@style/ExoMediaButton.Play"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_gravity="center"
         android:background="#CC000000"
-        style="@style/ExoMediaButton.Play"/>
-    <ImageButton android:id="@id/exo_pause"
+        android:visibility="gone" />
+
+    <ImageButton
+        android:id="@id/exo_pause"
+        style="@style/ExoMediaButton.Pause"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_gravity="center"
         android:background="#CC000000"
-        style="@style/ExoMediaButton.Pause"/>
+        android:visibility="gone" />
 
     <ImageButton
         android:id="@+id/fullscreen_toggle"

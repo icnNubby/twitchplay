@@ -1,4 +1,4 @@
-package ru.nubby.playstream.ui.stream;
+package ru.nubby.playstream.ui.stream.streamplayer;
 
 import java.util.List;
 
@@ -12,6 +12,7 @@ public interface StreamContract {
         void displayStream(String url);
         boolean hasPresenterAttached();
         void setQualitiesMenu(List<Quality> qualities);
+        void displayLoading(boolean loadingState);
     }
 
     interface Presenter extends BasePresenter {

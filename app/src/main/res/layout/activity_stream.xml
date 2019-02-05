@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:baselineAligned="false"
     android:orientation="horizontal"
-    tools:context=".ui.stream.StreamActivity">
+    tools:context=".ui.stream.StreamChatActivity">
 
     <FrameLayout
         android:id="@+id/fragment_player_container"

@@ -1,5 +1,8 @@
 package ru.nubby.playstream.model;
 
+/**
+ * POJO to store chat messages.
+ */
 public class ChatMessage {
     private String message;
     private String user;
