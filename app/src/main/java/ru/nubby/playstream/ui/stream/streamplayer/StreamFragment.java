@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -46,6 +47,8 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
     private ImageButton mQualityMenuButton;
     private PopupMenu mResolutionsMenu;
     private ProgressBar mProgressBar;
+    private TextView mTitleTextView;
+    private TextView mViewerCountTextView;
 
     private StreamActivityCallbacks mActivityCallbacks;
 
@@ -120,6 +123,16 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
         }
     }
 
+    @Override
+    public void displayTitle(String title) {
+        if (mTitleTextView != null) mTitleTextView.setText(title);
+    }
+
+    @Override
+    public void displayViewerCount(String count) {
+        if (mViewerCountTextView != null) mViewerCountTextView.setText(count);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -138,6 +151,9 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
             if (mResolutionsMenu != null)
                 mResolutionsMenu.show();
         });
+
+        mTitleTextView = fragmentView.findViewById(R.id.text_view_stream_title);
+        mViewerCountTextView = fragmentView.findViewById(R.id.text_view_stream_viewers);
 
         mProgressBar = fragmentView.findViewById(R.id.stream_buffer_playerview_progressbar);
 

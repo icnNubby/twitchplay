@@ -45,6 +45,20 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        String jsonStream = null;
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            jsonStream = extras.getString("stream_json");
+        }
+        if (jsonStream == null) {
+            Toast.makeText(this, getText(R.string.error_no_stream_info_provided), Toast.LENGTH_SHORT).show();
+            // TODO string res
+            finish(); //we cant start stream from nothing
+        }
+        Stream currentStream = new Gson().fromJson(jsonStream, Stream.class); //TODO inject?
+
+
         setContentView(R.layout.activity_stream);
         mChatContainer = findViewById(R.id.fragment_chat_container);
         mPlayerContainer = findViewById(R.id.fragment_player_container);
@@ -92,19 +106,6 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
                     .add(R.id.fragment_chat_container, chatFragment)
                     .commit();
         }
-
-        String jsonStream = null;
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            jsonStream = extras.getString("stream_json");
-        }
-        if (jsonStream == null) {
-            Toast.makeText(this, "No stream info provided.", Toast.LENGTH_SHORT).show();
-            // TODO string res
-            finish(); //we cant start stream from nothing
-        }
-
-        Stream currentStream = new Gson().fromJson(jsonStream, Stream.class); //TODO inject?
 
         //TODO !THINK HOW TO DECOUPLE THAT
         Single<Stream> currentStreamUpdate = new RemoteStreamFullInfo()

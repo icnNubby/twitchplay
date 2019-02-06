@@ -6,20 +6,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-import androidx.lifecycle.LifecycleObserver;
 import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.twitchapi.RemoteStreamFullInfo;
 import ru.nubby.playstream.utils.Quality;
 
-public class StreamPresenter implements StreamContract.Presenter, LifecycleObserver {
+public class StreamPresenter implements StreamContract.Presenter {
     private final String TAG = "StreamPresenter";
 
     private StreamContract.View mStreamView;
     private Single<Stream> mSingleStream;
     private Disposable mDisposableStreamResolutionsInfo;
     private Disposable mDisposableStreamAdditionalInfo;
+    private Disposable mDisposableStreamInfoUpdater;
     private HashMap<Quality, String> mQualityUrls;
     private ArrayList<Quality> mQualities;
 
@@ -36,16 +37,23 @@ public class StreamPresenter implements StreamContract.Presenter, LifecycleObser
                 .subscribe(streamReturned -> {
                             playStream(streamReturned);
                             mStreamView.displayLoading(false);
+                            mStreamView.displayTitle(streamReturned.getTitle());
+                            mStreamView.displayViewerCount(streamReturned.getViewerCount());
                         },
                         error -> Log.e(TAG, "Error while fetching additional data ", error));
     }
 
     @Override
     public void unsubscribe() {
-        if (!mDisposableStreamResolutionsInfo.isDisposed())
+        if (mDisposableStreamResolutionsInfo != null && !mDisposableStreamResolutionsInfo.isDisposed()) {
             mDisposableStreamResolutionsInfo.dispose();
-        if (!mDisposableStreamAdditionalInfo.isDisposed())
+        }
+        if (mDisposableStreamAdditionalInfo != null && !mDisposableStreamAdditionalInfo.isDisposed()) {
             mDisposableStreamAdditionalInfo.dispose();
+        }
+        if (mDisposableStreamInfoUpdater != null && !mDisposableStreamInfoUpdater.isDisposed()) {
+            mDisposableStreamInfoUpdater.dispose();
+        }
     }
 
     @Override
@@ -66,6 +74,9 @@ public class StreamPresenter implements StreamContract.Presenter, LifecycleObser
             mDisposableStreamResolutionsInfo.dispose();
         }
 
+        if (mDisposableStreamInfoUpdater != null && !mDisposableStreamInfoUpdater.isDisposed()) {
+            mDisposableStreamInfoUpdater.dispose();
+        }
         RemoteStreamFullInfo info = new RemoteStreamFullInfo();
         mStreamView.displayLoading(true);
         mDisposableStreamResolutionsInfo = info
@@ -84,7 +95,17 @@ public class StreamPresenter implements StreamContract.Presenter, LifecycleObser
                             }
                             mStreamView.displayLoading(false);
                         },
-                        e -> Log.e("StreamPresenter", "Error while fetching quality urls " + e, e));
+                        error -> Log.e(TAG, "Error while fetching quality urls " + error, error));
+
+        mDisposableStreamInfoUpdater = info
+                .updateStream(stream)
+                .subscribe(streamUpdated -> {
+                            mStreamView.displayTitle(streamUpdated.getTitle());
+                            mStreamView.displayViewerCount(streamUpdated.getViewerCount());
+                        },
+                        error -> Log.e(TAG, "Error while updating stream info "
+                                + error.getMessage(), error));
+
         //todo error processing in view
     }
 

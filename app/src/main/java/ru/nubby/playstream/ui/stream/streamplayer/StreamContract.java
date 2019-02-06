@@ -13,6 +13,8 @@ public interface StreamContract {
         boolean hasPresenterAttached();
         void setQualitiesMenu(List<Quality> qualities);
         void displayLoading(boolean loadingState);
+        void displayTitle(String title);
+        void displayViewerCount(String count);
     }
 
     interface Presenter extends BasePresenter {

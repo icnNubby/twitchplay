@@ -1,27 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/exo_content_frame">
-
-    <ImageButton
-        android:id="@id/exo_play"
-        style="@style/ExoMediaButton.Play"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center"
-        android:background="#CC000000"
-        android:visibility="gone" />
-
-    <ImageButton
-        android:id="@id/exo_pause"
-        style="@style/ExoMediaButton.Pause"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center"
-        android:background="#CC000000"
-        android:visibility="gone" />
+    <TextView
+        android:id="@+id/text_view_stream_title"
+        android:maxLines="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorWhite"
+        android:gravity="top|center_horizontal"/>
+    <TextView
+        android:id="@+id/text_view_stream_viewers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorWhite"
+        android:layout_gravity="bottom|center_horizontal"
+        android:gravity="bottom|center_horizontal"/>
 
     <ImageButton
         android:id="@+id/fullscreen_toggle"

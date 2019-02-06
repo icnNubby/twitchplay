@@ -40,6 +40,10 @@ public class Stream {
     @Expose
     private String viewerCount;
 
+    @SerializedName("thumbnail_url")
+    @Expose
+    private String thumbnailUrl;
+
     public String getTitle() {
         return title;
     }
@@ -66,5 +70,9 @@ public class Stream {
 
     public void setStreamerLogin(String streamerLogin) {
         this.streamerLogin = streamerLogin;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
     }
 }

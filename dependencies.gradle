@@ -27,6 +27,7 @@ ext {
 
     // other
     okhttp_version = '3.11.0'
+    picasso_version = '2.71828'
 
     // testing
     junit_version = '4.12'
@@ -51,6 +52,8 @@ ext {
             //parsing m3u8 playlists
             m3u8parse: "io.lindstrom:m3u8-parser:0.6",
             //exoplayer
-            exoplayer: "com.google.android.exoplayer:exoplayer:$exoplayer_version"
+            exoplayer: "com.google.android.exoplayer:exoplayer:$exoplayer_version",
+            //picasso
+            picasso: "com.squareup.picasso:picasso:$picasso_version"
     ]
 }

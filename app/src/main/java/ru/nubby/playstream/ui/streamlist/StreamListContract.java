@@ -10,6 +10,7 @@ public interface StreamListContract {
 
     interface View extends BaseView<Presenter> {
         void displayStreamList(List<Stream> streams);
+        void addStreamList(List<Stream> streams);
     }
 
     interface Presenter extends BasePresenter {

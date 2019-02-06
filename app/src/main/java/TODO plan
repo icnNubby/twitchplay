@@ -5,13 +5,22 @@ and portrait mode)
     3 modes (fullscreen and chat+video and chatonly)
     controls on player: fullscreen button, sleepmode button, goback button
 
+fix chat thread dying after some waiting time
 
 change backgrounds colors overall
 maybe implement chatfragment to overlap stream
 
-implement: viewer count, title, backnav button
+backnav button
 think about better implementation of chat
 how to close bufferedreader at disposal of activity, but not on next emittion
+----------------------------------------------------------------------------------------------------
+
+implement autocloseable actionbar to get more space for preview.
+think about overall design
+
+----------------------------------------------------------------------------------------------------
+
+add dagger and dependencies injection
 
 ----------------------------------------------------------------------------------------------------
 
@@ -20,8 +29,6 @@ implement authorization via twitch oAuth.
 
 implement custom setting
     ex default quality, prob w list of nonstandart qualities if set for concrete streamer
-
-pagination
 
 ----------------------------------------------------------------------------------------------------
 far far away plans:

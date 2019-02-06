@@ -15,7 +15,7 @@ import ru.nubby.playstream.twitchapi.services.TwitchStreamsApiService;
 //TODO prob extract repeating path from retrofit builder to some private method, and build upon it
 /**
  * Some of requests will not work with helix API, some will not work with old api API.
- * after building {@link TwitchStreamsApiService} object, you should know, which endpoint it
+ * after building {@link TwitchStreamsApiService} object, you should know, which endpoint to use
  */
 public class TwitchApi {
 

@@ -34,14 +34,14 @@ public class ChatPresenter implements ChatContract.Presenter {
                             startListeningToChat(streamReturned);
                             mChatView.displayLoading(false);
                         },
-                        error -> android.util.Log.e(TAG, "Error while fetching additional data ", error));    }
+                        error -> Log.e(TAG, "Error while fetching additional data", error));    }
 
     @Override
     public void unsubscribe() {
-        if (!mChatListener.isDisposed()) mChatListener.dispose();
-        if (!mDisposableStreamAdditionalInfo.isDisposed())
+        if (mChatListener != null && !mChatListener.isDisposed()) mChatListener.dispose();
+        if (mDisposableStreamAdditionalInfo != null && !mDisposableStreamAdditionalInfo.isDisposed()) {
             mDisposableStreamAdditionalInfo.dispose();
-
+        }
     }
 
     public void startListeningToChat(Stream stream) {
@@ -58,6 +58,7 @@ public class ChatPresenter implements ChatContract.Presenter {
                                 error -> {
                                     Log.e(TAG, "Error while listening to chat", error);
                                     mChatView.addChatMessage(new ChatMessage("ERROR:", "DISCONNECTED FROM CHAT", ""));
+                                    // TODO how to get string resource w/o coupling to context
                                     startListeningToChat(stream);
                                 });
 

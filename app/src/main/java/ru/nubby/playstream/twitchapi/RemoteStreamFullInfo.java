@@ -4,16 +4,16 @@ import android.util.Log;
 
 import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.Observable;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.SensitiveStorage;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.model.Token;
-import ru.nubby.playstream.model.UserData;
 import ru.nubby.playstream.utils.M3U8Parser;
 import ru.nubby.playstream.utils.Quality;
 
@@ -72,6 +72,12 @@ public class RemoteStreamFullInfo {
                         .observeOn(AndroidSchedulers.mainThread()));
     }
 
+    /**
+     * Gets login name in latin for further queries.
+     *
+     * @param stream {@link Stream} object
+     * @return {@link Single} of login name string.
+     */
     public Single<String> getStreamerInfo(Stream stream) {
         return TwitchApi
                 .getInstance()
@@ -87,5 +93,17 @@ public class RemoteStreamFullInfo {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    public Observable<Stream> updateStream(Stream stream) {
+        return TwitchApi
+                .getInstance()
+                .getStreamHelixService()
+                .updateStream(SensitiveStorage.getClientApiKey(), stream.getUserId())
+                .subscribeOn(Schedulers.io())
+                .map(streamsRequest -> streamsRequest.getData().get(0))
+                .delay(10, TimeUnit.SECONDS)
+                .repeat()
+                .toObservable()
+                .observeOn(AndroidSchedulers.mainThread());
+    }
 
 }

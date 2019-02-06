@@ -3,6 +3,7 @@ package ru.nubby.playstream.ui.streamlist;
 import android.util.Log;
 
 import io.reactivex.disposables.Disposable;
+import ru.nubby.playstream.model.Pagination;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.twitchapi.RemoteStreamList;
 import ru.nubby.playstream.twitchapi.Repository;
@@ -12,6 +13,7 @@ public class StreamListPresenter implements StreamListContract.Presenter {
 
     private StreamListContract.View mStreamListView;
     private Disposable mDisposable;
+    private Pagination mPagination;
 
     public StreamListPresenter(StreamListContract.View streamListView) {
         this.mStreamListView = streamListView;
@@ -21,14 +23,29 @@ public class StreamListPresenter implements StreamListContract.Presenter {
     @Override
     public void addMoreStreams() {
         Repository internet = new RemoteStreamList(); //TODO INJECT
-        mDisposable = internet.getStreams()
-                .subscribe(streams -> mStreamListView.displayStreamList(streams),
-                        e -> Log.e(TAG, "Error while fetching streams", e));
+
+        if (mPagination == null) {
+            mDisposable = internet
+                    .getStreams()
+                    .subscribe(streams -> {
+                                mStreamListView.displayStreamList(streams.getData());
+                                mPagination = streams.getPagination();
+                            },
+                            e -> Log.e(TAG, "Error while fetching streams", e));
+        } else {
+            mDisposable = internet
+                    .getStreams(mPagination)
+                    .subscribe(streams -> {
+                                mStreamListView.addStreamList(streams.getData());
+                                mPagination = streams.getPagination();
+                            },
+                            e -> Log.e(TAG, "Error while fetching more streams", e));
+        }
     }
 
     @Override
     public void updateStreams() {
-            //TODO
+        //TODO
     }
 
     @Override
@@ -38,7 +55,7 @@ public class StreamListPresenter implements StreamListContract.Presenter {
 
     @Override
     public void subscribe() {
-            //TODO
+        addMoreStreams();
     }
 
     @Override

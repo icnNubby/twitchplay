@@ -1,19 +1,25 @@
 package ru.nubby.playstream.ui.streamlist;
 
 import android.content.Intent;
+import android.icu.text.MessageFormat;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -22,10 +28,16 @@ import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.ui.stream.StreamChatActivity;
 
 public class StreamListFragment extends Fragment implements StreamListContract.View {
+    private final String TAG = "StreamListFragment";
 
     private RecyclerView mStreamListRecyclerView;
     private StreamListContract.Presenter mPresenter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+
+
+    private float streamCardWidth;
+    private float streamCardHeight;
+    private float density;
 
     public static StreamListFragment newInstance() {
 
@@ -41,10 +53,15 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.fragment_stream_list, container, false);
         mStreamListRecyclerView = fragmentView.findViewById(R.id.stream_list_recycler_view);
-        mStreamListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mStreamListRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 1));
         mSwipeRefreshLayout = fragmentView.findViewById(R.id.stream_list_swipe_refresh);
         mSwipeRefreshLayout.setOnRefreshListener(() -> mPresenter.addMoreStreams());
-        mPresenter.addMoreStreams();
+        density = getActivity().getResources().getDisplayMetrics().density;
+        fragmentView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            streamCardWidth = mStreamListRecyclerView.getMeasuredWidth() / density ;
+            streamCardHeight = streamCardWidth * 9 / 16;
+            ((GridLayoutManager) mStreamListRecyclerView.getLayoutManager()).setSpanCount((int) streamCardWidth / 250);
+        });
         return fragmentView;
     }
 
@@ -71,6 +88,19 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
     }
 
     @Override
+    public void addStreamList(List<Stream> streams) {
+        if (mStreamListRecyclerView != null) {
+            StreamListAdapter streamListAdapter = (StreamListAdapter) mStreamListRecyclerView.getAdapter();
+            if (streamListAdapter != null) {
+                int sizeBefore = streamListAdapter.getItemCount();
+                streamListAdapter.addStreams(streams);
+                streamListAdapter.notifyItemRangeInserted(sizeBefore, streams.size());
+            }
+        }
+        mSwipeRefreshLayout.setRefreshing(false);
+    }
+
+    @Override
     public void setPresenter(@NonNull StreamListContract.Presenter presenter) {
         mPresenter = presenter;
     }
@@ -78,15 +108,30 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
     private class StreamListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private Stream mStream;
         private TextView mTextViewStreamDescription;
+        private TextView mTextViewStreamerName;
+        private ImageView mStreamPreview;
 
         public void bind(Stream stream) {
             mStream = stream;
-            mTextViewStreamDescription.setText(stream.getStreamerName() + "___"  + stream.getTitle());
+            mTextViewStreamerName.setText(stream.getStreamerName());
+            mTextViewStreamDescription.setText(stream.getTitle());
+            String formattedUrl = stream
+                    .getThumbnailUrl()
+                    .replace("{width}", "" + (int) (streamCardWidth))
+                    .replace("{height}", "" + (int) (streamCardHeight));
+            Log.d(TAG, formattedUrl);
+            Picasso.get() // todo inject
+                    .load(formattedUrl)
+                    .placeholder(R.drawable.video_placeholder)
+                    .resize((int)(streamCardWidth * density), (int)(streamCardHeight * density))
+                    .into(mStreamPreview);
         }
 
         public StreamListViewHolder(@NonNull View itemView) {
             super(itemView);
             mTextViewStreamDescription = itemView.findViewById(R.id.stream_description);
+            mTextViewStreamerName = itemView.findViewById(R.id.stream_streamer_name);
+            mStreamPreview = itemView.findViewById(R.id.stream_preview_thumbnail);
         }
 
         @Override
@@ -117,11 +162,19 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
         @Override
         public void onBindViewHolder(@NonNull StreamListViewHolder holder, int position) {
             holder.bind(mStreamsList.get(position));
+            if (position == mStreamsList.size() - 3) {
+                mSwipeRefreshLayout.setRefreshing(true);
+                mPresenter.addMoreStreams();
+            }
         }
 
         @Override
         public int getItemCount() {
             return mStreamsList.size();
+        }
+
+        public void addStreams(List<Stream> streams) {
+            mStreamsList.addAll(streams);
         }
     }
 }
