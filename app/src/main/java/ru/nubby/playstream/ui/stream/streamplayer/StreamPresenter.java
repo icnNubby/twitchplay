@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.twitchapi.RemoteStreamFullInfo;

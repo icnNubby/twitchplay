@@ -189,14 +189,23 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
+        mVideoView = null;
         mExoPlayer.release();
+        mExoPlayer = null;
+        mFullscreenToggle = null;
+        mQualityMenuButton = null;
+        mTitleTextView = null;
+        mViewerCountTextView = null;
+        mProgressBar = null;
+        mResolutionsMenu = null;
     }
 
+
     @Override
-    public void setPresenter(StreamContract.Presenter presenter) {
-        mPresenter = presenter;
+    public void setPresenter(StreamContract.Presenter fragmentPresenter) {
+        mPresenter = fragmentPresenter;
     }
 
     public void toggleFullscreen(boolean currentModeFullscreenOn) {

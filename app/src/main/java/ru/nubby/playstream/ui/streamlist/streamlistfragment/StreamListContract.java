@@ -1,4 +1,4 @@
-package ru.nubby.playstream.ui.streamlist;
+package ru.nubby.playstream.ui.streamlist.streamlistfragment;
 
 import java.util.List;
 

@@ -1,13 +1,11 @@
-package ru.nubby.playstream.ui.streamlist;
+package ru.nubby.playstream.ui.streamlist.streamlistfragment;
 
 import android.content.Intent;
-import android.icu.text.MessageFormat;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,7 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import ru.nubby.playstream.R;
@@ -55,7 +52,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
         mStreamListRecyclerView = fragmentView.findViewById(R.id.stream_list_recycler_view);
         mStreamListRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 1));
         mSwipeRefreshLayout = fragmentView.findViewById(R.id.stream_list_swipe_refresh);
-        mSwipeRefreshLayout.setOnRefreshListener(() -> mPresenter.addMoreStreams());
+        mSwipeRefreshLayout.setOnRefreshListener(() -> mPresenter.updateStreams());
         density = getActivity().getResources().getDisplayMetrics().density;
         fragmentView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
             streamCardWidth = mStreamListRecyclerView.getMeasuredWidth() / density ;
@@ -69,6 +66,13 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
     public void onResume() {
         super.onResume();
         mPresenter.subscribe();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mStreamListRecyclerView = null;
+        mSwipeRefreshLayout = null;
     }
 
     @Override
@@ -101,8 +105,8 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
     }
 
     @Override
-    public void setPresenter(@NonNull StreamListContract.Presenter presenter) {
-        mPresenter = presenter;
+    public void setPresenter(@NonNull StreamListContract.Presenter fragmentPresenter) {
+        mPresenter = fragmentPresenter;
     }
 
     private class StreamListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

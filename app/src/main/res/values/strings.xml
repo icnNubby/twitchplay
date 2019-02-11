@@ -17,5 +17,6 @@
     <!-- Errors, translatable                           -->
     <string name="error_no_stream_info_provided">No stream info provided.</string>
     <string name="error_disconnected_from_chat">Disconnected from chat.</string>
+    <string name="login">login</string>
 
 </resources>

@@ -31,9 +31,9 @@ public class ChatChannelApi {
     private BufferedWriter writer;
     private BufferedReader reader;
 
-    public ChatChannelApi(String user, String oauth_key, String channelName) {
+    public ChatChannelApi(String user, String oauthKey, String channelName) {
         this.user = user;
-        this.oauthKey = oauth_key;
+        this.oauthKey = oauthKey;
         this.channelName = channelName.toLowerCase();
     }
 

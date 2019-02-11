@@ -47,14 +47,12 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     }
 
     @Override
-    public void setPresenter(ChatContract.Presenter presenter) {
-        mPresenter = presenter;
+    public void onDestroyView() {
+        super.onDestroyView();
+        mChatRecyclerview = null;
+        mProgressBar = null;
     }
 
-    @Override
-    public boolean hasPresenterAttached() {
-        return mPresenter != null;
-    }
 
     @Override
     public void onResume() {
@@ -66,6 +64,16 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     public void onPause() {
         super.onPause();
         mPresenter.unsubscribe();
+    }
+
+    @Override
+    public void setPresenter(ChatContract.Presenter fragmentPresenter) {
+        mPresenter = fragmentPresenter;
+    }
+
+    @Override
+    public boolean hasPresenterAttached() {
+        return mPresenter != null;
     }
 
     @Override
