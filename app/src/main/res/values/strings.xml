@@ -3,6 +3,7 @@
 
     <!-- Quality list, translatable                     -->
     <string-array name="quality_list">
+        <item string="quality_default">original</item>
         <item string="quality_108060">1080x60</item>
         <item string="quality_108030">1080x30</item>
         <item string="quality_72060">720x60</item>
@@ -11,12 +12,16 @@
         <item string="quality_360">360</item>
         <item string="quality_240">240</item>
         <item string="quality_audio_only">audio only</item>
-        <item string="quality_default">original</item>
     </string-array>
 
     <!-- Errors, translatable                           -->
     <string name="error_no_stream_info_provided">No stream info provided.</string>
     <string name="error_disconnected_from_chat">Disconnected from chat.</string>
+
+    <!-- Menus, translatable                           -->
     <string name="login">login</string>
+    <string name="favourites">Favourites</string>
+    <string name="top_streams">Top streams</string>
+
 
 </resources>

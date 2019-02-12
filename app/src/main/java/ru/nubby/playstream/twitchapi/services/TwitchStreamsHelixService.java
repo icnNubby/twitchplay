@@ -7,6 +7,7 @@ import retrofit2.http.Header;
 import retrofit2.http.Query;
 import ru.nubby.playstream.model.StreamsRequest;
 import ru.nubby.playstream.model.UserDataList;
+import ru.nubby.playstream.model.UserFollowsRequest;
 
 public interface TwitchStreamsHelixService {
 
@@ -14,7 +15,16 @@ public interface TwitchStreamsHelixService {
     Single<StreamsRequest> getTopStreams(@Header("client-id") String clientId);
 
     @GET("users")
-    Single<UserDataList> getUserDataList(@Header("client-id") String clientId, @Query("id") String streamId);
+    Single<UserDataList> getUserDataListById(@Header("client-id") String clientId, @Query("id") String streamId);
+
+    @GET("users")
+    Single<UserDataList> getUserDataListByToken(@Header("client-id") String clientId, @Header("Authorization") String token);
+
+    @GET("users/follows")
+    Single<UserFollowsRequest> getUserFollowsById(@Header("client-id") String clientId, @Query("from_id") String userId);
+
+    @GET("users/follows")
+    Single<UserFollowsRequest> getUserFollowsById(@Header("client-id") String clientId, @Query("from_id") String userId, @Query("after") String cursor);
 
     @GET("streams")
     Single<StreamsRequest> updateStream(@Header("client-id") String clientId, @Query("user_id") String userId);

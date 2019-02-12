@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import ru.nubby.playstream.model.FollowRelations;
 import ru.nubby.playstream.model.Pagination;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.model.StreamsRequest;
@@ -22,4 +23,10 @@ public interface Repository {
      */
     Single<StreamsRequest> getStreams(Pagination pagination);
 
+    /**
+     * Gets user follows list from remote or local(cached) repository
+     * @param userId current (logged) user id
+     * @return list of user's followed streams
+     */
+    Single<List<FollowRelations>> getUserFollows(String userId);
 }

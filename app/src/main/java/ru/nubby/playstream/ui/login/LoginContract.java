@@ -10,10 +10,11 @@ import ru.nubby.playstream.utils.Quality;
 public interface LoginContract {
     interface View extends BaseView<Presenter> {
         void loadUrl(String url);
+        void userInfoFetched(boolean success);
     }
 
     interface Presenter extends BasePresenter {
          void receivedError(String badUrl);
-         void interceptedAnswer(String url);
+         boolean interceptedAnswer(String url);
     }
 }

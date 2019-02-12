@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/stream_list_navigation_favourites"
+        android:title="@string/favourites"
+        android:icon="@drawable/ic_favorite"/>
+    <item
+        android:id="@+id/stream_list_navigation_top_streams"
+        android:title="@string/top_streams"
+        android:icon="@drawable/ic_top"/>
+</menu>

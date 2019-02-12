@@ -165,6 +165,7 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
     public void onResume() {
         super.onResume();
         mPresenter.subscribe();
+        mVideoView.onResume();
         mExoPlayer.setPlayWhenReady(true);
     }
 

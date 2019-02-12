@@ -5,9 +5,15 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.squareup.picasso.Picasso;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import ru.nubby.playstream.R; //TODO FIX
+import ru.nubby.playstream.model.UserData;
 import ru.nubby.playstream.ui.login.LoginActivity;
 import ru.nubby.playstream.ui.streamlist.streamlistfragment.StreamListContract;
 import ru.nubby.playstream.ui.streamlist.streamlistfragment.StreamListFragment;
@@ -16,13 +22,18 @@ import ru.nubby.playstream.ui.streamlist.streamlistfragment.StreamListPresenter;
 
 public class StreamListActivity extends AppCompatActivity implements StreamListActivityContract.View {
 
-    StreamListContract.Presenter mFragmentPresenter;
-    StreamListActivityContract.Presenter mActivityPresenter;
+    private static final int LOGIN_REQUEST_CODE = 101;
+
+    private StreamListContract.Presenter mFragmentPresenter;
+    private StreamListActivityContract.Presenter mActivityPresenter;
+    private Toolbar mToolbar;
+    private BottomNavigationView mBottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stream_list);
+        mToolbar = findViewById(R.id.toolbar);
 
         StreamListFragment fragmentStreamList = (StreamListFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_container);
@@ -37,7 +48,24 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
         mFragmentPresenter = new StreamListPresenter(fragmentStreamList); //TODO inject
         new StreamListActivityPresenter(this); //TODO inject
         setSupportActionBar(findViewById(R.id.toolbar));
+        mBottomNavigationView = findViewById(R.id.bottom_navigation);
 
+        mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.stream_list_navigation_favourites: {
+                        mFragmentPresenter.getFollowedStreams();
+                        break;
+                    }
+                    case R.id.stream_list_navigation_top_streams: {
+                        mFragmentPresenter.getTopStreams();
+                        break;
+                    }
+                }
+                return true;
+            }
+        });
     }
 
     @Override
@@ -70,21 +98,17 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
     }
 
     @Override
-    public void displayLoggedStatus(String loggedName, boolean logged) {
-        
+    public void displayLoggedStatus(UserData user, boolean logged) {
+        if (logged) {
+            mToolbar.setTitle("Logged as " + user.getLogin());
+        } else {
+            mToolbar.setTitle("");
+        }
     }
 
     private void startLoggingActivity() {
         Intent startLogin = new Intent(this, LoginActivity.class);
-        //TODO fix to some constant
-        startActivityForResult(startLogin, 0);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == 0 && resultCode == RESULT_OK) {
-            //mActivityPresenter.login(token);
-        }
+        startActivity(startLogin);
     }
 
     @Override

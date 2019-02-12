@@ -17,6 +17,9 @@ public interface StreamListContract {
         void addMoreStreams();
         void updateStreams();
         void showStream(Stream stream);
+        void getFollowedStreams();
+        void getTopStreams();
+
     }
 
 }

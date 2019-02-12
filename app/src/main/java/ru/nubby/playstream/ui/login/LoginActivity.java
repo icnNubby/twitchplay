@@ -53,9 +53,19 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
 
                     @Override
                     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                        mLoginPresenter.interceptedAnswer(url);
-                        mWebViewProgress.setVisibility(View.GONE);
-                        return false;
+                        if (mLoginPresenter.interceptedAnswer(url)) {
+                            mWebViewProgress.setVisibility(View.VISIBLE);
+                            mWebView.setVisibility(View.GONE);
+                            CookieManager cm = CookieManager.getInstance();
+                            cm.removeAllCookie();
+
+                            view.clearCache(true);
+                            view.clearHistory();
+                            view.clearFormData();
+                            return true;
+                        } else {
+                            return false;
+                        }
                     }
 
                     @Override
@@ -69,6 +79,18 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         mWebViewProgress.setVisibility(View.VISIBLE);
 
         new LoginPresenter(this); //TODO INJECT
+    }
+
+    @Override
+    public void userInfoFetched(boolean success) {
+        if (success) {
+            finish();
+        }
+        else {
+            mWebViewProgress.setVisibility(View.GONE);
+            mWebView.setVisibility(View.VISIBLE);
+            //todo error messaging
+        }
     }
 
     @Override

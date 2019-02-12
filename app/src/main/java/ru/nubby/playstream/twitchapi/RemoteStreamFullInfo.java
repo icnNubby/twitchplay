@@ -14,6 +14,7 @@ import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.SensitiveStorage;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.model.Token;
+import ru.nubby.playstream.model.UserData;
 import ru.nubby.playstream.utils.M3U8Parser;
 import ru.nubby.playstream.utils.Quality;
 
@@ -82,7 +83,7 @@ public class RemoteStreamFullInfo {
         return TwitchApi
                 .getInstance()
                 .getStreamHelixService()
-                .getUserDataList(SensitiveStorage.getClientApiKey(),
+                .getUserDataListById(SensitiveStorage.getClientApiKey(),
                         stream.getUserId())
                 .subscribeOn(Schedulers.io())
                 .filter(userDataList -> !userDataList.getData().isEmpty())
@@ -93,6 +94,21 @@ public class RemoteStreamFullInfo {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    public Single<UserData> getUserDataFromToken(String token) {
+        return TwitchApi
+                .getInstance()
+                .getStreamHelixService()
+                .getUserDataListByToken(SensitiveStorage.getClientApiKey(),
+                        "Bearer " + token)
+                .subscribeOn(Schedulers.io())
+                .filter(userDataList -> !userDataList.getData().isEmpty())
+                .map(userDataList -> userDataList.getData().get(0))
+                .doOnSuccess(userData -> Log.d(TAG, "Login is " + userData.getLogin()))
+                .doOnError(error -> Log.e(TAG, "Error while getting user info " + error, error))
+                .toSingle()
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
     public Observable<Stream> updateStream(Stream stream) {
         return TwitchApi
                 .getInstance()
@@ -100,10 +116,12 @@ public class RemoteStreamFullInfo {
                 .updateStream(SensitiveStorage.getClientApiKey(), stream.getUserId())
                 .subscribeOn(Schedulers.io())
                 .map(streamsRequest -> streamsRequest.getData().get(0))
-                .delay(10, TimeUnit.SECONDS)
+                .delay(30, TimeUnit.SECONDS)
                 .repeat()
                 .toObservable()
                 .observeOn(AndroidSchedulers.mainThread());
     }
+
+
 
 }

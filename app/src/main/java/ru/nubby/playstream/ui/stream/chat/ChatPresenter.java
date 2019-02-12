@@ -34,7 +34,8 @@ public class ChatPresenter implements ChatContract.Presenter {
                             startListeningToChat(streamReturned);
                             mChatView.displayLoading(false);
                         },
-                        error -> Log.e(TAG, "Error while fetching additional data", error));    }
+                        error -> Log.e(TAG, "Error while fetching additional data", error));
+    }
 
     @Override
     public void unsubscribe() {
