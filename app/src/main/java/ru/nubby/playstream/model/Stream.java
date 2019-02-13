@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Stream class. Contains information about user, stream title, viewer count, etc.
  * <a href = "https://dev.twitch.tv/docs/api/reference/#get-streams">Documentation here.</a>
  */
-public class Stream {
+public class Stream implements Comparable<Stream> {
 
     @SerializedName("title")
     @Expose
@@ -19,7 +19,9 @@ public class Stream {
 
     @SerializedName("user_name")
     @Expose
-    private String streamerName; //TODO deal with chinese streams
+    private String streamerName;
+
+    private String profileImageUrl;
 
     /**
      * This is always in latin letters(english alphabet), should be used in all queries instead of
@@ -74,5 +76,18 @@ public class Stream {
 
     public String getThumbnailUrl() {
         return thumbnailUrl;
+    }
+
+    @Override
+    public int compareTo(Stream o) throws NumberFormatException {
+        return Integer.valueOf(o.getViewerCount()) - Integer.valueOf(this.getViewerCount());
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 }

@@ -82,7 +82,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
     }
 
     @Override
-    public void displayStreamList(List<Stream> streams) {
+    public void displayNewStreamList(List<Stream> streams) {
         StreamListAdapter streamListAdapter = new StreamListAdapter(streams);
         if (mStreamListRecyclerView != null) {
             mStreamListRecyclerView.setAdapter(streamListAdapter);
@@ -101,7 +101,6 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
                 streamListAdapter.notifyItemRangeInserted(sizeBefore, streams.size());
             }
         }
-        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -113,12 +112,14 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
         private Stream mStream;
         private TextView mTextViewStreamDescription;
         private TextView mTextViewStreamerName;
+        private TextView mTextViewStreamViewerCount;
         private ImageView mStreamPreview;
 
         public void bind(Stream stream) {
             mStream = stream;
             mTextViewStreamerName.setText(stream.getStreamerName());
             mTextViewStreamDescription.setText(stream.getTitle());
+            mTextViewStreamViewerCount.setText(stream.getViewerCount());
             String formattedUrl = stream
                     .getThumbnailUrl()
                     .replace("{width}", "" + (int) (streamCardWidth))
@@ -136,6 +137,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
             mTextViewStreamDescription = itemView.findViewById(R.id.stream_description);
             mTextViewStreamerName = itemView.findViewById(R.id.stream_streamer_name);
             mStreamPreview = itemView.findViewById(R.id.stream_preview_thumbnail);
+            mTextViewStreamViewerCount = itemView.findViewById(R.id.stream_viewer_count);
         }
 
         @Override
@@ -167,7 +169,6 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
         public void onBindViewHolder(@NonNull StreamListViewHolder holder, int position) {
             holder.bind(mStreamsList.get(position));
             if (position == mStreamsList.size() - 3) {
-                mSwipeRefreshLayout.setRefreshing(true);
                 mPresenter.addMoreStreams();
             }
         }

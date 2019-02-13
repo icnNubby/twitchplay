@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 /**
- * <a href = "https://dev.twitch.tv/docs/api/reference/#get-streams">
+ * <a href = "https://dev.twitch.tv/docs/api/reference/#get-users-follows">
  * Query parameters here.</a>
  */
 public class UserFollowsRequest {
@@ -15,14 +15,14 @@ public class UserFollowsRequest {
     @Expose
     private Integer total;
     /**
-     * Contains an array of {@link Stream} information elements.
+     * Contains an array of {@link FollowRelations} information elements.
      */
     @SerializedName("data")
     @Expose
     private List<FollowRelations> data;
 
     /**
-     * Contains information, required to query for more streams.
+     * Contains information, required to query for more follows.
      */
     @SerializedName("pagination")
     @Expose

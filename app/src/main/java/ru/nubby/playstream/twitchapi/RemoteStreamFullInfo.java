@@ -24,8 +24,8 @@ public class RemoteStreamFullInfo {
     /**
      * Gets video url from stream object
      *
-     * @param stream Stream
-     * @return url as string
+     * @param stream {@link Stream}
+     * @return HashMap of Qualities as keys, and Urls to hls resources as values
      */
     public Single<HashMap<Quality, String>> getVideoUrl(Stream stream) {
         Single<String> channelName;
@@ -35,7 +35,8 @@ public class RemoteStreamFullInfo {
                     .just(stream.getStreamerLogin())
                     .subscribeOn(Schedulers.io());
         } else {
-            channelName = getStreamerInfo(stream);
+            channelName = getStreamerInfo(stream)
+                            .map(UserData::getLogin);
         }
 
         Single<Token> tokenSingle = channelName
@@ -79,7 +80,7 @@ public class RemoteStreamFullInfo {
      * @param stream {@link Stream} object
      * @return {@link Single} of login name string.
      */
-    public Single<String> getStreamerInfo(Stream stream) {
+    public Single<UserData> getStreamerInfo(Stream stream) {
         return TwitchApi
                 .getInstance()
                 .getStreamHelixService()
@@ -87,13 +88,19 @@ public class RemoteStreamFullInfo {
                         stream.getUserId())
                 .subscribeOn(Schedulers.io())
                 .filter(userDataList -> !userDataList.getData().isEmpty())
-                .map(userDataList -> userDataList.getData().get(0).getLogin())
+                .map(userDataList -> userDataList.getData().get(0))
                 .doOnSuccess(login -> Log.d(TAG, "Login is " + login))
                 .doOnError(error -> Log.e(TAG, "Error while getting streamer info " + error, error))
-                .toSingle(stream.getStreamerName())
+                .toSingle()
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    /**
+     * Gets {@link UserData} for currently logged user.
+     *
+     * @param token String OAUTH2 token
+     * @return {@link Single} of {@link UserData} object, related to logged user.
+     */
     public Single<UserData> getUserDataFromToken(String token) {
         return TwitchApi
                 .getInstance()
@@ -109,6 +116,12 @@ public class RemoteStreamFullInfo {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    /**
+     * Updates {@link Stream} information.
+     *
+     * @param stream {@link Stream} object
+     * @return {@link Single} of {@link Stream} with updated user counter.
+     */
     public Observable<Stream> updateStream(Stream stream) {
         return TwitchApi
                 .getInstance()

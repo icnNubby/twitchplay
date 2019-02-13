@@ -9,7 +9,7 @@ import ru.nubby.playstream.model.Stream;
 public interface StreamListContract {
 
     interface View extends BaseView<Presenter> {
-        void displayStreamList(List<Stream> streams);
+        void displayNewStreamList(List<Stream> streams);
         void addStreamList(List<Stream> streams);
     }
 

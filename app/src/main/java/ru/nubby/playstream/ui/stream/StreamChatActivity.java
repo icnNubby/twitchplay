@@ -53,7 +53,6 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
         }
         if (jsonStream == null) {
             Toast.makeText(this, getText(R.string.error_no_stream_info_provided), Toast.LENGTH_SHORT).show();
-            // TODO string res
             finish(); //we cant start stream from nothing
         }
         Stream currentStream = new Gson().fromJson(jsonStream, Stream.class); //TODO inject?
@@ -81,10 +80,6 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
         };
         mStreamLinearLayout.setOnTouchListener(mOnSwipeTouchListener);
 
-        if (savedInstanceState != null) {
-            fullscreenOn = savedInstanceState.getBoolean(BUNDLE_FULLSCREEN_ON);
-            toggleFullscreen(fullscreenOn);
-        }
 
         StreamFragment streamFragment = (StreamFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_player_container);
@@ -96,6 +91,11 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
                     .commit();
         }
         mStreamFragment = streamFragment;
+
+        if (savedInstanceState != null) {
+            fullscreenOn = savedInstanceState.getBoolean(BUNDLE_FULLSCREEN_ON);
+            toggleFullscreen(fullscreenOn);
+        }
 
         ChatFragment chatFragment = (ChatFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_chat_container);
@@ -111,7 +111,7 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
         Single<Stream> currentStreamUpdate = new RemoteStreamFullInfo()
                 .getStreamerInfo(currentStream)
                 .map(updatedLogin -> {
-                    currentStream.setStreamerLogin(updatedLogin);
+                    currentStream.setStreamerLogin(updatedLogin.getLogin());
                     return currentStream;
                 });
         //TODO !THINK HOW TO DECOUPLE THAT

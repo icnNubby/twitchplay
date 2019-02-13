@@ -17,7 +17,6 @@ how to close bufferedreader at disposal of activity, but not on next emittion
 chat improve (emodzi display, sending messages(after logging obv))
 ----------------------------------------------------------------------------------------------------
 
-implement autocloseable actionbar to get more space for preview.
 think about overall design
 appbar on mainscreen overlaps nested recycler
 
@@ -25,10 +24,12 @@ appbar on mainscreen overlaps nested recycler
 
 add dagger and dependencies injection
 decouple adapters and viewholders
-
 ----------------------------------------------------------------------------------------------------
 
-implement authorization via twitch oAuth.
+make stubs when loading streams
+load users thumbnails on streams page
+
+----------------------------------------------------------------------------------------------------
     update local caches w favourite streams
 
 implement custom setting

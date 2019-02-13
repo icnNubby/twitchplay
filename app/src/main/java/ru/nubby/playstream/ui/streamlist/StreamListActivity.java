@@ -50,22 +50,22 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
         setSupportActionBar(findViewById(R.id.toolbar));
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
 
-        mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.stream_list_navigation_favourites: {
-                        mFragmentPresenter.getFollowedStreams();
-                        break;
-                    }
-                    case R.id.stream_list_navigation_top_streams: {
-                        mFragmentPresenter.getTopStreams();
-                        break;
-                    }
+        mBottomNavigationView.setOnNavigationItemSelectedListener(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.stream_list_navigation_favourites: {
+                    mFragmentPresenter.getFollowedStreams();
+                    break;
                 }
-                return true;
+                case R.id.stream_list_navigation_top_streams: {
+                    mFragmentPresenter.getTopStreams();
+                    break;
+                }
             }
+            return true;
         });
+
+        //TODO bundle
+        mBottomNavigationView.setSelectedItemId(R.id.stream_list_navigation_top_streams);
     }
 
     @Override
@@ -100,9 +100,11 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
     @Override
     public void displayLoggedStatus(UserData user, boolean logged) {
         if (logged) {
-            mToolbar.setTitle("Logged as " + user.getLogin());
+            mToolbar.setTitle(getString(R.string.logged_in) + user.getLogin());
+            mBottomNavigationView.getMenu().findItem(R.id.stream_list_navigation_favourites).setEnabled(true);
         } else {
-            mToolbar.setTitle("");
+            mToolbar.setTitle(getString(R.string.not_logged_in));
+            mBottomNavigationView.getMenu().findItem(R.id.stream_list_navigation_favourites).setEnabled(false);
         }
     }
 

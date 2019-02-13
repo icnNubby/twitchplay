@@ -20,8 +20,12 @@
 
     <!-- Menus, translatable                           -->
     <string name="login">login</string>
-    <string name="favourites">Favourites</string>
+    <string name="favourites">Follows</string>
     <string name="top_streams">Top streams</string>
+
+    <!-- Title, translatable                           -->
+    <string name="logged_in">Logged as: </string>
+    <string name="not_logged_in">You are not logged in</string>
 
 
 </resources>

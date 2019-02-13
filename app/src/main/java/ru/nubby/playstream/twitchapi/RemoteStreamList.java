@@ -2,6 +2,7 @@ package ru.nubby.playstream.twitchapi;
 
 import android.util.Log;
 
+import java.util.Comparator;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -12,6 +13,7 @@ import io.reactivex.subjects.BehaviorSubject;
 import ru.nubby.playstream.SensitiveStorage;
 import ru.nubby.playstream.model.FollowRelations;
 import ru.nubby.playstream.model.Pagination;
+import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.model.StreamsRequest;
 import ru.nubby.playstream.model.UserFollowsRequest;
 
@@ -38,43 +40,63 @@ public class RemoteStreamList implements Repository {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    @Override
     public Single<List<FollowRelations>> getUserFollows(String userId) {
 
+        return  getAllUserFollowRelations(userId)
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    @Override
+    public Single<List<Stream>> getLiveStreamsFollowedByUser(String userId) {
+        return getAllUserFollowRelations(userId)
+                .map(FollowRelations::getToId)
+                .buffer(100)
+                .flatMap(userList -> TwitchApi
+                        .getInstance()
+                        .getStreamHelixService()
+                        .getAllStreamsByUserList(SensitiveStorage.getClientApiKey(), userList)
+                        .toObservable())
+                .map(StreamsRequest::getData)
+                .flatMap(Observable::fromIterable)
+                .toSortedList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private Observable<FollowRelations> getAllUserFollowRelations(String userId) {
         return Observable
                 .defer(() ->
                 {
-                    Log.d(TAG, "Combining observables");
                     BehaviorSubject<String> pagecontrol = BehaviorSubject.create();
                     pagecontrol.onNext("start");
                     return pagecontrol.concatMap(aKey ->
                     {
-                        Single<UserFollowsRequest> listSingle;
                         if (aKey != null && aKey.equals("start")) {
-                            listSingle = TwitchApi
+                            return TwitchApi
                                     .getInstance()
                                     .getStreamHelixService()
-                                    .getUserFollowsById(SensitiveStorage.getClientApiKey(), userId);
-                            Log.d(TAG, "Emitting start one");
-                            return listSingle.doOnSuccess(page -> {
-                                if (page.getPagination() != null && page.getPagination().getCursor() != null)
-                                    pagecontrol.onNext(page.getPagination().getCursor());
-                                else Observable.<UserFollowsRequest>empty()
-                                        .doOnComplete(pagecontrol::onComplete);
-                            })
+                                    .getUserFollowsById(SensitiveStorage.getClientApiKey(), userId)
+                                    .doOnSuccess(page -> {
+                                        if (page.getPagination() != null &&
+                                                page.getPagination().getCursor() != null)
+                                            pagecontrol.onNext(page.getPagination().getCursor());
+                                        else pagecontrol.onComplete();
+                                    })
                                     .toObservable();
                         } else if (aKey != null) {
-                            listSingle = TwitchApi
+                            return TwitchApi
                                     .getInstance()
                                     .getStreamHelixService()
-                                    .getUserFollowsById(SensitiveStorage.getClientApiKey(), userId, aKey);
-
-                            Log.d(TAG, "Emitting next one " + aKey);
-                            return listSingle.doOnSuccess(page -> {
-                                if (page.getPagination() != null && page.getPagination().getCursor() != null)
-                                    pagecontrol.onNext(page.getPagination().getCursor());
-                                else Observable.<UserFollowsRequest>empty()
-                                        .doOnComplete(pagecontrol::onComplete);
-                            })
+                                    .getUserFollowsById(SensitiveStorage.getClientApiKey(), userId, aKey)
+                                    .doOnSuccess(page -> {
+                                        if (page.getPagination() != null &&
+                                                page.getPagination().getCursor() != null)
+                                            pagecontrol.onNext(page.getPagination().getCursor());
+                                        else pagecontrol.onComplete();
+                                    })
                                     .toObservable();
 
                         } else {
@@ -85,10 +107,7 @@ public class RemoteStreamList implements Repository {
                 })
                 .doOnNext(userFollowsRequest -> Log.d(TAG, userFollowsRequest.toString()))
                 .map(UserFollowsRequest::getData)
-                .flatMap(Observable::fromIterable)
-                .toList()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                .flatMap(Observable::fromIterable);
     }
 
 }

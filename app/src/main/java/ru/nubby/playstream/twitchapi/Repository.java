@@ -29,4 +29,11 @@ public interface Repository {
      * @return list of user's followed streams
      */
     Single<List<FollowRelations>> getUserFollows(String userId);
+
+    /**
+     * Gets active stream list from remote or local(cached) repository
+     * @param userId current (logged) user id
+     * @return list of user's followed streams
+     */
+    Single<List<Stream>> getLiveStreamsFollowedByUser(String userId);
 }
