@@ -34,7 +34,9 @@
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
             app:layout_scrollFlags="scroll|snap" />
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -42,6 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
+            android:elevation="3dp"
             app:menu="@menu/stream_list_navigation">
 
         </com.google.android.material.bottomnavigation.BottomNavigationView>

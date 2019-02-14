@@ -3,7 +3,6 @@ package ru.nubby.playstream.ui.streamlist;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.squareup.picasso.Picasso;
 
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.model.UserData;
@@ -33,12 +32,12 @@ public class StreamListActivityPresenter implements StreamListActivityContract.P
         if (token != null && !token.equals("")) {
             UserData data = SharedPreferencesHelper.getUserData(); // TODO INJECT
             if (data == null) {
-                RemoteStreamFullInfo info = new RemoteStreamFullInfo();
+                RemoteStreamFullInfo info = new RemoteStreamFullInfo(); // TODO INJECT
                 mDisposableUserFetchTask = info
                         .getUserDataFromToken(token)
                         .doOnSuccess(userData -> SharedPreferencesHelper.setUserData(new Gson().toJson(userData, UserData.class)))
                         .filter(userData -> userData != null)
-                        .subscribe(userData -> mMainStreamListView.displayLoggedStatus(data, true),
+                        .subscribe(userData -> mMainStreamListView.displayLoggedStatus(userData, true),
                                 error -> Log.e(TAG, "Error while fetching user data", error));
 
             } else {

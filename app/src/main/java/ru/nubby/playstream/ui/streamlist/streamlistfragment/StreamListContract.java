@@ -10,13 +10,14 @@ public interface StreamListContract {
 
     interface View extends BaseView<Presenter> {
         void displayNewStreamList(List<Stream> streams);
+        void clearStreamList();
         void addStreamList(List<Stream> streams);
+        void setupProgressBar(boolean visible);
     }
 
     interface Presenter extends BasePresenter {
-        void addMoreStreams();
+        void getMoreTopStreams();
         void updateStreams();
-        void showStream(Stream stream);
         void getFollowedStreams();
         void getTopStreams();
 

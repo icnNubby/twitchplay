@@ -10,7 +10,6 @@ import ru.nubby.playstream.utils.Quality;
 public interface StreamContract {
     interface View extends BaseView<Presenter> {
         void displayStream(String url);
-        boolean hasPresenterAttached();
         void setQualitiesMenu(List<Quality> qualities);
         void displayLoading(boolean loadingState);
         void displayTitle(String title);

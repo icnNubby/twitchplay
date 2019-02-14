@@ -56,13 +56,21 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
             finish(); //we cant start stream from nothing
         }
         Stream currentStream = new Gson().fromJson(jsonStream, Stream.class); //TODO inject?
-
+        if (currentStream == null) {
+            finish();
+        }
 
         setContentView(R.layout.activity_stream);
         mChatContainer = findViewById(R.id.fragment_chat_container);
         mPlayerContainer = findViewById(R.id.fragment_player_container);
         mStreamLinearLayout = findViewById(R.id.fragment_stream_linear_layout);
         mOnSwipeTouchListener = new OnSwipeTouchListener(this) {
+            @Override
+            public void onSwipeBottom() {
+                finish();
+                //todo if possible make small window like a twitch app
+            }
+
             @Override
             public void onSwipeLeft() {
                 showChat();
@@ -92,10 +100,6 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
         }
         mStreamFragment = streamFragment;
 
-        if (savedInstanceState != null) {
-            fullscreenOn = savedInstanceState.getBoolean(BUNDLE_FULLSCREEN_ON);
-            toggleFullscreen(fullscreenOn);
-        }
 
         ChatFragment chatFragment = (ChatFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_chat_container);
@@ -111,7 +115,9 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
         Single<Stream> currentStreamUpdate = new RemoteStreamFullInfo()
                 .getStreamerInfo(currentStream)
                 .map(updatedLogin -> {
-                    currentStream.setStreamerLogin(updatedLogin.getLogin());
+                    if (currentStream != null) {
+                        currentStream.setStreamerLogin(updatedLogin.getLogin());
+                    }
                     return currentStream;
                 });
         //TODO !THINK HOW TO DECOUPLE THAT
@@ -133,6 +139,12 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
                         hideSystemUI();
                     }
                 });
+
+        if (savedInstanceState != null) {
+            fullscreenOn = savedInstanceState.getBoolean(BUNDLE_FULLSCREEN_ON);
+            toggleFullscreen(fullscreenOn);
+        }
+
         setWindowMode(getResources().getConfiguration().orientation);
     }
 

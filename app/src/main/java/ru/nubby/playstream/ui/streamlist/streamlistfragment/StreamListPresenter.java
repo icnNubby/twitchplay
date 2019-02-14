@@ -2,41 +2,49 @@ package ru.nubby.playstream.ui.streamlist.streamlistfragment;
 
 import android.util.Log;
 
+import java.util.List;
+
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.model.Pagination;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.twitchapi.RemoteStreamList;
 import ru.nubby.playstream.twitchapi.Repository;
+import ru.nubby.playstream.ui.streamlist.StreamListNavigationState;
 import ru.nubby.playstream.utils.SharedPreferencesHelper;
 
 public class StreamListPresenter implements StreamListContract.Presenter {
 
     private static final String TAG = "StreamListPresenter";
-    private static final int STATE_FAVOURITES = 1;
-    private static final int STATE_TOP = 2;
 
     private StreamListContract.View mStreamListView;
     private Disposable mDisposableFetchingTask;
     private Pagination mPagination;
     private Repository mRemoteRepo;
 
-    private int listState;
+    private List<Stream> mCurrentStreamList;
+    private StreamListNavigationState mListState;
+    private boolean forceReload;
 
-
-    public StreamListPresenter(StreamListContract.View streamListView) {
+    public StreamListPresenter(StreamListContract.View streamListView, StreamListNavigationState state, boolean forceReload) {
         this.mStreamListView = streamListView;
         mStreamListView.setPresenter(this);
         mRemoteRepo = new RemoteStreamList(); //TODO INJECT
-        listState = 2; //TODO prob get from prefs
+        mListState = state;
+        this.forceReload = forceReload;
     }
 
     @Override
-    public void addMoreStreams() {
-        if (listState != STATE_FAVOURITES && mPagination != null) {
+    public void getMoreTopStreams() {
+        if (mListState != StreamListNavigationState.MODE_FAVOURITES && mPagination != null) {
             if (mDisposableFetchingTask != null) mDisposableFetchingTask.dispose();
             mDisposableFetchingTask = mRemoteRepo
                     .getStreams(mPagination)
                     .subscribe(streams -> {
+                                if (mCurrentStreamList != null) {
+                                    mCurrentStreamList.addAll(streams.getData());
+                                } else {
+                                    mCurrentStreamList = streams.getData();
+                                }
                                 mStreamListView.addStreamList(streams.getData());
                                 mPagination = streams.getPagination();
                             },
@@ -47,51 +55,68 @@ public class StreamListPresenter implements StreamListContract.Presenter {
     @Override
     public void updateStreams() {
         if (mDisposableFetchingTask != null) mDisposableFetchingTask.dispose();
-        if (listState == STATE_TOP) {
+
+        if (mListState == StreamListNavigationState.MODE_TOP) {
             mDisposableFetchingTask = mRemoteRepo
                     .getStreams()
+                    .doOnSubscribe(disposable -> {
+                        mStreamListView.clearStreamList();
+                        mStreamListView.setupProgressBar(true);
+                    })
                     .subscribe(streams -> {
+                                mCurrentStreamList = streams.getData();
                                 mStreamListView.displayNewStreamList(streams.getData());
                                 mPagination = streams.getPagination();
+                                mStreamListView.setupProgressBar(false);
                             },
-                            e -> Log.e(TAG, "Error while fetching streams", e));
+                            e -> {
+                                mStreamListView.setupProgressBar(false);
+                                Log.e(TAG, "Error while fetching streams", e);
+                            });
         } else {
             getFollowedStreams();
         }
     }
 
     @Override
-    public void showStream(Stream stream) {
-
-    }
-
-    @Override
     public void getFollowedStreams() {
-        listState = STATE_FAVOURITES;
+        mListState = StreamListNavigationState.MODE_FAVOURITES;
         if (mDisposableFetchingTask != null) mDisposableFetchingTask.dispose();
         mDisposableFetchingTask = mRemoteRepo
                 .getLiveStreamsFollowedByUser(SharedPreferencesHelper.getUserData().getId())
+                .doOnSubscribe(disposable -> {
+                    mStreamListView.clearStreamList();
+                    mStreamListView.setupProgressBar(true);
+                })
                 .subscribe(streams -> {
+                            mCurrentStreamList = streams;
                             mStreamListView.displayNewStreamList(streams);
+                            mStreamListView.setupProgressBar(false);
                             mPagination = null;
                         },
-                        error -> Log.e(TAG, "Error while fetching user follows ", error));
+                        error -> {
+                            mStreamListView.setupProgressBar(false);
+                            Log.e(TAG, "Error while fetching user follows ", error);
+                        });
     }
 
     @Override
     public void getTopStreams() {
-        listState = STATE_TOP;
+        mListState = StreamListNavigationState.MODE_TOP;
         updateStreams();
     }
 
     @Override
     public void subscribe() {
-        if (mDisposableFetchingTask == null || mPagination == null) {
-            if (listState == STATE_TOP) {
+        if (forceReload && (mDisposableFetchingTask == null || mPagination == null)) {
+            forceReload = false;
+            if (mListState == StreamListNavigationState.MODE_TOP) {
                 getTopStreams();
-            } else if (listState == STATE_FAVOURITES) {
+            } else if (mListState == StreamListNavigationState.MODE_FAVOURITES) {
                 getFollowedStreams();
             }
+        } else {
+            mStreamListView.displayNewStreamList(mCurrentStreamList);
         }
     }
 

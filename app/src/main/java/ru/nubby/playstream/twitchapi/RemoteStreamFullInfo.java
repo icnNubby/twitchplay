@@ -19,7 +19,7 @@ import ru.nubby.playstream.utils.M3U8Parser;
 import ru.nubby.playstream.utils.Quality;
 
 public class RemoteStreamFullInfo {
-    private final String TAG = "RemoteStreamFullInfo";
+    private final String TAG = RemoteStreamFullInfo.class.getSimpleName();
 
     /**
      * Gets video url from stream object

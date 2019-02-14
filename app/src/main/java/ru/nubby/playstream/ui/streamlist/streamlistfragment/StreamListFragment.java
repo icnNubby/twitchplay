@@ -7,11 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -30,7 +32,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
     private RecyclerView mStreamListRecyclerView;
     private StreamListContract.Presenter mPresenter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-
+    private ProgressBar mProgressBar;
 
     private float streamCardWidth;
     private float streamCardHeight;
@@ -45,6 +47,12 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
         return fragment;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -53,6 +61,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
         mStreamListRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 1));
         mSwipeRefreshLayout = fragmentView.findViewById(R.id.stream_list_swipe_refresh);
         mSwipeRefreshLayout.setOnRefreshListener(() -> mPresenter.updateStreams());
+        mProgressBar = fragmentView.findViewById(R.id.stream_list_progress_bar);
         density = getActivity().getResources().getDisplayMetrics().density;
         fragmentView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
             streamCardWidth = mStreamListRecyclerView.getMeasuredWidth() / density ;
@@ -66,13 +75,6 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
     public void onResume() {
         super.onResume();
         mPresenter.subscribe();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mStreamListRecyclerView = null;
-        mSwipeRefreshLayout = null;
     }
 
     @Override
@@ -92,6 +94,15 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
     }
 
     @Override
+    public void clearStreamList() {
+        StreamListAdapter streamListAdapter = new StreamListAdapter(new ArrayList<>());
+        if (mStreamListRecyclerView != null) {
+            mStreamListRecyclerView.setAdapter(streamListAdapter);
+            streamListAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
     public void addStreamList(List<Stream> streams) {
         if (mStreamListRecyclerView != null) {
             StreamListAdapter streamListAdapter = (StreamListAdapter) mStreamListRecyclerView.getAdapter();
@@ -106,6 +117,26 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
     @Override
     public void setPresenter(@NonNull StreamListContract.Presenter fragmentPresenter) {
         mPresenter = fragmentPresenter;
+    }
+
+    @Override
+    public boolean hasPresenterAttached() {
+        return mPresenter != null;
+    }
+
+    public StreamListContract.Presenter returnAttachedPresenter() {
+        return mPresenter;
+    }
+
+    public void setupProgressBar(boolean visible) {
+        if (mProgressBar != null) {
+            if (visible) {
+                mProgressBar.setVisibility(View.VISIBLE);
+            } else {
+                mProgressBar.setVisibility(View.GONE);
+            }
+            mProgressBar.setIndeterminate(visible);
+        }
     }
 
     private class StreamListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -169,7 +200,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
         public void onBindViewHolder(@NonNull StreamListViewHolder holder, int position) {
             holder.bind(mStreamsList.get(position));
             if (position == mStreamsList.size() - 3) {
-                mPresenter.addMoreStreams();
+                mPresenter.getMoreTopStreams();
             }
         }
 

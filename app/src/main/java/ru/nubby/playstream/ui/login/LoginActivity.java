@@ -113,4 +113,9 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
     public void setPresenter(LoginContract.Presenter presenter) {
         mLoginPresenter = presenter;
     }
+
+    @Override
+    public boolean hasPresenterAttached() {
+        return mLoginPresenter != null;
+    }
 }

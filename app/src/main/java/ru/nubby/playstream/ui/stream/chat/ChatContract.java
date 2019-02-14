@@ -7,7 +7,6 @@ import ru.nubby.playstream.ui.BaseView;
 
 public interface ChatContract {
     interface View extends BaseView<Presenter> {
-        boolean hasPresenterAttached();
         void addChatMessage(ChatMessage message);
         void displayLoading(boolean loadingState);
     }
