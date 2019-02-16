@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -27,7 +28,7 @@ import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.ui.stream.StreamChatActivity;
 
 public class StreamListFragment extends Fragment implements StreamListContract.View {
-    private final String TAG = "StreamListFragment";
+    private final String TAG = StreamListFragment.class.getSimpleName();
 
     private RecyclerView mStreamListRecyclerView;
     private StreamListContract.Presenter mPresenter;
@@ -139,6 +140,13 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
         }
     }
 
+    @Override
+    public void displayError(ErrorMessage message) {
+        String errorMessage =
+                getResources().getStringArray(R.array.streams_list_errors)[message.ordinal()];
+        Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
+    }
+
     private class StreamListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private Stream mStream;
         private TextView mTextViewStreamDescription;
@@ -190,7 +198,9 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
         @NonNull
         @Override
         public StreamListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(getActivity()).inflate(R.layout.stream_list_element, parent, false);
+            View view = LayoutInflater
+                    .from(getActivity())
+                    .inflate(R.layout.stream_list_element, parent, false);
             StreamListViewHolder listViewHolder = new StreamListViewHolder(view);
             view.setOnClickListener(listViewHolder);
             return listViewHolder;

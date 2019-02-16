@@ -8,16 +8,17 @@ import io.lindstrom.m3u8.model.MasterPlaylist;
 import io.lindstrom.m3u8.model.Variant;
 import io.lindstrom.m3u8.parser.MasterPlaylistParser;
 import io.lindstrom.m3u8.parser.PlaylistParserException;
+import ru.nubby.playstream.model.Quality;
 
 /**
- * Helper class to make non standart parsing.
+ * Helper class to make non standard parsing.
  * Uses <a href = "https://github.com/carlanton/m3u8-parser">third party library.</a>
  */
 public class M3U8Parser {
 
     /**
      * Parses kinda non standart twitch M3U8 playlist.
-     * Maps it to Hastable indexed by {@link Quality}, valued by {@link String} url of HLS resource.
+     * Maps it to HashMap indexed by {@link Quality}, valued by {@link String} url of HLS resource.
      */
     public static HashMap<Quality, String> parseTwitchApiResponse(String playlist) {
         String[] lines = playlist.split("\n");

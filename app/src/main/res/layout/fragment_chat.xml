@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/transparentGray">
-    <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/chat_messages_recyclerview"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp">
-
-    </androidx.recyclerview.widget.RecyclerView>
     <ProgressBar
         android:id="@+id/stream_buffer_chat_progressbar"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_gravity="center"/>
-</LinearLayout>
+        android:layout_gravity="center"
+        android:visibility="gone"
+        tools:visibility="visible"
+        />
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/transparentGray"
+        android:id="@+id/chat_messages_recyclerview">
+    </androidx.recyclerview.widget.RecyclerView>
+
+</FrameLayout>

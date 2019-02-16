@@ -30,7 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.utils.Quality;
+import ru.nubby.playstream.model.Quality;
 
 public class StreamFragment extends Fragment implements StreamContract.View, PopupMenu.OnMenuItemClickListener {
 
@@ -52,14 +52,6 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
 
     private StreamActivityCallbacks mActivityCallbacks;
 
-
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        Quality quality = Quality.values()[item.getItemId()];
-        mPresenter.playChosenQuality(quality);
-        return true;
-    }
-
     public static StreamFragment newInstance() {
 
         Bundle args = new Bundle();
@@ -67,6 +59,88 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
         StreamFragment fragment = new StreamFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mActivityCallbacks = (StreamActivityCallbacks) context;
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View fragmentView = inflater.inflate(R.layout.fragment_stream, container, false);
+        mVideoView = fragmentView.findViewById(R.id.stream_player);
+        if (mExoPlayer == null)
+            mExoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity());
+        mVideoView.setPlayer(mExoPlayer);
+        mVideoView.setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS);
+
+        mFullscreenToggle = fragmentView.findViewById(R.id.fullscreen_toggle);
+        mFullscreenToggle.setOnClickListener(v -> mActivityCallbacks.toggleFullscreen(!mActivityCallbacks.getFullscreenState()));
+
+        mQualityMenuButton = fragmentView.findViewById(R.id.qualities_menu);
+        mQualityMenuButton.setOnClickListener(v -> {
+            if (mResolutionsMenu != null)
+                mResolutionsMenu.show();
+        });
+
+        mTitleTextView = fragmentView.findViewById(R.id.text_view_stream_title);
+        mViewerCountTextView = fragmentView.findViewById(R.id.text_view_stream_viewers);
+
+        mProgressBar = fragmentView.findViewById(R.id.stream_buffer_playerview_progressbar);
+
+        setRetainInstance(true);
+        return fragmentView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mPresenter.subscribe();
+        mVideoView.onResume();
+        mExoPlayer.setPlayWhenReady(true);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.unsubscribe();
+        mVideoView.onPause();
+        mExoPlayer.setPlayWhenReady(false);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mVideoView = null;
+        mExoPlayer.release();
+        mExoPlayer = null;
+        mFullscreenToggle = null;
+        mQualityMenuButton = null;
+        mTitleTextView = null;
+        mViewerCountTextView = null;
+        mProgressBar = null;
+        mResolutionsMenu = null;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mActivityCallbacks = null;
+    }
+
+    @Override
+    public void setPresenter(StreamContract.Presenter fragmentPresenter) {
+        mPresenter = fragmentPresenter;
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        Quality quality = Quality.values()[item.getItemId()];
+        mPresenter.playChosenQuality(quality);
+        return true;
     }
 
     @Override
@@ -133,82 +207,7 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
         if (mViewerCountTextView != null) mViewerCountTextView.setText(count);
     }
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View fragmentView = inflater.inflate(R.layout.fragment_stream, container, false);
-        mVideoView = fragmentView.findViewById(R.id.stream_player);
-        if (mExoPlayer == null)
-            mExoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity());
-        mVideoView.setPlayer(mExoPlayer);
-        mVideoView.setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS);
-
-        mFullscreenToggle = fragmentView.findViewById(R.id.fullscreen_toggle);
-        mFullscreenToggle.setOnClickListener(v -> mActivityCallbacks.toggleFullscreen(!mActivityCallbacks.getFullscreenState()));
-
-        mQualityMenuButton = fragmentView.findViewById(R.id.qualities_menu);
-        mQualityMenuButton.setOnClickListener(v -> {
-            if (mResolutionsMenu != null)
-                mResolutionsMenu.show();
-        });
-
-        mTitleTextView = fragmentView.findViewById(R.id.text_view_stream_title);
-        mViewerCountTextView = fragmentView.findViewById(R.id.text_view_stream_viewers);
-
-        mProgressBar = fragmentView.findViewById(R.id.stream_buffer_playerview_progressbar);
-
-        setRetainInstance(true);
-        return fragmentView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mPresenter.subscribe();
-        mVideoView.onResume();
-        mExoPlayer.setPlayWhenReady(true);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        mActivityCallbacks = (StreamActivityCallbacks) context;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mActivityCallbacks = null;
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mPresenter.unsubscribe();
-        mVideoView.onPause();
-        mExoPlayer.setPlayWhenReady(false);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mVideoView = null;
-        mExoPlayer.release();
-        mExoPlayer = null;
-        mFullscreenToggle = null;
-        mQualityMenuButton = null;
-        mTitleTextView = null;
-        mViewerCountTextView = null;
-        mProgressBar = null;
-        mResolutionsMenu = null;
-    }
-
-
-    @Override
-    public void setPresenter(StreamContract.Presenter fragmentPresenter) {
-        mPresenter = fragmentPresenter;
-    }
-
     public void toggleFullscreen(boolean currentModeFullscreenOn) {
         if (currentModeFullscreenOn) {
             //turn on fullscreen, rotate to landscape, hide chat

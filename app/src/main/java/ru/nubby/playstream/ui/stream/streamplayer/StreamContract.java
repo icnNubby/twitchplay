@@ -4,8 +4,7 @@ import java.util.List;
 
 import ru.nubby.playstream.ui.BasePresenter;
 import ru.nubby.playstream.ui.BaseView;
-import ru.nubby.playstream.model.Stream;
-import ru.nubby.playstream.utils.Quality;
+import ru.nubby.playstream.model.Quality;
 
 public interface StreamContract {
     interface View extends BaseView<Presenter> {
@@ -14,12 +13,10 @@ public interface StreamContract {
         void displayLoading(boolean loadingState);
         void displayTitle(String title);
         void displayViewerCount(String count);
+        void toggleFullscreen(boolean currentModeFullscreenOn);
     }
 
     interface Presenter extends BasePresenter {
         void playChosenQuality(Quality quality);
-        void pauseStream();
-        void playStream(Stream stream);
-        void volumeTune();
     }
 }

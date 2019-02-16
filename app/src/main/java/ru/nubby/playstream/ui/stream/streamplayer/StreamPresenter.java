@@ -10,7 +10,7 @@ import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.twitchapi.RemoteStreamFullInfo;
-import ru.nubby.playstream.utils.Quality;
+import ru.nubby.playstream.model.Quality;
 
 public class StreamPresenter implements StreamContract.Presenter {
     private final String TAG = "StreamPresenter";
@@ -61,13 +61,7 @@ public class StreamPresenter implements StreamContract.Presenter {
         mStreamView.displayStream(url);
     }
 
-    @Override
-    public void pauseStream() {
-
-    }
-
-    @Override
-    public void playStream(Stream stream) {
+    private void playStream(Stream stream) {
 
         if (mDisposableStreamResolutionsInfo != null && !mDisposableStreamResolutionsInfo.isDisposed()) {
             mDisposableStreamResolutionsInfo.dispose();
@@ -76,7 +70,7 @@ public class StreamPresenter implements StreamContract.Presenter {
         if (mDisposableStreamInfoUpdater != null && !mDisposableStreamInfoUpdater.isDisposed()) {
             mDisposableStreamInfoUpdater.dispose();
         }
-        RemoteStreamFullInfo info = new RemoteStreamFullInfo();
+        RemoteStreamFullInfo info = new RemoteStreamFullInfo(); //TODO inject
         mStreamView.displayLoading(true);
         mDisposableStreamResolutionsInfo = info
                 .getVideoUrl(stream)
@@ -108,8 +102,4 @@ public class StreamPresenter implements StreamContract.Presenter {
         //todo error processing in view
     }
 
-    @Override
-    public void volumeTune() {
-
-    }
 }

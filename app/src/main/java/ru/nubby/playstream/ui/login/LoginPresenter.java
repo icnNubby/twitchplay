@@ -58,7 +58,6 @@ public class LoginPresenter implements LoginContract.Presenter {
         return false;
     }
 
-
     private String getAccessTokenFromURL(String url) {
         String startIdentifier = "access_token";
         String endIdentifier = "&scope";

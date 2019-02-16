@@ -9,10 +9,14 @@ import ru.nubby.playstream.model.Stream;
 public interface StreamListContract {
 
     interface View extends BaseView<Presenter> {
+        enum ErrorMessage {
+            ERROR_BAD_CONNECTION
+        }
         void displayNewStreamList(List<Stream> streams);
         void clearStreamList();
         void addStreamList(List<Stream> streams);
         void setupProgressBar(boolean visible);
+        void displayError(ErrorMessage message);
     }
 
     interface Presenter extends BasePresenter {
@@ -20,7 +24,7 @@ public interface StreamListContract {
         void updateStreams();
         void getFollowedStreams();
         void getTopStreams();
-
+        void decideToReload(long interval);
     }
 
 }

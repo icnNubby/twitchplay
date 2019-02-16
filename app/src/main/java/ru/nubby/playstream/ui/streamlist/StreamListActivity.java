@@ -2,6 +2,7 @@ package ru.nubby.playstream.ui.streamlist;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -21,15 +22,17 @@ import static ru.nubby.playstream.ui.streamlist.StreamListNavigationState.MODE_F
 
 public class StreamListActivity extends AppCompatActivity implements StreamListActivityContract.View {
 
-    private static final int LOGIN_REQUEST_CODE = 101;
-    private static final String BUNDLE_NAVBAR_STATE = "navbar_state";
-    private static final StreamListNavigationState DEFAULT_NAVIGATION_STATE = MODE_FAVOURITES; //TODO PREFS
+    private final String BUNDLE_NAVBAR_STATE = "navbar_state";
+    private final String BUNDLE_TIME_STATE = "paused_at";
+    private final StreamListNavigationState DEFAULT_NAVIGATION_STATE = MODE_FAVOURITES; //TODO PREFS
 
     private StreamListContract.Presenter mFragmentPresenter;
     private StreamListActivityContract.Presenter mActivityPresenter;
     private Toolbar mToolbar;
     private BottomNavigationView mBottomNavigationView;
     private StreamListNavigationState stateNavbar = DEFAULT_NAVIGATION_STATE;
+
+    private long pausedAt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,10 +49,11 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
                     .commit();
         }
 
+        boolean forceReload = false;
         if (savedInstanceState != null) {
             stateNavbar = (StreamListNavigationState) savedInstanceState.get(BUNDLE_NAVBAR_STATE);
         }
-        if (!fragmentStreamList.hasPresenterAttached()) {
+        if (!fragmentStreamList.hasPresenterAttached() || forceReload) {
             mFragmentPresenter = new StreamListPresenter(fragmentStreamList,
                     stateNavbar,
                     true); //TODO inject
@@ -79,11 +83,17 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
         });
     }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        decideToUpdate(savedInstanceState.getLong(BUNDLE_TIME_STATE));
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
         mActivityPresenter.subscribe();
+        if (pausedAt > 0) decideToUpdate(pausedAt);
     }
 
     @Override
@@ -96,6 +106,8 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(BUNDLE_NAVBAR_STATE, stateNavbar);
+        outState.putLong(BUNDLE_TIME_STATE, SystemClock.elapsedRealtime());
+        pausedAt = SystemClock.elapsedRealtime();
     }
 
     @Override
@@ -126,11 +138,6 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
         }
     }
 
-    private void startLoggingActivity() {
-        Intent startLogin = new Intent(this, LoginActivity.class);
-        startActivity(startLogin);
-    }
-
     @Override
     public void setPresenter(StreamListActivityContract.Presenter presenter) {
         mActivityPresenter = presenter;
@@ -155,6 +162,17 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
                 stateNavbar = DEFAULT_NAVIGATION_STATE;
         }
         mBottomNavigationView.setSelectedItemId(currentNavbarItemRId);
+    }
+
+    private void startLoggingActivity() {
+        Intent startLogin = new Intent(this, LoginActivity.class);
+        startActivity(startLogin);
+    }
+
+    private void decideToUpdate(long savedTime) {
+        if (mFragmentPresenter != null) {
+            mFragmentPresenter.decideToReload(SystemClock.elapsedRealtime() - savedTime);
+        }
     }
 
 }

@@ -30,10 +30,10 @@ make stubs when loading streams
 load users thumbnails on streams page
 
 ----------------------------------------------------------------------------------------------------
-    update local caches w favourite streams
+update local caches w favourite streams
 
 implement custom setting
-    ex default quality, prob w list of nonstandart qualities if set for concrete streamer
+    ex default quality, prob w list of nonstandard qualities if set for concrete streamer
 
 ----------------------------------------------------------------------------------------------------
 far far away plans:

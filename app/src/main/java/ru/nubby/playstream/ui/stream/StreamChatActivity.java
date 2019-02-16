@@ -67,7 +67,6 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
         mOnSwipeTouchListener = new OnSwipeTouchListener(this) {
             @Override
             public void onSwipeBottom() {
-                finish();
                 //todo if possible make small window like a twitch app
             }
 
@@ -140,11 +139,6 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
                     }
                 });
 
-        if (savedInstanceState != null) {
-            fullscreenOn = savedInstanceState.getBoolean(BUNDLE_FULLSCREEN_ON);
-            toggleFullscreen(fullscreenOn);
-        }
-
         setWindowMode(getResources().getConfiguration().orientation);
     }
 
@@ -162,10 +156,18 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
     }
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            fullscreenOn = savedInstanceState.getBoolean(BUNDLE_FULLSCREEN_ON);
+            toggleFullscreen(fullscreenOn);
+        }
+    }
+
+    @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putBoolean(BUNDLE_FULLSCREEN_ON, fullscreenOn);
         super.onSaveInstanceState(outState);
-
     }
 
     @Override

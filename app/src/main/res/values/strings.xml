@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">playstream</string>
+    <string name="app_name">Playstream</string>
 
     <!-- Quality list, translatable                     -->
     <string-array name="quality_list">
@@ -16,16 +16,26 @@
 
     <!-- Errors, translatable                           -->
     <string name="error_no_stream_info_provided">No stream info provided.</string>
-    <string name="error_disconnected_from_chat">Disconnected from chat.</string>
+    <string name="system_user">System</string>
 
-    <!-- Menus, translatable                           -->
-    <string name="login">login</string>
+    <string-array name="chat_info_messages">
+        <item name="error_disconnected_from_chat">Disconnected from chat.</item>
+        <item name="error_while_reconnecting">Can not reconnect to chat.</item>
+        <item name="error_while_first_connect">Can not connect to chat.</item>
+        <item name="info_connected">Connected to chat.</item>
+    </string-array>
+
+    <string-array name="streams_list_errors">
+        <item name="error_bad_connection">No internet connection, please retry later.</item>
+    </string-array>
+
+    <!-- Menus, translatable                            -->
+    <string name="login">Login</string>
     <string name="favourites">Follows</string>
     <string name="top_streams">Top streams</string>
 
-    <!-- Title, translatable                           -->
+    <!-- Title, translatable                            -->
     <string name="logged_in">Logged as: </string>
     <string name="not_logged_in">You are not logged in</string>
-
 
 </resources>

@@ -12,9 +12,12 @@ import ru.nubby.playstream.twitchapi.Repository;
 import ru.nubby.playstream.ui.streamlist.StreamListNavigationState;
 import ru.nubby.playstream.utils.SharedPreferencesHelper;
 
+import static ru.nubby.playstream.ui.streamlist.streamlistfragment.StreamListContract.View.ErrorMessage.ERROR_BAD_CONNECTION;
+
 public class StreamListPresenter implements StreamListContract.Presenter {
 
-    private static final String TAG = "StreamListPresenter";
+    private static final String TAG = StreamListPresenter.class.getSimpleName();
+    private final long UPDATE_INTERVAL_MILLIS = 5 * 60 * 1000; //TODO 5 minutes
 
     private StreamListContract.View mStreamListView;
     private Disposable mDisposableFetchingTask;
@@ -48,7 +51,10 @@ public class StreamListPresenter implements StreamListContract.Presenter {
                                 mStreamListView.addStreamList(streams.getData());
                                 mPagination = streams.getPagination();
                             },
-                            e -> Log.e(TAG, "Error while fetching more streams", e));
+                            e -> {
+                                mStreamListView.displayError(ERROR_BAD_CONNECTION);
+                                Log.e(TAG, "Error while fetching more streams", e);
+                            });
         }
     }
 
@@ -71,6 +77,7 @@ public class StreamListPresenter implements StreamListContract.Presenter {
                             },
                             e -> {
                                 mStreamListView.setupProgressBar(false);
+                                mStreamListView.displayError(ERROR_BAD_CONNECTION);
                                 Log.e(TAG, "Error while fetching streams", e);
                             });
         } else {
@@ -96,6 +103,7 @@ public class StreamListPresenter implements StreamListContract.Presenter {
                         },
                         error -> {
                             mStreamListView.setupProgressBar(false);
+                            mStreamListView.displayError(ERROR_BAD_CONNECTION);
                             Log.e(TAG, "Error while fetching user follows ", error);
                         });
     }
@@ -107,8 +115,21 @@ public class StreamListPresenter implements StreamListContract.Presenter {
     }
 
     @Override
+    public void decideToReload(long interval) {
+        if (interval >= UPDATE_INTERVAL_MILLIS) {
+            mStreamListView.clearStreamList();
+            if (mListState == StreamListNavigationState.MODE_TOP) {
+                getTopStreams();
+            } else if (mListState == StreamListNavigationState.MODE_FAVOURITES) {
+                getFollowedStreams();
+            }
+        }
+    }
+
+    @Override
     public void subscribe() {
         if (forceReload && (mDisposableFetchingTask == null || mPagination == null)) {
+            mStreamListView.clearStreamList();
             forceReload = false;
             if (mListState == StreamListNavigationState.MODE_TOP) {
                 getTopStreams();

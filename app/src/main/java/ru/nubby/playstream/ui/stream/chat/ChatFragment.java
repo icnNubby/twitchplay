@@ -1,6 +1,10 @@
 package ru.nubby.playstream.ui.stream.chat;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,14 +51,6 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mChatRecyclerview = null;
-        mProgressBar = null;
-    }
-
-
-    @Override
     public void onResume() {
         super.onResume();
         mPresenter.subscribe();
@@ -64,6 +60,13 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     public void onPause() {
         super.onPause();
         mPresenter.unsubscribe();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mChatRecyclerview = null;
+        mProgressBar = null;
     }
 
     @Override
@@ -79,7 +82,17 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     @Override
     public void addChatMessage(ChatMessage message) {
         ChatMessagesAdapter chatMessagesAdapter = (ChatMessagesAdapter) mChatRecyclerview.getAdapter();
-        if (chatMessagesAdapter!= null) chatMessagesAdapter.addNewMessage(message);
+        if (chatMessagesAdapter != null) chatMessagesAdapter.addNewMessage(message);
+    }
+
+    @Override
+    public void displayInfoMessage(InfoMessage message) {
+        ChatMessage chatMessage = new ChatMessage(getString(R.string.system_user),
+                getResources().getStringArray(R.array.chat_info_messages)[message.ordinal()],
+                "#" + Integer.toHexString(getResources().getColor(R.color.colorAccent)));
+
+        ChatMessagesAdapter chatMessagesAdapter = (ChatMessagesAdapter) mChatRecyclerview.getAdapter();
+        if (chatMessagesAdapter != null) chatMessagesAdapter.addNewMessage(chatMessage);
     }
 
     @Override
@@ -87,8 +100,7 @@ public class ChatFragment extends Fragment implements ChatContract.View {
         mProgressBar.setIndeterminate(loadingState);
         if (loadingState) {
             mProgressBar.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             mProgressBar.setVisibility(View.GONE);
         }
     }
@@ -98,8 +110,20 @@ public class ChatFragment extends Fragment implements ChatContract.View {
         private TextView mTextViewContents;
 
         public void bind(ChatMessage chatMessage) {
-            mChatMessage = chatMessage;
-            mTextViewContents.setText(mChatMessage.getUser() + ": " + mChatMessage.getMessage());
+            if (!chatMessage.isEmpty()) {
+                mChatMessage = chatMessage;
+                SpannableStringBuilder builder = new SpannableStringBuilder();
+                SpannableString user = new SpannableString(mChatMessage.getUser());
+                if (!mChatMessage.getColor().isEmpty())
+                    user.setSpan(new ForegroundColorSpan(Color.parseColor(mChatMessage.getColor())),
+                            0,
+                            user.length(),
+                            0);
+                builder.append(user);
+                builder.append(": ");
+                builder.append(mChatMessage.getMessage());
+                mTextViewContents.setText(builder, TextView.BufferType.SPANNABLE);
+            }
         }
 
         public ChatMessagesViewHolder(@NonNull View itemView) {
@@ -120,7 +144,7 @@ public class ChatFragment extends Fragment implements ChatContract.View {
             //TODO implement scrollability while pushing new elements to list
             while (mChatMessages.size() >= MESSAGE_CAPACITY) {
                 mChatMessages.remove(0);
-                notifyItemRangeRemoved(0,1);
+                notifyItemRangeRemoved(0, 1);
             }
             mChatMessages.add(message);
             notifyItemInserted(mChatMessages.size());

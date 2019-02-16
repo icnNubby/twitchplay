@@ -16,7 +16,7 @@ import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.model.Token;
 import ru.nubby.playstream.model.UserData;
 import ru.nubby.playstream.utils.M3U8Parser;
-import ru.nubby.playstream.utils.Quality;
+import ru.nubby.playstream.model.Quality;
 
 public class RemoteStreamFullInfo {
     private final String TAG = RemoteStreamFullInfo.class.getSimpleName();

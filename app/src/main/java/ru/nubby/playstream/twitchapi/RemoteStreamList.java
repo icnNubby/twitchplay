@@ -52,6 +52,7 @@ public class RemoteStreamList implements Repository {
     @Override
     public Single<List<Stream>> getLiveStreamsFollowedByUser(String userId) {
         return getAllUserFollowRelations(userId)
+                .subscribeOn(Schedulers.io())
                 .map(FollowRelations::getToId)
                 .buffer(100)
                 .flatMap(userList -> TwitchApi
@@ -59,10 +60,10 @@ public class RemoteStreamList implements Repository {
                         .getStreamHelixService()
                         .getAllStreamsByUserList(SensitiveStorage.getClientApiKey(), userList)
                         .toObservable())
+                .subscribeOn(Schedulers.computation())
                 .map(StreamsRequest::getData)
                 .flatMap(Observable::fromIterable)
                 .toSortedList()
-                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -105,7 +106,6 @@ public class RemoteStreamList implements Repository {
                         }
                     });
                 })
-                .doOnNext(userFollowsRequest -> Log.d(TAG, userFollowsRequest.toString()))
                 .map(UserFollowsRequest::getData)
                 .flatMap(Observable::fromIterable);
     }
