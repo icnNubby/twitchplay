@@ -1,4 +1,4 @@
-package ru.nubby.playstream.ircapi;
+package ru.nubby.playstream.data.ircapi;
 
 import android.util.Log;
 
@@ -52,10 +52,9 @@ public class ChatChannelApi {
                 socket = new Socket(TWITCH_CHAT_SERVER, TWITCH_CHAT_PORT);
                 writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                 reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                String loginRequest =
-                        "PASS " + oauthKey + "\r\n" +
-                                "NICK " + user + "\r\n" +
-                                "USER " + user + " \r\n";
+                String loginRequest = "PASS " + oauthKey + "\r\n" +
+                        "NICK " + user + "\r\n" +
+                        "USER " + user + " \r\n";
                 sendMessage(loginRequest);
                 readerObservable = Observable
                         .create(emitter -> {
@@ -107,7 +106,7 @@ public class ChatChannelApi {
 
     }
 
-    public void closeConnection() throws IOException {
+    private void closeConnection() throws IOException {
         if (connected) {
             reader.close();
             writer.close();

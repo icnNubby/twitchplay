@@ -4,9 +4,13 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
+import androidx.annotation.NonNull;
+import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
+import ru.nubby.playstream.data.GlobalRepository;
+import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.UserData;
-import ru.nubby.playstream.twitchapi.RemoteStreamFullInfo;
+import ru.nubby.playstream.data.twitchapi.RemoteStreamFullInfo;
 import ru.nubby.playstream.utils.SharedPreferencesHelper;
 
 public class StreamListActivityPresenter implements StreamListActivityContract.Presenter {
@@ -14,10 +18,12 @@ public class StreamListActivityPresenter implements StreamListActivityContract.P
 
     private StreamListActivityContract.View mMainStreamListView;
     private Disposable mDisposableUserFetchTask;
+    private Repository mRepository;
 
-    public StreamListActivityPresenter(StreamListActivityContract.View view) {
+    public StreamListActivityPresenter(StreamListActivityContract.View view, @NonNull Repository repository) {
         mMainStreamListView = view;
         mMainStreamListView.setPresenter(this);
+        mRepository = repository;
     }
 
     @Override
@@ -32,20 +38,20 @@ public class StreamListActivityPresenter implements StreamListActivityContract.P
         if (token != null && !token.equals("")) {
             UserData data = SharedPreferencesHelper.getUserData(); // TODO INJECT
             if (data == null) {
-                RemoteStreamFullInfo info = new RemoteStreamFullInfo(); // TODO INJECT
-                mDisposableUserFetchTask = info
+                // TODO INJECT
+                mDisposableUserFetchTask = mRepository
                         .getUserDataFromToken(token)
                         .doOnSuccess(userData -> SharedPreferencesHelper.setUserData(new Gson().toJson(userData, UserData.class)))
                         .filter(userData -> userData != null)
-                        .subscribe(userData -> mMainStreamListView.displayLoggedStatus(userData, true),
+                        .subscribe(userData -> mMainStreamListView.displayLoggedStatus(userData),
                                 error -> Log.e(TAG, "Error while fetching user data", error));
 
             } else {
-                mMainStreamListView.displayLoggedStatus(data, true);
+                mMainStreamListView.displayLoggedStatus(data);
             }
 
         } else {
-            mMainStreamListView.displayLoggedStatus(null,false);
+            mMainStreamListView.displayLoggedStatus(new UserData()); //Empty user
         }
     }
 

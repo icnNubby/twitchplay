@@ -24,11 +24,14 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import ru.nubby.playstream.R;
+import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.ui.stream.StreamChatActivity;
 
 public class StreamListFragment extends Fragment implements StreamListContract.View {
     private final String TAG = StreamListFragment.class.getSimpleName();
+
+    private Picasso mPicasso;
 
     private RecyclerView mStreamListRecyclerView;
     private StreamListContract.Presenter mPresenter;
@@ -52,6 +55,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        mPicasso = Picasso.get();
     }
 
     @Nullable
@@ -163,8 +167,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
                     .getThumbnailUrl()
                     .replace("{width}", "" + (int) (streamCardWidth))
                     .replace("{height}", "" + (int) (streamCardHeight));
-            Log.d(TAG, formattedUrl);
-            Picasso.get() // todo inject
+            mPicasso // todo inject
                     .load(formattedUrl)
                     .placeholder(R.drawable.video_placeholder)
                     .resize((int)(streamCardWidth * density), (int)(streamCardHeight * density))

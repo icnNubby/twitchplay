@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:baselineAligned="false"
     android:orientation="horizontal"
+    android:background="@color/colorBlack"
     tools:context=".ui.stream.StreamChatActivity">
 
     <FrameLayout

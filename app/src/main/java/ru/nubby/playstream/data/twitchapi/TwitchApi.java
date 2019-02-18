@@ -1,4 +1,4 @@
-package ru.nubby.playstream.twitchapi;
+package ru.nubby.playstream.data.twitchapi;
 
 import java.util.concurrent.TimeUnit;
 
@@ -8,9 +8,9 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
-import ru.nubby.playstream.twitchapi.services.RawJsonService;
-import ru.nubby.playstream.twitchapi.services.TwitchStreamsHelixService;
-import ru.nubby.playstream.twitchapi.services.TwitchStreamsApiService;
+import ru.nubby.playstream.data.twitchapi.services.RawJsonService;
+import ru.nubby.playstream.data.twitchapi.services.TwitchStreamsHelixService;
+import ru.nubby.playstream.data.twitchapi.services.TwitchStreamsApiService;
 
 //TODO prob extract repeating path from retrofit builder to some private method, and build upon it
 /**

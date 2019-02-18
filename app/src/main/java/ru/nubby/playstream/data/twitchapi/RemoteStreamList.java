@@ -1,8 +1,5 @@
-package ru.nubby.playstream.twitchapi;
+package ru.nubby.playstream.data.twitchapi;
 
-import android.util.Log;
-
-import java.util.Comparator;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -11,16 +8,17 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import ru.nubby.playstream.SensitiveStorage;
+import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.FollowRelations;
 import ru.nubby.playstream.model.Pagination;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.model.StreamsRequest;
 import ru.nubby.playstream.model.UserFollowsRequest;
 
-public class RemoteStreamList implements Repository {
-    private final String TAG = RemoteStreamList.class.getSimpleName();
+@Deprecated
+public class RemoteStreamList{
+    private final String TAG = "RemoteStreamList";
 
-    @Override
     public Single<StreamsRequest> getStreams() {
         return TwitchApi
                 .getInstance()
@@ -30,7 +28,6 @@ public class RemoteStreamList implements Repository {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    @Override
     public Single<StreamsRequest> getStreams(Pagination pagination) {
         return TwitchApi
                 .getInstance()
@@ -40,7 +37,6 @@ public class RemoteStreamList implements Repository {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    @Override
     public Single<List<FollowRelations>> getUserFollows(String userId) {
 
         return  getAllUserFollowRelations(userId)
@@ -49,7 +45,6 @@ public class RemoteStreamList implements Repository {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    @Override
     public Single<List<Stream>> getLiveStreamsFollowedByUser(String userId) {
         return getAllUserFollowRelations(userId)
                 .subscribeOn(Schedulers.io())

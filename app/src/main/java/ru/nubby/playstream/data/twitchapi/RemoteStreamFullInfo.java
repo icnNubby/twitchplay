@@ -1,4 +1,4 @@
-package ru.nubby.playstream.twitchapi;
+package ru.nubby.playstream.data.twitchapi;
 
 import android.util.Log;
 
@@ -18,8 +18,9 @@ import ru.nubby.playstream.model.UserData;
 import ru.nubby.playstream.utils.M3U8Parser;
 import ru.nubby.playstream.model.Quality;
 
+@Deprecated
 public class RemoteStreamFullInfo {
-    private final String TAG = RemoteStreamFullInfo.class.getSimpleName();
+    private final String TAG = "RemoteStreamFullInfo";
 
     /**
      * Gets video url from stream object
@@ -134,7 +135,5 @@ public class RemoteStreamFullInfo {
                 .toObservable()
                 .observeOn(AndroidSchedulers.mainThread());
     }
-
-
 
 }

@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
- * POJO to store chat messages.
+ * DTO to store chat messages.
  */
 public final class ChatMessage {
     @NonNull
@@ -54,6 +54,14 @@ public final class ChatMessage {
         return user.equals(((ChatMessage) obj).user) &&
                 message.equals(((ChatMessage) obj).message) &&
                 color.equals(((ChatMessage) obj).color);
+    }
+
+    @Override
+    public int hashCode() {
+        int hashCode = this.user.hashCode();
+        hashCode = hashCode * 31 + this.message.hashCode();
+        hashCode = hashCode * 31 + this.color.hashCode();
+        return hashCode;
     }
 
     public boolean isEmpty(){

@@ -14,7 +14,7 @@ public class SharedPreferencesHelper {
     private static final String PREF_USER_DATA = "user_data";
 
     private static SharedPreferences mSharedPreferences;
-    private static SharedPreferencesHelper mSharedPreferencesHelper ;
+    private static SharedPreferencesHelper mSharedPreferencesHelper;
 
     private SharedPreferencesHelper(Context context) {
         mSharedPreferences = context.getSharedPreferences(PREFERENCES_FILENAME, Context.MODE_PRIVATE);

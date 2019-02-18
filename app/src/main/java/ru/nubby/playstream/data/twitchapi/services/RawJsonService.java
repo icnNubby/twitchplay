@@ -1,4 +1,4 @@
-package ru.nubby.playstream.twitchapi.services;
+package ru.nubby.playstream.data.twitchapi.services;
 
 
 import io.reactivex.Single;

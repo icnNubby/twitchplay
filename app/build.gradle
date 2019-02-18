@@ -43,6 +43,11 @@ dependencies {
     implementation dependencies.m3u8parse
     implementation dependencies.exoplayer
     implementation dependencies.picasso
+    debugImplementation dependencies.leakcanary
+    debugImplementation dependencies.leakcanary_fragments
+    implementation dependencies.room
+    implementation dependencies.room_rxjava
+    annotationProcessor dependencies.room_annotations
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

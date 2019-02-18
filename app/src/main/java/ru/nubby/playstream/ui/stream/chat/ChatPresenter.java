@@ -3,7 +3,6 @@ package ru.nubby.playstream.ui.stream.chat;
 
 import com.google.android.exoplayer2.util.Log;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Single;
@@ -11,7 +10,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.SensitiveStorage;
-import ru.nubby.playstream.ircapi.ChatChannelApi;
+import ru.nubby.playstream.data.ircapi.ChatChannelApi;
 import ru.nubby.playstream.model.Stream;
 
 import static ru.nubby.playstream.ui.stream.chat.ChatContract.View.InfoMessage.ERROR_DISCONNECTED;
@@ -67,17 +66,10 @@ public class ChatPresenter implements ChatContract.Presenter {
         if (mDisposableStreamAdditionalInfo != null && !mDisposableStreamAdditionalInfo.isDisposed()) {
             mDisposableStreamAdditionalInfo.dispose();
         }
-        try {
-            if (mChatApi != null)
-                mChatApi.closeConnection();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
     public void startListeningToChat(Stream stream) {
-
         mChatListener = mChatApi
                 .listenToChat()
                 .subscribeOn(Schedulers.io())
@@ -97,7 +89,6 @@ public class ChatPresenter implements ChatContract.Presenter {
                                                 Log.e(TAG, "Error while reconnecting", errorReconnect);
                                             });
                         });
-
     }
 
 }

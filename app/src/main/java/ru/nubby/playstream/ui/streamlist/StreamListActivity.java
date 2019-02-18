@@ -11,6 +11,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import ru.nubby.playstream.R;
+import ru.nubby.playstream.data.GlobalRepository;
+import ru.nubby.playstream.data.Repository;
+import ru.nubby.playstream.data.database.AppDatabase;
+import ru.nubby.playstream.data.database.LocalDataSourceImpl;
+import ru.nubby.playstream.data.twitchapi.RemoteRepository;
 import ru.nubby.playstream.model.UserData;
 import ru.nubby.playstream.ui.login.LoginActivity;
 import ru.nubby.playstream.ui.streamlist.streamlistfragment.StreamListContract;
@@ -49,6 +54,7 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
                     .commit();
         }
 
+        Repository globalRepo =  GlobalRepository.getInstance(); //TODO INJECT
         boolean forceReload = false;
         if (savedInstanceState != null) {
             stateNavbar = (StreamListNavigationState) savedInstanceState.get(BUNDLE_NAVBAR_STATE);
@@ -56,12 +62,13 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
         if (!fragmentStreamList.hasPresenterAttached() || forceReload) {
             mFragmentPresenter = new StreamListPresenter(fragmentStreamList,
                     stateNavbar,
-                    true); //TODO inject
+                    true,
+                    globalRepo); //TODO inject
         } else {
             mFragmentPresenter = fragmentStreamList.returnAttachedPresenter();
         }
 
-        new StreamListActivityPresenter(this); //TODO inject
+        new StreamListActivityPresenter(this, globalRepo); //TODO inject
 
         setSupportActionBar(findViewById(R.id.toolbar));
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -128,13 +135,14 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
     }
 
     @Override
-    public void displayLoggedStatus(UserData user, boolean logged) {
-        if (logged) {
+    public void displayLoggedStatus(UserData user) {
+        if (!user.isEmpty()) {
             mToolbar.setTitle(getString(R.string.logged_in) + user.getLogin());
             mBottomNavigationView.getMenu().findItem(R.id.stream_list_navigation_favourites).setEnabled(true);
         } else {
             mToolbar.setTitle(getString(R.string.not_logged_in));
             mBottomNavigationView.getMenu().findItem(R.id.stream_list_navigation_favourites).setEnabled(false);
+            mBottomNavigationView.setSelectedItemId(R.id.stream_list_navigation_top_streams);
         }
     }
 

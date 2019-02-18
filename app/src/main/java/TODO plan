@@ -5,35 +5,33 @@ and portrait mode)
     3 modes (fullscreen and chat+video and chatonly)
     controls on player: fullscreen button, sleepmode button, goback button
 
-fix chat thread dying after some waiting time
-
 change backgrounds colors overall
 maybe implement chatfragment to overlap stream
 
 backnav button
-think about better implementation of chat
-how to close bufferedreader at disposal of activity, but not on next emittion
 
 chat improve (emodzi display, sending messages(after logging obv))
 ----------------------------------------------------------------------------------------------------
 
 think about overall design
-appbar on mainscreen overlaps nested recycler
+
+----------------------------------------------------------------------------------------------------
+
+SPLASH screen to fetch user data(follow list), update user token at start of the app.
+
+----------------------------------------------------------------------------------------------------
+
+!atleast we should encode oauth token
 
 ----------------------------------------------------------------------------------------------------
 
 add dagger and dependencies injection
 decouple adapters and viewholders
+
 ----------------------------------------------------------------------------------------------------
 
 make stubs when loading streams
 load users thumbnails on streams page
-
-----------------------------------------------------------------------------------------------------
-update local caches w favourite streams
-
-implement custom setting
-    ex default quality, prob w list of nonstandard qualities if set for concrete streamer
 
 ----------------------------------------------------------------------------------------------------
 far far away plans:
@@ -42,4 +40,5 @@ far far away plans:
 
     settings
         pref quality
+        small preview
 

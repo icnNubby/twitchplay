@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import ru.nubby.playstream.R;
+import ru.nubby.playstream.data.GlobalRepository;
 
 public class LoginActivity extends AppCompatActivity implements LoginContract.View {
     private final String TAG = this.getClass().getSimpleName();
@@ -78,7 +79,7 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         mWebViewProgress.setIndeterminate(true);
         mWebViewProgress.setVisibility(View.VISIBLE);
 
-        new LoginPresenter(this); //TODO INJECT
+        new LoginPresenter(this, GlobalRepository.getInstance()); //TODO INJECT
     }
 
     @Override

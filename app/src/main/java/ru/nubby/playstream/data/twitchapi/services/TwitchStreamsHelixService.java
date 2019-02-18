@@ -1,8 +1,7 @@
-package ru.nubby.playstream.twitchapi.services;
+package ru.nubby.playstream.data.twitchapi.services;
 
 import java.util.List;
 
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import retrofit2.http.GET;
 import retrofit2.http.Header;

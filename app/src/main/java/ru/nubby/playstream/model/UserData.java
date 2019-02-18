@@ -3,6 +3,8 @@ package ru.nubby.playstream.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import androidx.annotation.NonNull;
+
 /**
  *
  * <a href = "https://dev.twitch.tv/docs/api/reference/#get-users">User data.</a>
@@ -11,10 +13,12 @@ public class UserData {
 
     @SerializedName("id")
     @Expose
-    private String id;
+    @NonNull
+    private String id = "";
     @SerializedName("login")
     @Expose
-    private String login;
+    @NonNull
+    private String login = "";
     @SerializedName("display_name")
     @Expose
     private String displayName;
@@ -40,19 +44,21 @@ public class UserData {
     @Expose
     private String email;
 
+    @NonNull
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(@NonNull String id) {
         this.id = id;
     }
 
+    @NonNull
     public String getLogin() {
         return login;
     }
 
-    public void setLogin(String login) {
+    public void setLogin(@NonNull String login) {
         this.login = login;
     }
 
@@ -118,6 +124,10 @@ public class UserData {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public boolean isEmpty(){
+        return this.id.isEmpty() && this.login.isEmpty();
     }
 
 }

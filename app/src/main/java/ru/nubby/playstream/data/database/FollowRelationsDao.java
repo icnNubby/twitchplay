@@ -1,0 +1,32 @@
+package ru.nubby.playstream.data.database;
+
+import java.util.List;
+
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
+import io.reactivex.Completable;
+import io.reactivex.Single;
+import ru.nubby.playstream.model.FollowRelations;
+
+@Dao
+public interface FollowRelationsDao {
+
+        @Query("SELECT * FROM follow_relations WHERE from_id = :fromId")
+        Single<List<FollowRelations>> loadRelationsFromId(String fromId);
+
+        @Insert(onConflict = OnConflictStrategy.REPLACE)
+        Completable insertFollowRelationsEntry(FollowRelations followRelationsEntry);
+
+        @Insert(onConflict = OnConflictStrategy.REPLACE)
+        Completable insertListFollowRelationsEntries(FollowRelations... followRelationsEntry);
+
+        @Delete
+        Completable deleteFollowRelationsEntry(FollowRelations followRelationsEntry);
+
+        @Query("DELETE FROM follow_relations")
+        Completable deleteAllFollowRelationsEntries();
+
+}

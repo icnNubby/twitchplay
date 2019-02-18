@@ -6,8 +6,9 @@ import com.google.gson.Gson;
 
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.SensitiveStorage;
+import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.UserData;
-import ru.nubby.playstream.twitchapi.RemoteStreamFullInfo;
+import ru.nubby.playstream.data.twitchapi.RemoteStreamFullInfo;
 import ru.nubby.playstream.utils.SharedPreferencesHelper;
 
 public class LoginPresenter implements LoginContract.Presenter {
@@ -18,9 +19,12 @@ public class LoginPresenter implements LoginContract.Presenter {
     private LoginContract.View mLoginView;
     private Disposable mDisposableUserFetchTask;
 
-    LoginPresenter(LoginContract.View loginView) {
+    private Repository mRemoteStreamFullInfo;
+
+    LoginPresenter(LoginContract.View loginView, Repository repository) {
         mLoginView = loginView;
         mLoginView.setPresenter(this);
+        mRemoteStreamFullInfo = repository;
     }
 
     @Override
@@ -47,8 +51,7 @@ public class LoginPresenter implements LoginContract.Presenter {
             SharedPreferencesHelper.setUserToken(mAccessToken);
             Log.d(TAG, "Token response " + mAccessToken);
             //TODO make interactor
-            RemoteStreamFullInfo info = new RemoteStreamFullInfo();
-            mDisposableUserFetchTask = info
+            mDisposableUserFetchTask = mRemoteStreamFullInfo
                     .getUserDataFromToken(mAccessToken)
                     .doOnSuccess(userData -> SharedPreferencesHelper.setUserData(new Gson().toJson(userData, UserData.class)))
                     .subscribe(userData -> mLoginView.userInfoFetched(true),

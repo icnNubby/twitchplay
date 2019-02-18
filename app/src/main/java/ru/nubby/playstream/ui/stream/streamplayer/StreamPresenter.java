@@ -8,9 +8,10 @@ import java.util.HashMap;
 
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
-import ru.nubby.playstream.model.Stream;
-import ru.nubby.playstream.twitchapi.RemoteStreamFullInfo;
+import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.Quality;
+import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.data.twitchapi.RemoteStreamFullInfo;
 
 public class StreamPresenter implements StreamContract.Presenter {
     private final String TAG = "StreamPresenter";
@@ -23,10 +24,13 @@ public class StreamPresenter implements StreamContract.Presenter {
     private HashMap<Quality, String> mQualityUrls;
     private ArrayList<Quality> mQualities;
 
-    public StreamPresenter(StreamContract.View streamView, Single<Stream> stream) {
+    private Repository mRemoteStreamFullInfo; //TODO inject
+
+    public StreamPresenter(StreamContract.View streamView, Single<Stream> stream, Repository repository) {
         this.mStreamView = streamView;
         mSingleStream = stream;
         streamView.setPresenter(this);
+        mRemoteStreamFullInfo = repository;
     }
 
     @Override
@@ -39,7 +43,10 @@ public class StreamPresenter implements StreamContract.Presenter {
                             mStreamView.displayTitle(streamReturned.getTitle());
                             mStreamView.displayViewerCount(streamReturned.getViewerCount());
                         },
-                        error -> Log.e(TAG, "Error while fetching additional data ", error));
+                        error -> {
+                            mStreamView.displayLoading(false);
+                            Log.e(TAG, "Error while fetching additional data ", error);
+                        });
     }
 
     @Override
@@ -70,9 +77,8 @@ public class StreamPresenter implements StreamContract.Presenter {
         if (mDisposableStreamInfoUpdater != null && !mDisposableStreamInfoUpdater.isDisposed()) {
             mDisposableStreamInfoUpdater.dispose();
         }
-        RemoteStreamFullInfo info = new RemoteStreamFullInfo(); //TODO inject
         mStreamView.displayLoading(true);
-        mDisposableStreamResolutionsInfo = info
+        mDisposableStreamResolutionsInfo = mRemoteStreamFullInfo
                 .getVideoUrl(stream)
                 .subscribe(fetchedQualityTable -> {
                             mQualityUrls = fetchedQualityTable;
@@ -88,15 +94,18 @@ public class StreamPresenter implements StreamContract.Presenter {
                             }
                             mStreamView.displayLoading(false);
                         },
-                        error -> Log.e(TAG, "Error while fetching quality urls " + error, error));
+                        error -> {
+                            mStreamView.displayLoading(false);
+                            Log.e(TAG, "Error while fetching quality urls " + error, error);
+                        });
 
-        mDisposableStreamInfoUpdater = info
-                .updateStream(stream)
+        mDisposableStreamInfoUpdater = mRemoteStreamFullInfo
+                .getUpdatedStreamInfo(stream)
                 .subscribe(streamUpdated -> {
                             mStreamView.displayTitle(streamUpdated.getTitle());
                             mStreamView.displayViewerCount(streamUpdated.getViewerCount());
                         },
-                        error -> Log.e(TAG, "Error while updating stream info "
+                        error -> Log.e(TAG, "Error while updating stream mRemoteStreamFullInfo "
                                 + error.getMessage(), error));
 
         //todo error processing in view
