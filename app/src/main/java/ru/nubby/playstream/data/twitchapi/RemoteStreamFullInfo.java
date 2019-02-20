@@ -13,7 +13,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.SensitiveStorage;
 import ru.nubby.playstream.model.Stream;
-import ru.nubby.playstream.model.Token;
+import ru.nubby.playstream.model.StreamToken;
 import ru.nubby.playstream.model.UserData;
 import ru.nubby.playstream.utils.M3U8Parser;
 import ru.nubby.playstream.model.Quality;
@@ -40,7 +40,7 @@ public class RemoteStreamFullInfo {
                             .map(UserData::getLogin);
         }
 
-        Single<Token> tokenSingle = channelName
+        Single<StreamToken> tokenSingle = channelName
                 .flatMap(channelNameString -> TwitchApi
                         .getInstance()
                         .getStreamApiService()
@@ -50,9 +50,9 @@ public class RemoteStreamFullInfo {
 
         return Single
                 .zip(tokenSingle, channelName,
-                        (token, streamerName) ->
+                        (streamToken, streamerName) ->
                                 String.format("%s.m3u8" +
-                                                "?token=%s" +
+                                                "?streamToken=%s" +
                                                 "&sig=%s" +
                                                 "&player=twitchweb" +
                                                 "&allow_audio_only=true" +
@@ -60,10 +60,10 @@ public class RemoteStreamFullInfo {
                                                 "&type=any" +
                                                 "&p=%s",
                                         streamerName,
-                                        URLEncoder.encode(token.getToken(), "UTF-8")
+                                        URLEncoder.encode(streamToken.getToken(), "UTF-8")
                                                 .replaceAll("%3A", ":")
                                                 .replaceAll("%2C", ","),
-                                        token.getSig(),
+                                        streamToken.getSig(),
                                         "" + new Random().nextInt(6)))
                 .flatMap(urlToGetStreamPlaylist -> TwitchApi
                         .getInstance()
@@ -81,7 +81,7 @@ public class RemoteStreamFullInfo {
      * @param stream {@link Stream} object
      * @return {@link Single} of login name string.
      */
-    public Single<UserData> getStreamerInfo(Stream stream) {
+    private Single<UserData> getStreamerInfo(Stream stream) {
         return TwitchApi
                 .getInstance()
                 .getStreamHelixService()

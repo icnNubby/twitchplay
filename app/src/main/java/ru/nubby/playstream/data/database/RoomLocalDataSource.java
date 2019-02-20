@@ -3,17 +3,15 @@ package ru.nubby.playstream.data.database;
 import java.util.List;
 
 import io.reactivex.Completable;
-import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import ru.nubby.playstream.model.FollowRelations;
 
-public class LocalDataSourceImpl implements  LocalDataSource {
+public class RoomLocalDataSource implements  LocalDataSource {
 
     private final FollowRelationsDao mFollowRelationsDao;
 
-    public LocalDataSourceImpl(FollowRelationsDao appDao) {
-        mFollowRelationsDao = appDao;
+    public RoomLocalDataSource(FollowRelationsDao followRelationsDao) {
+        mFollowRelationsDao = followRelationsDao;
     }
 
     @Override
@@ -38,7 +36,7 @@ public class LocalDataSourceImpl implements  LocalDataSource {
     }
 
     @Override
-    public Completable deleteAllEntries() {
+    public Completable deleteAllFollowRelationsEntries() {
         return mFollowRelationsDao.deleteAllFollowRelationsEntries();
     }
 }

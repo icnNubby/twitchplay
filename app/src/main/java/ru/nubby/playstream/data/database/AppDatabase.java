@@ -12,21 +12,16 @@ import ru.nubby.playstream.model.FollowRelations;
 public abstract class AppDatabase extends RoomDatabase {
 
     private static final String TAG = AppDatabase.class.getSimpleName();
-    private static final Object LOCK = new Object();
     private static final String DATABASE_NAME = "playstream";
     private static AppDatabase sInstance;
 
-    public static void init(Context context) {
+    public static synchronized void init(Context context) {
         if (sInstance == null) {
-            synchronized (LOCK) {
-                if (sInstance == null) {
-                    Log.d(TAG, "Creating new database instance");
-                    sInstance = Room.databaseBuilder(context.getApplicationContext(),
-                            AppDatabase.class,
-                            AppDatabase.DATABASE_NAME)
-                            .build();
-                }
-            }
+            Log.d(TAG, "Creating new database instance");
+            sInstance = Room.databaseBuilder(context.getApplicationContext(),
+                    AppDatabase.class,
+                    AppDatabase.DATABASE_NAME)
+                    .build();
         }
     }
 

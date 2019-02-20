@@ -5,13 +5,10 @@ import android.util.Log;
 import com.google.gson.Gson;
 
 import androidx.annotation.NonNull;
-import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
-import ru.nubby.playstream.data.GlobalRepository;
 import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.UserData;
-import ru.nubby.playstream.data.twitchapi.RemoteStreamFullInfo;
-import ru.nubby.playstream.utils.SharedPreferencesHelper;
+import ru.nubby.playstream.utils.SharedPreferencesManager;
 
 public class StreamListActivityPresenter implements StreamListActivityContract.Presenter {
     private final String TAG = StreamListActivityPresenter.class.getSimpleName();
@@ -34,14 +31,14 @@ public class StreamListActivityPresenter implements StreamListActivityContract.P
 
     @Override
     public void subscribe() {
-        String token = SharedPreferencesHelper.getUserToken();
+        String token = SharedPreferencesManager.getUserAccessToken();
         if (token != null && !token.equals("")) {
-            UserData data = SharedPreferencesHelper.getUserData(); // TODO INJECT
+            UserData data = SharedPreferencesManager.getUserData(); // TODO INJECT
             if (data == null) {
                 // TODO INJECT
                 mDisposableUserFetchTask = mRepository
                         .getUserDataFromToken(token)
-                        .doOnSuccess(userData -> SharedPreferencesHelper.setUserData(new Gson().toJson(userData, UserData.class)))
+                        .doOnSuccess(userData -> SharedPreferencesManager.setUserData(new Gson().toJson(userData, UserData.class)))
                         .filter(userData -> userData != null)
                         .subscribe(userData -> mMainStreamListView.displayLoggedStatus(userData),
                                 error -> Log.e(TAG, "Error while fetching user data", error));

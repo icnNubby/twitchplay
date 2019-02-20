@@ -8,8 +8,7 @@ import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.SensitiveStorage;
 import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.UserData;
-import ru.nubby.playstream.data.twitchapi.RemoteStreamFullInfo;
-import ru.nubby.playstream.utils.SharedPreferencesHelper;
+import ru.nubby.playstream.utils.SharedPreferencesManager;
 
 public class LoginPresenter implements LoginContract.Presenter {
     private final String TAG = LoginPresenter.class.getSimpleName();
@@ -48,13 +47,15 @@ public class LoginPresenter implements LoginContract.Presenter {
     public boolean interceptedAnswer(String url) {
         if (url.contains("#access_token=")) {
             String mAccessToken = getAccessTokenFromURL(url);
-            SharedPreferencesHelper.setUserToken(mAccessToken);
-            Log.d(TAG, "Token response " + mAccessToken);
-            //TODO make interactor
+            if (SharedPreferencesManager.setUserAccessToken(mAccessToken)) {
+                Log.d(TAG, "StreamToken response " + mAccessToken);
+            } else {
+                Log.e(TAG, "StreamToken response " + mAccessToken + " is not written to prefs!");
+            }
             mDisposableUserFetchTask = mRemoteStreamFullInfo
                     .getUserDataFromToken(mAccessToken)
-                    .doOnSuccess(userData -> SharedPreferencesHelper.setUserData(new Gson().toJson(userData, UserData.class)))
-                    .subscribe(userData -> mLoginView.userInfoFetched(true),
+                    .doOnSuccess(userData -> SharedPreferencesManager.setUserData(new Gson().toJson(userData, UserData.class)))
+                    .subscribe(userData -> mLoginView.handleUserInfoFetched(true),
                             error -> Log.e(TAG, "Error while fetching user data", error));
             return true;
         }

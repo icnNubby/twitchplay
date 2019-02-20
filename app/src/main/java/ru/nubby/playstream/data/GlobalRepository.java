@@ -6,12 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.data.database.LocalDataSource;
-import ru.nubby.playstream.data.database.LocalDataSourceImpl;
 import ru.nubby.playstream.data.twitchapi.RemoteRepository;
 import ru.nubby.playstream.model.FollowRelations;
 import ru.nubby.playstream.model.Pagination;
@@ -23,11 +21,10 @@ import ru.nubby.playstream.model.UserData;
 /**
  * Contains decision making on what kind of repo we should use.
  * Some logic probably can be decoupled into usecases/interactors.
+ * Although its already some sort of interactor.
  */
 public class GlobalRepository implements Repository {
     private final String TAG = GlobalRepository.class.getSimpleName();
-
-    private static final Object LOCK = new Object();
 
     private final RemoteRepository mRemoteRepository;
     private final LocalDataSource mLocalDataSource;
@@ -43,15 +40,13 @@ public class GlobalRepository implements Repository {
 
     public synchronized static void init(@NonNull RemoteRepository remoteRepository, @NonNull LocalDataSource localDataSource) {
         if (sInstance == null) {
-            synchronized (LOCK) {
-                if (sInstance == null) {
-                    sInstance = new GlobalRepository(remoteRepository, localDataSource);
-                }
-            }
+            sInstance = new GlobalRepository(remoteRepository, localDataSource);
         }
     }
 
+    @NonNull
     public static GlobalRepository getInstance() {
+        if (sInstance == null) throw new NullPointerException("Global repository is not instantiated");
         return sInstance;
     }
 
@@ -75,7 +70,8 @@ public class GlobalRepository implements Repository {
                     .doOnSuccess(list -> {
                         mLocalDataSource
                                 .insertFollowRelationsList(list.toArray(new FollowRelations[0]))
-                                .subscribe(() -> {},
+                                .subscribe(() -> {
+                                        },
                                         error -> firstLoad = true);
                         //TODO think how to do better, that is awful
                         Log.d(TAG, "Probably written to db");

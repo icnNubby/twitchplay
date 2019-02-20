@@ -19,57 +19,66 @@ import ru.nubby.playstream.data.twitchapi.services.TwitchStreamsApiService;
  */
 public class TwitchApi {
 
-    private static TwitchApi mInstance;
+    private static TwitchApi sInstance;
     private static final String BASE_URL_HELIX = "https://api.twitch.tv/helix/";
     private static final String BASE_URL_KRAKEN = "https://api.twitch.tv/kraken/";
     private static final String BASE_URL_API = "https://api.twitch.tv/api/";
     private static final String BASE_URL_USHER_HLS = "https://usher.ttvnw.net/api/channel/hls/";
+
     private OkHttpClient mOkHttpClient;
+    private TwitchStreamsHelixService mTwitchStreamsHelixService;
+    private TwitchStreamsApiService mTwitchStreamsApiService;
+    private RawJsonService mRawJsonService;
 
     private TwitchApi() {
         mOkHttpClient = provideOkHttpClient();
     }
 
     public static synchronized TwitchApi getInstance() {
-        if (mInstance == null) {
-            mInstance = new TwitchApi();
+        if (sInstance == null) {
+            sInstance = new TwitchApi();
         }
-        return mInstance;
+        return sInstance;
     }
 
-    public TwitchStreamsHelixService getStreamHelixService() {
+    TwitchStreamsHelixService getStreamHelixService() {
+        if (mTwitchStreamsHelixService == null) {
+            mTwitchStreamsHelixService = new Retrofit.Builder()
+                    .baseUrl(BASE_URL_HELIX)
+                    .client(mOkHttpClient)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build()
+                    .create(TwitchStreamsHelixService.class);
+        }
+        return mTwitchStreamsHelixService;
+    }
 
-        return new Retrofit.Builder()
-                .baseUrl(BASE_URL_HELIX)
-                .client(mOkHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build()
-                .create(TwitchStreamsHelixService.class);
+    TwitchStreamsApiService getStreamApiService() {
+        if (mTwitchStreamsApiService == null) {
+            mTwitchStreamsApiService = new Retrofit.Builder()
+                    .baseUrl(BASE_URL_API)
+                    .client(mOkHttpClient)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build()
+                    .create(TwitchStreamsApiService.class);
+        }
+        return mTwitchStreamsApiService;
 
     }
 
-    public TwitchStreamsApiService getStreamApiService() {
-
-        return new Retrofit.Builder()
-                .baseUrl(BASE_URL_API)
-                .client(mOkHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build()
-                .create(TwitchStreamsApiService.class);
-
-    }
-
-    public RawJsonService getRawJsonHlsService() {
-
-        return new Retrofit.Builder()
-                .baseUrl(BASE_URL_USHER_HLS)
-                .client(mOkHttpClient)
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build()
-                .create(RawJsonService.class);
+    RawJsonService getRawJsonHlsService() {
+        if (mRawJsonService == null){
+            mRawJsonService = new Retrofit.Builder()
+                    .baseUrl(BASE_URL_USHER_HLS)
+                    .client(mOkHttpClient)
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build()
+                    .create(RawJsonService.class);
+        }
+        return mRawJsonService;
 
     }
 

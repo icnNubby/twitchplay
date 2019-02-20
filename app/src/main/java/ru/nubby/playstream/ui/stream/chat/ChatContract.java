@@ -16,6 +16,5 @@ public interface ChatContract {
     }
 
     interface Presenter extends BasePresenter {
-        void startListeningToChat(Stream stream);
     }
 }

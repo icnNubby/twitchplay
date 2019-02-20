@@ -13,9 +13,6 @@ import androidx.appcompat.widget.Toolbar;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.data.GlobalRepository;
 import ru.nubby.playstream.data.Repository;
-import ru.nubby.playstream.data.database.AppDatabase;
-import ru.nubby.playstream.data.database.LocalDataSourceImpl;
-import ru.nubby.playstream.data.twitchapi.RemoteRepository;
 import ru.nubby.playstream.model.UserData;
 import ru.nubby.playstream.ui.login.LoginActivity;
 import ru.nubby.playstream.ui.streamlist.streamlistfragment.StreamListContract;
@@ -93,7 +90,7 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        decideToUpdate(savedInstanceState.getLong(BUNDLE_TIME_STATE));
+        pausedAt = savedInstanceState.getLong(BUNDLE_TIME_STATE);
     }
 
     @Override

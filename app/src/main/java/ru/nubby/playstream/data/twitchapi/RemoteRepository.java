@@ -18,8 +18,8 @@ import ru.nubby.playstream.model.FollowRelations;
 import ru.nubby.playstream.model.Pagination;
 import ru.nubby.playstream.model.Quality;
 import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.model.StreamToken;
 import ru.nubby.playstream.model.StreamsRequest;
-import ru.nubby.playstream.model.Token;
 import ru.nubby.playstream.model.UserData;
 import ru.nubby.playstream.model.UserFollowsRequest;
 import ru.nubby.playstream.utils.M3U8Parser;
@@ -42,7 +42,7 @@ public class RemoteRepository {
                     .map(UserData::getLogin);
         }
 
-        Single<Token> tokenSingle = channelName
+        Single<StreamToken> tokenSingle = channelName
                 .flatMap(channelNameString -> TwitchApi
                         .getInstance()
                         .getStreamApiService()
@@ -52,9 +52,9 @@ public class RemoteRepository {
 
         return Single
                 .zip(tokenSingle, channelName,
-                        (token, streamerName) ->
+                        (streamToken, streamerName) ->
                                 String.format("%s.m3u8" +
-                                                "?token=%s" +
+                                                "?streamToken=%s" +
                                                 "&sig=%s" +
                                                 "&player=twitchweb" +
                                                 "&allow_audio_only=true" +
@@ -62,10 +62,10 @@ public class RemoteRepository {
                                                 "&type=any" +
                                                 "&p=%s",
                                         streamerName,
-                                        URLEncoder.encode(token.getToken(), "UTF-8")
+                                        URLEncoder.encode(streamToken.getToken(), "UTF-8")
                                                 .replaceAll("%3A", ":")
                                                 .replaceAll("%2C", ","),
-                                        token.getSig(),
+                                        streamToken.getSig(),
                                         "" + new Random().nextInt(6)))
                 .flatMap(urlToGetStreamPlaylist -> TwitchApi
                         .getInstance()

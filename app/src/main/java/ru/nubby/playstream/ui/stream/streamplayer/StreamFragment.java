@@ -37,6 +37,7 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
 
     public interface StreamActivityCallbacks {
         void toggleFullscreen(boolean fullscreenOn);
+
         boolean getFullscreenState();
     }
 
@@ -44,6 +45,7 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
     private PlayerView mVideoView;
     private ExoPlayer mExoPlayer;
     private ImageButton mFullscreenToggle;
+    private ImageButton mPlayButton;
     private ImageButton mQualityMenuButton;
     private PopupMenu mResolutionsMenu;
     private ProgressBar mProgressBar;
@@ -77,13 +79,21 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
         mVideoView.setPlayer(mExoPlayer);
         mVideoView.setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS);
 
+        mPlayButton = fragmentView.findViewById(R.id.exo_play);
+        mPlayButton.setOnClickListener(v -> {
+            if (mExoPlayer != null) {
+                mExoPlayer.setPlayWhenReady(true);
+            }
+        });
+
         mFullscreenToggle = fragmentView.findViewById(R.id.fullscreen_toggle);
         mFullscreenToggle.setOnClickListener(v -> mActivityCallbacks.toggleFullscreen(!mActivityCallbacks.getFullscreenState()));
 
         mQualityMenuButton = fragmentView.findViewById(R.id.qualities_menu);
         mQualityMenuButton.setOnClickListener(v -> {
-            if (mResolutionsMenu != null)
+            if (mResolutionsMenu != null) {
                 mResolutionsMenu.show();
+            }
         });
 
         mTitleTextView = fragmentView.findViewById(R.id.text_view_stream_title);
@@ -122,6 +132,7 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
         mTitleTextView = null;
         mViewerCountTextView = null;
         mProgressBar = null;
+        mPlayButton = null;
         mResolutionsMenu = null;
     }
 
@@ -176,14 +187,16 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
 
     @Override
     public void setQualitiesMenu(List<Quality> qualities) {
-        mResolutionsMenu = new PopupMenu(getActivity(), mQualityMenuButton);
-        for (Quality quality: qualities)
-            mResolutionsMenu.getMenu().add(
-                    1,
-                    quality.ordinal(),
-                    0,
-                    quality.getQualityShortName(getActivity()));
-        mResolutionsMenu.setOnMenuItemClickListener(this);
+        if (isAdded()) {
+            mResolutionsMenu = new PopupMenu(getActivity(), mQualityMenuButton);
+            for (Quality quality : qualities)
+                mResolutionsMenu.getMenu().add(
+                        1,
+                        quality.ordinal(),
+                        0,
+                        quality.getQualityShortName(getActivity()));
+            mResolutionsMenu.setOnMenuItemClickListener(this);
+        }
     }
 
     @Override
@@ -191,8 +204,7 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
         mProgressBar.setIndeterminate(loadingState);
         if (loadingState) {
             mProgressBar.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             mProgressBar.setVisibility(View.GONE);
         }
     }

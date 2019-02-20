@@ -2,7 +2,6 @@ package ru.nubby.playstream.ui.streamlist.streamlistfragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +23,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.ui.stream.StreamChatActivity;
 
@@ -89,7 +87,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
     }
 
     @Override
-    public void displayNewStreamList(List<Stream> streams) {
+    public void displayStreamList(List<Stream> streams) {
         StreamListAdapter streamListAdapter = new StreamListAdapter(streams);
         if (mStreamListRecyclerView != null) {
             mStreamListRecyclerView.setAdapter(streamListAdapter);
@@ -146,6 +144,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
 
     @Override
     public void displayError(ErrorMessage message) {
+        mSwipeRefreshLayout.setRefreshing(false);
         String errorMessage =
                 getResources().getStringArray(R.array.streams_list_errors)[message.ordinal()];
         Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
@@ -203,7 +202,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
         public StreamListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater
                     .from(getActivity())
-                    .inflate(R.layout.stream_list_element, parent, false);
+                    .inflate(R.layout.stream_list_element_small, parent, false);
             StreamListViewHolder listViewHolder = new StreamListViewHolder(view);
             view.setOnClickListener(listViewHolder);
             return listViewHolder;
@@ -213,7 +212,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
         public void onBindViewHolder(@NonNull StreamListViewHolder holder, int position) {
             holder.bind(mStreamsList.get(position));
             if (position == mStreamsList.size() - 3) {
-                mPresenter.getMoreTopStreams();
+                mPresenter.getMoreStreams();
             }
         }
 

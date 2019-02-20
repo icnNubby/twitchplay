@@ -6,7 +6,7 @@ import ru.nubby.playstream.ui.BaseView;
 public interface LoginContract {
     interface View extends BaseView<Presenter> {
         void loadUrl(String url);
-        void userInfoFetched(boolean success);
+        void handleUserInfoFetched(boolean success);
     }
 
     interface Presenter extends BasePresenter {

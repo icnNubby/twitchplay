@@ -12,7 +12,7 @@ public interface StreamListContract {
         enum ErrorMessage {
             ERROR_BAD_CONNECTION
         }
-        void displayNewStreamList(List<Stream> streams);
+        void displayStreamList(List<Stream> streams);
         void clearStreamList();
         void addStreamList(List<Stream> streams);
         void setupProgressBar(boolean visible);
@@ -20,7 +20,7 @@ public interface StreamListContract {
     }
 
     interface Presenter extends BasePresenter {
-        void getMoreTopStreams();
+        void getMoreStreams();
         void updateStreams();
         void getFollowedStreams();
         void getTopStreams();

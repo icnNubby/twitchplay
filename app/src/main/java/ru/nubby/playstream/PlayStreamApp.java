@@ -6,9 +6,9 @@ import com.squareup.leakcanary.LeakCanary;
 
 import ru.nubby.playstream.data.GlobalRepository;
 import ru.nubby.playstream.data.database.AppDatabase;
-import ru.nubby.playstream.data.database.LocalDataSourceImpl;
+import ru.nubby.playstream.data.database.RoomLocalDataSource;
 import ru.nubby.playstream.data.twitchapi.RemoteRepository;
-import ru.nubby.playstream.utils.SharedPreferencesHelper;
+import ru.nubby.playstream.utils.SharedPreferencesManager;
 
 public class PlayStreamApp extends Application {
 
@@ -19,10 +19,10 @@ public class PlayStreamApp extends Application {
             return;
         }
         LeakCanary.install(this);
-        SharedPreferencesHelper.init(this);
+        SharedPreferencesManager.init(this);
         AppDatabase.init(this);
         GlobalRepository.init(new RemoteRepository(),
-                new LocalDataSourceImpl(AppDatabase.getInstance().appDao()));
+                new RoomLocalDataSource(AppDatabase.getInstance().appDao()));
         //TODO fking use dagger already
     }
 }

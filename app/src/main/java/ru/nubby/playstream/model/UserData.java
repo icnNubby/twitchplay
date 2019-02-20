@@ -12,36 +12,26 @@ import androidx.annotation.NonNull;
 public class UserData {
 
     @SerializedName("id")
-    @Expose
     @NonNull
     private String id = "";
     @SerializedName("login")
-    @Expose
     @NonNull
     private String login = "";
     @SerializedName("display_name")
-    @Expose
     private String displayName;
     @SerializedName("type")
-    @Expose
     private String type;
     @SerializedName("broadcaster_type")
-    @Expose
     private String broadcasterType;
     @SerializedName("description")
-    @Expose
     private String description;
     @SerializedName("profile_image_url")
-    @Expose
     private String profileImageUrl;
     @SerializedName("offline_image_url")
-    @Expose
     private String offlineImageUrl;
     @SerializedName("view_count")
-    @Expose
     private Integer viewCount;
     @SerializedName("email")
-    @Expose
     private String email;
 
     @NonNull

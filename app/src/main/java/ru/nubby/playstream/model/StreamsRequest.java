@@ -15,14 +15,12 @@ public class StreamsRequest {
      * Contains an array of {@link Stream} information elements.
      */
     @SerializedName("data")
-    @Expose
     private List<Stream> data;
 
     /**
     * Contains information, required to query for more streams.
      */
     @SerializedName("pagination")
-    @Expose
     private Pagination pagination;
 
     public List<Stream> getData() {

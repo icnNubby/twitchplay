@@ -1,44 +1,31 @@
-// TODO !!!!LIST!!!!
-implement stream fragment + chat fragment together in 1 activity (should work correctly in landscape
-and portrait mode)
-    add animation of appearing and disappearing of fragment
-    3 modes (fullscreen and chat+video and chatonly)
-    controls on player: fullscreen button, sleepmode button, goback button
+// TODO future plans
+Bugs
+    fix displaying appsecret at failed load in login activity
+More features gradually from nearest to farthest:
+    authorization flow, figure out what to do when streamToken expires
+        implement it
+    possibility to follow/unfollow channels
+    saving information about users we follow (avatars, etc) to db
+    notifications when in background
+    sleep mode and setup to it
+    backnav!
+    preferences screen finally
+    chat answers
+    chat emodzi displays
+    emodzi update and storage locally
+    user view screen (prob with possibilities to edit urself)
+    subscriptions workaround (? figure out how it works)
+    syncing it periodically (prob on weekly basis? it doesnot change too often)
+    animations (learning some ui stuff)
+    launcher icon and overall beautify
 
-change backgrounds colors overall
-maybe implement chatfragment to overlap stream
+Development stuff:
+    add DI
+    add atleast unittests
+    add CI
 
-backnav button
+Things to think at:
+    better architecture? does app need it?
 
-chat improve (emodzi display, sending messages(after logging obv))
-----------------------------------------------------------------------------------------------------
 
-think about overall design
-
-----------------------------------------------------------------------------------------------------
-
-SPLASH screen to fetch user data(follow list), update user token at start of the app.
-
-----------------------------------------------------------------------------------------------------
-
-!atleast we should encode oauth token
-
-----------------------------------------------------------------------------------------------------
-
-add dagger and dependencies injection
-decouple adapters and viewholders
-
-----------------------------------------------------------------------------------------------------
-
-make stubs when loading streams
-load users thumbnails on streams page
-
-----------------------------------------------------------------------------------------------------
-far far away plans:
-    favourite streamers local and remote
-    sync them on authorize (?) and setting for that in settings
-
-    settings
-        pref quality
-        small preview
-
+Kinda here you may stop.

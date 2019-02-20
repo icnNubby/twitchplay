@@ -10,15 +10,12 @@ import com.google.gson.annotations.SerializedName;
 public class Stream implements Comparable<Stream> {
 
     @SerializedName("title")
-    @Expose
     private String title;
 
     @SerializedName("user_id")
-    @Expose
     private String userId;
 
     @SerializedName("user_name")
-    @Expose
     private String streamerName;
 
     private String profileImageUrl;
@@ -28,22 +25,18 @@ public class Stream implements Comparable<Stream> {
      * invalid user_name fields in chinese symbols
      */
     @SerializedName("user_login")
-    @Expose
     private String streamerLogin;
 
     /**
      * Stream type: "live" or "" (in case of error).
      */
     @SerializedName("type")
-    @Expose
     private String type;
 
     @SerializedName("viewer_count")
-    @Expose
     private String viewerCount;
 
     @SerializedName("thumbnail_url")
-    @Expose
     private String thumbnailUrl;
 
     public String getTitle() {

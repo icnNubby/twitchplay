@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import ru.nubby.playstream.model.ChatMessage;
 
 public class ChatChannelApi {
@@ -23,13 +24,12 @@ public class ChatChannelApi {
     private final String TWITCH_CHAT_SERVER = "irc.twitch.tv";
     private final int TWITCH_CHAT_PORT = 6667;
 
-
     private static final Pattern stdVarPattern =
             Pattern.compile("color=(#?\\w*);display-name=(\\w+).*;mod=(0|1);room-id=\\d+;.*subscriber=(0|1);.*turbo=(0|1);.* PRIVMSG #\\S* :(.*)");
 
-    private String user;
-    private String oauthKey;
-    private String channelName;
+    private final String user;
+    private final String oauthKey;
+    private final String channelName;
     private Socket socket;
 
     private boolean connected;
@@ -46,8 +46,13 @@ public class ChatChannelApi {
         this.channelName = channelName.toLowerCase();
     }
 
-    public Maybe<Boolean> init() {
-        return Maybe.create(maybeEmitter -> {
+    public Single<Boolean> init() {
+
+        //Single initialization emitter would emit true (success) if we instantiated
+        //socket, reader and writer
+        //if anything went wrong (socket connection, streams instantiation) it would emit error.
+
+        return Single.create(singleEmitter -> {
             try {
                 socket = new Socket(TWITCH_CHAT_SERVER, TWITCH_CHAT_PORT);
                 writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -56,22 +61,38 @@ public class ChatChannelApi {
                         "NICK " + user + "\r\n" +
                         "USER " + user + " \r\n";
                 sendMessage(loginRequest);
+
+                //readerObservable will emit new line each time BufferedReader will provide any new
+                //in case of IOException (probably because of net loss) we emit errors
+                //in case of IOException + Disposal we suppose that it is normal closing state
+
                 readerObservable = Observable
                         .create(emitter -> {
                             String line;
                             try {
-                                while (!emitter.isDisposed() && (line = reader.readLine()) != null)
+                                while (!socket.isClosed() &&
+                                        !emitter.isDisposed() &&
+                                        (line = reader.readLine()) != null) {
                                     emitter.onNext(line);
-                            } catch (IOException e) {
-                                emitter.onError(e);
+                                }
+                            } catch (IOException exception) {
+                                if (!emitter.isDisposed()) {
+                                    connected = false;
+                                    emitter.onError(exception);
+                                } else {
+                                    Log.e(TAG, "Rx chain is disposed, but error thrown " +
+                                            "in chat listener, beware", exception);
+                                }
                             }
                         });
-                maybeEmitter.onSuccess(true);
+                singleEmitter.onSuccess(true);
                 Log.d(TAG, "Connected: ");
-            } catch (UnknownHostException e) {
-                maybeEmitter.onError(e);
-                e.printStackTrace();
-                Log.e(TAG, "Error: " + e, e);
+            } catch (UnknownHostException exception) {
+                singleEmitter.onError(exception);
+                Log.e(TAG, "UnknownHost error while connecting to chat: " + exception, exception);
+            } catch (IOException exception) {
+                singleEmitter.onError(exception);
+                Log.e(TAG, "IOException error while connecting to chat: " + exception, exception);
             }
         });
     }
@@ -97,20 +118,26 @@ public class ChatChannelApi {
                             Log.d(TAG, "No pattern found in message: " + line);
                         }
                     } else if (line.toLowerCase().contains("disconnected")) {
+                        connected = false;
                         //TODO think about reconnect
                     }
                     return new ChatMessage("", "", "");
                 })
                 .filter(message -> !message.isEmpty())
-                .doFinally(this::closeConnection);
+                .doOnDispose(this::closeConnection);
 
     }
 
-    private void closeConnection() throws IOException {
+    private synchronized void closeConnection() throws IOException {
         if (connected) {
-            reader.close();
-            writer.close();
-            socket.close();
+            if (!socket.isClosed()) {
+                socket.shutdownInput();
+                socket.shutdownOutput();
+                socket.close();
+            }
+            //It WILL throw IOException, which will be catched while reading next line
+            //https://stackoverflow.com/questions/3595926/how-to-interrupt-bufferedreaders-readline/8358072
+            //Not the best way to handle it, yes.
             connected = false;
         }
     }

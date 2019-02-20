@@ -13,29 +13,24 @@ import androidx.room.PrimaryKey;
 public class FollowRelations {
     @ColumnInfo(name = "from_id")
     @SerializedName("from_id")
-    @Expose
     @NonNull
     private String fromId;
 
     @ColumnInfo(name = "from_name")
     @SerializedName("from_name")
-    @Expose
     private String fromName;
 
     @ColumnInfo(name = "to_id")
     @SerializedName("to_id")
-    @Expose
     @NonNull
     private String toId;
 
     @ColumnInfo(name = "to_name")
     @SerializedName("to_name")
-    @Expose
     private String toName;
 
     @ColumnInfo(name = "followed_at")
     @SerializedName("followed_at")
-    @Expose
     private String followedAt;
 
     @NonNull

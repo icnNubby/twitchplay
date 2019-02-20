@@ -38,21 +38,24 @@ public class ChatPresenter implements ChatContract.Presenter {
     public void subscribe() {
         mDisposableStreamAdditionalInfo = mStreamSingle
                 .doOnSubscribe(streamReturned -> mChatView.displayLoading(true))
-                .subscribe(streamReturned -> {
+                .subscribe(
+                        streamReturned -> {
                             mChatApi = new ChatChannelApi(SensitiveStorage.getDefaultChatBotName(),
                                     SensitiveStorage.getDefaultChatBotToken(),
                                     streamReturned.getStreamerLogin());
                             mChatInitializer = mChatApi
                                     .init()
+                                    .retryWhen(throwableFlowable -> throwableFlowable
+                                            .delay(10, TimeUnit.SECONDS)
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .doOnEach(throwableNotification ->
+                                                    mChatView.displayInfoMessage(ERROR_RECONNECT)))
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(success -> {
+                                    .subscribe(
+                                            success -> {
                                                 mChatView.displayInfoMessage(INFO_CONNECTED);
-                                                startListeningToChat(streamReturned);
-                                            },
-                                            error -> {
-                                                mChatView.displayInfoMessage(ERROR_FIRST_CONNECT);
-                                                Log.e(TAG, "Error while connecting", error);
+                                                listenToChat();
                                             });
                             mChatView.displayLoading(false);
                         },
@@ -61,15 +64,19 @@ public class ChatPresenter implements ChatContract.Presenter {
 
     @Override
     public void unsubscribe() {
-        if (mChatListener != null && !mChatListener.isDisposed()) mChatListener.dispose();
-        if (mChatInitializer != null && !mChatInitializer.isDisposed()) mChatInitializer.dispose();
+        //TODO composite disposal
+        if (mChatListener != null && !mChatListener.isDisposed()) {
+            mChatListener.dispose();
+        }
+        if (mChatInitializer != null && !mChatInitializer.isDisposed()) {
+            mChatInitializer.dispose();
+        }
         if (mDisposableStreamAdditionalInfo != null && !mDisposableStreamAdditionalInfo.isDisposed()) {
             mDisposableStreamAdditionalInfo.dispose();
         }
     }
 
-    @Override
-    public void startListeningToChat(Stream stream) {
+    private void listenToChat() {
         mChatListener = mChatApi
                 .listenToChat()
                 .subscribeOn(Schedulers.io())
@@ -81,12 +88,17 @@ public class ChatPresenter implements ChatContract.Presenter {
                             mChatView.displayInfoMessage(ERROR_DISCONNECTED);
                             mChatListener.dispose();
                             mChatInitializer = mChatApi.init()
-                                    .delay(10, TimeUnit.SECONDS)
-                                    .retry()
-                                    .subscribe(success -> startListeningToChat(stream),
-                                            errorReconnect -> {
-                                                mChatView.displayInfoMessage(ERROR_RECONNECT);
-                                                Log.e(TAG, "Error while reconnecting", errorReconnect);
+                                    .subscribeOn(Schedulers.io())
+                                    .retryWhen(throwableFlowable -> throwableFlowable
+                                            .delay(10, TimeUnit.SECONDS)
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .doOnEach(throwableNotification ->
+                                                    mChatView.displayInfoMessage(ERROR_RECONNECT)))
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(
+                                            success -> {
+                                                mChatView.displayInfoMessage(INFO_CONNECTED);
+                                                listenToChat();
                                             });
                         });
     }

@@ -16,6 +16,6 @@ public interface LocalDataSource {
 
     Completable deleteFollowRelationsEntry(FollowRelations followRelationsEntry);
 
-    Completable deleteAllEntries();
+    Completable deleteAllFollowRelationsEntries();
 
 }

@@ -7,8 +7,7 @@ import com.google.gson.annotations.SerializedName;
 public class UserDataList {
 
     @SerializedName("data")
-    @Expose
-    private List<UserData> data = null;
+    private List<UserData> data;
 
     public List<UserData> getData() {
         return data;

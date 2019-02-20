@@ -12,20 +12,17 @@ import java.util.List;
 public class UserFollowsRequest {
 
     @SerializedName("total")
-    @Expose
     private Integer total;
     /**
      * Contains an array of {@link FollowRelations} information elements.
      */
     @SerializedName("data")
-    @Expose
     private List<FollowRelations> data;
 
     /**
      * Contains information, required to query for more follows.
      */
     @SerializedName("pagination")
-    @Expose
     private Pagination pagination;
 
     public List<FollowRelations> getData() {
