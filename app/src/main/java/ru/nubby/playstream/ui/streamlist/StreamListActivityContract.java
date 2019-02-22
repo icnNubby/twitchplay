@@ -10,6 +10,5 @@ public interface StreamListActivityContract {
     }
 
     interface Presenter extends BasePresenter {
-        void login(String token);
     }
 }

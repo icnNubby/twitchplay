@@ -20,6 +20,12 @@ public class RoomLocalDataSource implements  LocalDataSource {
     }
 
     @Override
+    public Single<List<FollowRelations>> findRelation(String fromId, String toId) {
+        return mFollowRelationsDao.findRelation(fromId, toId);
+    }
+
+
+    @Override
     public Completable insertFollowRelationsEntry(FollowRelations followRelationsEntry) {
         return mFollowRelationsDao.insertFollowRelationsEntry(followRelationsEntry);
     }

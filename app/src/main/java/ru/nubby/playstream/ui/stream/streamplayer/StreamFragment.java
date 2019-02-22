@@ -47,6 +47,7 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
     private ImageButton mFullscreenToggle;
     private ImageButton mPlayButton;
     private ImageButton mQualityMenuButton;
+    private ImageButton mFollowUnfollowButton;
     private PopupMenu mResolutionsMenu;
     private ProgressBar mProgressBar;
     private TextView mTitleTextView;
@@ -88,6 +89,10 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
 
         mFullscreenToggle = fragmentView.findViewById(R.id.fullscreen_toggle);
         mFullscreenToggle.setOnClickListener(v -> mActivityCallbacks.toggleFullscreen(!mActivityCallbacks.getFullscreenState()));
+
+        mFollowUnfollowButton = fragmentView.findViewById(R.id.follow_unfollow);
+        mFollowUnfollowButton.setOnClickListener(v -> mPresenter.followOrUnfollowChannel());
+        mFollowUnfollowButton.setEnabled(false);
 
         mQualityMenuButton = fragmentView.findViewById(R.id.qualities_menu);
         mQualityMenuButton.setOnClickListener(v -> {
@@ -220,6 +225,15 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
     }
 
     @Override
+    public void displayFollowStatus(boolean followed) {
+        if (followed) {
+            mFollowUnfollowButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_white));
+        } else {
+            mFollowUnfollowButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_border_white));
+        }
+    }
+
+    @Override
     public void toggleFullscreen(boolean currentModeFullscreenOn) {
         if (currentModeFullscreenOn) {
             //turn on fullscreen, rotate to landscape, hide chat
@@ -229,6 +243,11 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
             mVideoView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
         }
         redrawFullscreenButton(currentModeFullscreenOn);
+    }
+
+    @Override
+    public void enableFollow(boolean enabled) {
+        mFollowUnfollowButton.setEnabled(enabled);
     }
 
     private void redrawFullscreenButton(boolean currentModeFullscreenOn) {

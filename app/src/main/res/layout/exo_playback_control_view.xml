@@ -1,25 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/exo_content_frame"
     android:layout_width="match_parent"
     android:background="@color/transparentGray"
     android:layout_height="match_parent">
 
+    <ImageButton
+        android:id="@+id/follow_unfollow"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="top|end"
+        android:layout_marginEnd="8dp"
+        android:background="?android:selectableItemBackground"
+        android:src="@drawable/ic_favorite_border_white"
+        app:layout_constraintBottom_toBottomOf="@+id/qualities_menu"
+        app:layout_constraintEnd_toStartOf="@+id/qualities_menu"
+        app:layout_constraintTop_toTopOf="@+id/qualities_menu" />
+
     <TextView
         android:id="@+id/text_view_stream_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="48dp"
+        android:layout_marginEnd="8dp"
         android:ellipsize="end"
+        android:gravity="center|start"
         android:singleLine="true"
+        android:textAlignment="textStart"
         android:textColor="@color/colorWhite"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/qualities_menu"
-        app:layout_constraintEnd_toStartOf="@+id/qualities_menu"
+        app:layout_constraintEnd_toStartOf="@+id/follow_unfollow"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/qualities_menu" />
+        app:layout_constraintTop_toTopOf="@+id/qualities_menu"
+        tools:text="Very long and strange stream title, not ending here, no, not yet" />
 
     <TextView
         android:id="@+id/text_view_stream_viewers"

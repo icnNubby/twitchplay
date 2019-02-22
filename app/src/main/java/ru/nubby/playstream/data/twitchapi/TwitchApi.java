@@ -1,21 +1,26 @@
 package ru.nubby.playstream.data.twitchapi;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
+import ru.nubby.playstream.SensitiveStorage;
 import ru.nubby.playstream.data.twitchapi.services.RawJsonService;
-import ru.nubby.playstream.data.twitchapi.services.TwitchStreamsHelixService;
-import ru.nubby.playstream.data.twitchapi.services.TwitchStreamsApiService;
+import ru.nubby.playstream.data.twitchapi.services.TwitchHelixService;
+import ru.nubby.playstream.data.twitchapi.services.TwitchApiService;
+import ru.nubby.playstream.data.twitchapi.services.TwitchKrakenService;
 
 //TODO prob extract repeating path from retrofit builder to some private method, and build upon it
 /**
  * Some of requests will not work with helix API, some will not work with old api API.
- * after building {@link TwitchStreamsApiService} object, you should know which endpoint to use
+ * after building {@link TwitchApiService} object, you should know which endpoint to use
  */
 public class TwitchApi {
 
@@ -26,8 +31,9 @@ public class TwitchApi {
     private static final String BASE_URL_USHER_HLS = "https://usher.ttvnw.net/api/channel/hls/";
 
     private OkHttpClient mOkHttpClient;
-    private TwitchStreamsHelixService mTwitchStreamsHelixService;
-    private TwitchStreamsApiService mTwitchStreamsApiService;
+    private TwitchHelixService mTwitchHelixService;
+    private TwitchApiService mTwitchApiService;
+    private TwitchKrakenService mTwitchKrakenService;
     private RawJsonService mRawJsonService;
 
     private TwitchApi() {
@@ -41,30 +47,30 @@ public class TwitchApi {
         return sInstance;
     }
 
-    TwitchStreamsHelixService getStreamHelixService() {
-        if (mTwitchStreamsHelixService == null) {
-            mTwitchStreamsHelixService = new Retrofit.Builder()
+    TwitchHelixService getStreamHelixService() {
+        if (mTwitchHelixService == null) {
+            mTwitchHelixService = new Retrofit.Builder()
                     .baseUrl(BASE_URL_HELIX)
                     .client(mOkHttpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .build()
-                    .create(TwitchStreamsHelixService.class);
+                    .create(TwitchHelixService.class);
         }
-        return mTwitchStreamsHelixService;
+        return mTwitchHelixService;
     }
 
-    TwitchStreamsApiService getStreamApiService() {
-        if (mTwitchStreamsApiService == null) {
-            mTwitchStreamsApiService = new Retrofit.Builder()
+    TwitchApiService getStreamApiService() {
+        if (mTwitchApiService == null) {
+            mTwitchApiService = new Retrofit.Builder()
                     .baseUrl(BASE_URL_API)
                     .client(mOkHttpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .build()
-                    .create(TwitchStreamsApiService.class);
+                    .create(TwitchApiService.class);
         }
-        return mTwitchStreamsApiService;
+        return mTwitchApiService;
 
     }
 
@@ -82,14 +88,43 @@ public class TwitchApi {
 
     }
 
+    TwitchKrakenService getKrakenService() {
+        if (mTwitchKrakenService == null){
+            mTwitchKrakenService = new Retrofit.Builder()
+                    .baseUrl(BASE_URL_KRAKEN)
+                    .client(mOkHttpClient)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build()
+                    .create(TwitchKrakenService.class);
+        }
+        return mTwitchKrakenService;
+    }
+
     private OkHttpClient provideOkHttpClient() {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        Interceptor tokenInterceptor = new RequestTokenInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         return new OkHttpClient().newBuilder()
-                .connectTimeout(5000, TimeUnit.MILLISECONDS) //TODO think what to do incase of reaaaaaaallly bbaaaaaaadd connetion
+                .connectTimeout(5000, TimeUnit.MILLISECONDS)
+                //TODO think what to do incase of reaaaaaaallly bbaaaaaaadd connetion
                 .readTimeout(5000, TimeUnit.MILLISECONDS)
                 .addInterceptor(logging)
+                .addInterceptor(tokenInterceptor)
                 .build();
+    }
+
+    private class RequestTokenInterceptor implements Interceptor {
+        @Override
+        public okhttp3.Response intercept(Chain chain) throws IOException {
+            Request request = chain.request();
+            Request newRequest;
+
+            newRequest = request.newBuilder()
+                    .addHeader(SensitiveStorage.getHeaderClientId(), SensitiveStorage.getClientApiKey())
+                    .build();
+            return chain.proceed(newRequest);
+        }
     }
 }

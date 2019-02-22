@@ -6,11 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.disposables.Disposable;
+import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.Pagination;
 import ru.nubby.playstream.model.Stream;
-import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.ui.streamlist.StreamListNavigationState;
-import ru.nubby.playstream.utils.SharedPreferencesManager;
 
 import static ru.nubby.playstream.ui.streamlist.streamlistfragment.StreamListContract.View.ErrorMessage.ERROR_BAD_CONNECTION;
 
@@ -80,26 +79,25 @@ public class StreamListPresenter implements StreamListContract.Presenter {
     public void getFollowedStreams() {
         mListState = StreamListNavigationState.MODE_FAVOURITES;
         if (mDisposableFetchingTask != null) mDisposableFetchingTask.dispose();
-        if (SharedPreferencesManager.getUserData() != null) {
-            mDisposableFetchingTask = mRepository
-                    .getLiveStreamsFollowedByUser(SharedPreferencesManager.getUserData().getId())
-                    .doOnSubscribe(disposable -> {
-                        mStreamListView.clearStreamList();
-                        mCurrentStreamList = new ArrayList<>();
-                        mStreamListView.setupProgressBar(true);
-                    })
-                    .subscribe(streams -> {
-                                mCurrentStreamList = streams;
-                                mStreamListView.displayStreamList(streams);
-                                mStreamListView.setupProgressBar(false);
-                                mPagination = null;
-                            },
-                            error -> {
-                                mStreamListView.setupProgressBar(false);
-                                mStreamListView.displayError(ERROR_BAD_CONNECTION);
-                                Log.e(TAG, "Error while fetching user follows ", error);
-                            });
-        }
+
+        mDisposableFetchingTask = mRepository
+                .getLiveStreamsFollowedByUser()
+                .doOnSubscribe(disposable -> {
+                    mStreamListView.clearStreamList();
+                    mCurrentStreamList = new ArrayList<>();
+                    mStreamListView.setupProgressBar(true);
+                })
+                .subscribe(streams -> {
+                            mCurrentStreamList = streams;
+                            mStreamListView.displayStreamList(streams);
+                            mStreamListView.setupProgressBar(false);
+                            mPagination = null;
+                        },
+                        error -> {
+                            mStreamListView.setupProgressBar(false);
+                            mStreamListView.displayError(ERROR_BAD_CONNECTION);
+                            Log.e(TAG, "Error while fetching user follows ", error);
+                        });
     }
 
     @Override

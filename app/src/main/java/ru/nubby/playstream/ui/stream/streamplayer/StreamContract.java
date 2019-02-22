@@ -13,10 +13,13 @@ public interface StreamContract {
         void displayLoading(boolean loadingState);
         void displayTitle(String title);
         void displayViewerCount(String count);
+        void displayFollowStatus(boolean followed);
         void toggleFullscreen(boolean currentModeFullscreenOn);
+        void enableFollow(boolean enabled);
     }
 
     interface Presenter extends BasePresenter {
         void playChosenQuality(Quality quality);
+        void followOrUnfollowChannel();
     }
 }

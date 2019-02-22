@@ -11,9 +11,11 @@ public class SharedPreferencesManager {
     private static final String PREFERENCES_FILENAME = "playstream";
 
     private static final String PREF_USER_ACCESS_TOKEN = "oauth_token";
+    private static final String PREF_USER_DATA = "user_data";
+
+    //TODO probably exclude unused
     private static final String PREF_USER_REFRESH_TOKEN = "oauth_refresh_token";
     private static final String PREF_TOKEN_EXPIRES_AT = "oauth_expires_at";
-    private static final String PREF_USER_DATA = "user_data";
 
     private static SharedPreferences mSharedPreferences;
     private static SharedPreferencesManager sMSharedPreferencesManager;
@@ -65,10 +67,10 @@ public class SharedPreferencesManager {
         return new Gson().fromJson(mSharedPreferences.getString(PREF_USER_DATA, ""), UserData.class);
     }
 
-    public static boolean setUserData(String data) {
+    public static boolean setUserData(UserData data) {
         return mSharedPreferences
                 .edit()
-                .putString(PREF_USER_DATA, data)
+                .putString(PREF_USER_DATA, new Gson().toJson(data, UserData.class))
                 .commit();
     }
 

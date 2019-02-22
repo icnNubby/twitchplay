@@ -3,6 +3,7 @@ package ru.nubby.playstream.data;
 import java.util.HashMap;
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import ru.nubby.playstream.model.FollowRelations;
@@ -38,14 +39,13 @@ public interface Repository {
      * @param userId current (logged) user id
      * @return always true if fetch went well, error in rx style if something happened.
      */
-    public Single<Boolean> synchronizeFollows(String userId);
+    Single<Boolean> synchronizeFollows(String userId);
 
     /**
      * Gets active stream list from remote or local(cached) repository
-     * @param userId current (logged) user id
      * @return list of user's followed streams
      */
-    Single<List<Stream>> getLiveStreamsFollowedByUser(String userId);
+    Single<List<Stream>> getLiveStreamsFollowedByUser();
 
     /**
      * Gets video url from stream object
@@ -69,7 +69,7 @@ public interface Repository {
      * @param token String OAUTH2 token
      * @return {@link Single} of {@link UserData} object, related to logged user.
      */
-    public Single<UserData> getUserDataFromToken(String token);
+    Single<UserData> getUserDataFromToken(String token);
 
     /**
      * Updates {@link Stream} information.
@@ -77,5 +77,43 @@ public interface Repository {
      * @param stream {@link Stream} object
      * @return {@link Single} of {@link Stream} with updated user counter.
      */
-    public Observable<Stream> getUpdatedStreamInfo(Stream stream);
+    Observable<Stream> getUpdatedStreamInfo(Stream stream);
+
+    /**
+     * Makes a request to follow targetUser by its ID.
+     *
+     * @param targetUser {@link String} target user's id.
+     * @return {@link Completable} when succeeded or error.
+     */
+    Completable followUser(String targetUser);
+
+    /**
+     * Makes a request to unfollow targetUser by its ID.
+     *
+     * @param targetUser {@link String} target user's id.
+     * @return {@link Completable} when succeeded or error.
+     */
+    Completable unfollowUser(String targetUser);
+
+    /**
+     * Makes request to db and returns true if logged user follows targetUser.
+     * False if not.
+     * @param targetUser user, relation to whom is checked
+     * @return {@link Single} Boolean value of follow existence
+     */
+    Single<Boolean> isUserFollowed(String targetUser);
+
+    /**
+     * Gets current login info. If current login procedure was not complete - finishes it.
+     * @return {@link Single} of {@link UserData} object with logged user info.
+     */
+    Single<UserData> getCurrentLoginInfo();
+
+    /**
+     * Saves token to shared prefs and performs further login.
+     * @param token {@link String} token
+     * @return {@link Single} of {@link UserData} object with logged user info.
+     */
+    Single<UserData> loginAttempt(String token);
+
 }

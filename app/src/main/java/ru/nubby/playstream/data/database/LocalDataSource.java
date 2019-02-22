@@ -10,6 +10,8 @@ public interface LocalDataSource {
 
     Single<List<FollowRelations>> getFollowRelationsEntriesById(String fromId);
 
+    Single<List<FollowRelations>> findRelation(String fromId, String toId);
+
     Completable insertFollowRelationsEntry(FollowRelations followRelationsEntry);
 
     Completable insertFollowRelationsList(FollowRelations... followRelationsList);

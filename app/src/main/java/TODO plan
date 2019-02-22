@@ -2,8 +2,6 @@
 Bugs
     fix displaying appsecret at failed load in login activity
 More features gradually from nearest to farthest:
-    authorization flow, figure out what to do when streamToken expires
-        implement it
     possibility to follow/unfollow channels
     saving information about users we follow (avatars, etc) to db
     notifications when in background

@@ -2,12 +2,9 @@ package ru.nubby.playstream.ui.login;
 
 import android.util.Log;
 
-import com.google.gson.Gson;
-
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.SensitiveStorage;
 import ru.nubby.playstream.data.Repository;
-import ru.nubby.playstream.model.UserData;
 import ru.nubby.playstream.utils.SharedPreferencesManager;
 
 public class LoginPresenter implements LoginContract.Presenter {
@@ -18,12 +15,12 @@ public class LoginPresenter implements LoginContract.Presenter {
     private LoginContract.View mLoginView;
     private Disposable mDisposableUserFetchTask;
 
-    private Repository mRemoteStreamFullInfo;
+    private Repository mRepository;
 
     LoginPresenter(LoginContract.View loginView, Repository repository) {
         mLoginView = loginView;
         mLoginView.setPresenter(this);
-        mRemoteStreamFullInfo = repository;
+        mRepository = repository;
     }
 
     @Override
@@ -47,14 +44,8 @@ public class LoginPresenter implements LoginContract.Presenter {
     public boolean interceptedAnswer(String url) {
         if (url.contains("#access_token=")) {
             String mAccessToken = getAccessTokenFromURL(url);
-            if (SharedPreferencesManager.setUserAccessToken(mAccessToken)) {
-                Log.d(TAG, "StreamToken response " + mAccessToken);
-            } else {
-                Log.e(TAG, "StreamToken response " + mAccessToken + " is not written to prefs!");
-            }
-            mDisposableUserFetchTask = mRemoteStreamFullInfo
-                    .getUserDataFromToken(mAccessToken)
-                    .doOnSuccess(userData -> SharedPreferencesManager.setUserData(new Gson().toJson(userData, UserData.class)))
+            mDisposableUserFetchTask = mRepository
+                    .loginAttempt(mAccessToken)
                     .subscribe(userData -> mLoginView.handleUserInfoFetched(true),
                             error -> Log.e(TAG, "Error while fetching user data", error));
             return true;

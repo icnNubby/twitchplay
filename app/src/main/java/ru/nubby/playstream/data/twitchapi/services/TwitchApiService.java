@@ -7,9 +7,9 @@ import retrofit2.http.Header;
 import retrofit2.http.Path;
 import ru.nubby.playstream.model.StreamToken;
 
-public interface TwitchStreamsApiService {
+public interface TwitchApiService {
 
     @GET("channels/{streamId}/access_token")
-    Single<StreamToken> getAccessToken(@Header("client-id") String clientId, @Path("streamId") String streamId);
+    Single<StreamToken> getAccessToken(@Path("streamId") String streamId);
 
 }

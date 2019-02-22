@@ -1,11 +1,10 @@
 package ru.nubby.playstream.data;
 
-import android.util.Log;
-
 import java.util.HashMap;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
@@ -17,13 +16,18 @@ import ru.nubby.playstream.model.Quality;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.model.StreamsRequest;
 import ru.nubby.playstream.model.UserData;
+import ru.nubby.playstream.utils.SharedPreferencesManager;
 
 /**
  * Contains decision making on what kind of repo we should use.
- * Some logic probably can be decoupled into usecases/interactors.
+ * Some logic definitely can be decoupled into usecases/interactors.
  * Although its already some sort of interactor.
  */
 public class GlobalRepository implements Repository {
+    public enum LoggedStatus {
+        NOT_LOGGED, TOKEN_ONLY, LOGGED
+    }
+
     private final String TAG = GlobalRepository.class.getSimpleName();
 
     private final RemoteRepository mRemoteRepository;
@@ -46,7 +50,8 @@ public class GlobalRepository implements Repository {
 
     @NonNull
     public static GlobalRepository getInstance() {
-        if (sInstance == null) throw new NullPointerException("Global repository is not instantiated");
+        if (sInstance == null)
+            throw new NullPointerException("Global repository is not instantiated");
         return sInstance;
     }
 
@@ -67,15 +72,13 @@ public class GlobalRepository implements Repository {
             return mRemoteRepository
                     .getUserFollows(userId)
                     .subscribeOn(Schedulers.io())
-                    .doOnSuccess(list -> {
-                        mLocalDataSource
-                                .insertFollowRelationsList(list.toArray(new FollowRelations[0]))
-                                .subscribe(() -> {
-                                        },
-                                        error -> firstLoad = true);
-                        //TODO think how to do better, that is awful
-                        Log.d(TAG, "Probably written to db");
-                    });
+                    .flatMap(followRelationsList ->
+                            mLocalDataSource
+                                    .insertFollowRelationsList(
+                                            followRelationsList.toArray(new FollowRelations[0]))
+                                    .andThen(Single.create(emitter ->
+                                            emitter.onSuccess(followRelationsList))));
+
         } else {
             return mLocalDataSource
                     .getFollowRelationsEntriesById(userId)
@@ -95,8 +98,11 @@ public class GlobalRepository implements Repository {
     }
 
     @Override
-    public Single<List<Stream>> getLiveStreamsFollowedByUser(String userId) {
-        return mRemoteRepository.getLiveStreamsFromRelationList(getUserFollows(userId));
+    public Single<List<Stream>> getLiveStreamsFollowedByUser() {
+        return getCurrentLoginInfo()
+                .flatMap(userData ->
+                        mRemoteRepository
+                                .getLiveStreamsFromRelationList(getUserFollows(userData.getId())));
     }
 
     @Override
@@ -119,5 +125,74 @@ public class GlobalRepository implements Repository {
         return mRemoteRepository.getUpdatedStreamInfo(stream);
     }
 
+    @Override
+    public Completable followUser(String targetUser) {
+        return getCurrentLoginInfo()
+                .subscribeOn(Schedulers.io())
+                .flatMapCompletable(userData ->
+                        mRemoteRepository
+                                .followTargetUser(SharedPreferencesManager.getUserAccessToken(),
+                                        userData.getId(), targetUser)
+                                .andThen(mLocalDataSource.insertFollowRelationsEntry(
+                                        new FollowRelations(userData.getId(), userData.getLogin(),
+                                                targetUser, "", ""))));
+        //todo fix empty fields;
+    }
+
+    @Override
+    public Completable unfollowUser(String targetUser) {
+        return getCurrentLoginInfo()
+                .subscribeOn(Schedulers.io())
+                .flatMapCompletable(userData ->
+                        mRemoteRepository
+                                .unfollowTargetUser(SharedPreferencesManager.getUserAccessToken(),
+                                        userData.getId(), targetUser)
+                                .andThen(mLocalDataSource.deleteFollowRelationsEntry(
+                                        new FollowRelations(userData.getId(), "",
+                                                targetUser, "", ""))));
+    }
+
+    @Override
+    public Single<Boolean> isUserFollowed(String targetUser) {
+        return getCurrentLoginInfo()
+                .flatMap(userData -> mLocalDataSource.findRelation(userData.getId(), targetUser))
+                .flatMap(followRelationsList ->
+                        Single.create(emitter -> emitter.onSuccess(followRelationsList.isEmpty())));
+    }
+
+    @Override
+    public Single<UserData> getCurrentLoginInfo() {
+        LoggedStatus currentStatus = getCurrentLoggedStatus();
+        if (currentStatus == LoggedStatus.NOT_LOGGED) {
+            return Single.create(emitter -> emitter.onError(new Throwable("Not logged in")));
+        } else if (currentStatus == LoggedStatus.LOGGED) {
+            return Single.create(emitter -> {
+                emitter.onSuccess(SharedPreferencesManager.getUserData());
+            });
+        } else { //LoggedStatus.TOKEN_ONLY
+            return getUserDataFromToken(SharedPreferencesManager.getUserAccessToken())
+                    .doOnSuccess(SharedPreferencesManager::setUserData);
+        }
+    }
+
+    @Override
+    public Single<UserData> loginAttempt(String token) {
+        SharedPreferencesManager.setUserAccessToken(token);
+        return getCurrentLoginInfo();
+    }
+
+    private LoggedStatus getCurrentLoggedStatus() {
+        String token = SharedPreferencesManager.getUserAccessToken();
+        if (token != null && !token.equals("")) {
+            UserData data = SharedPreferencesManager.getUserData();
+            if (data == null) {
+                return LoggedStatus.TOKEN_ONLY;
+            } else {
+                return LoggedStatus.LOGGED;
+            }
+        } else {
+            return LoggedStatus.NOT_LOGGED;
+        }
+    }
 
 }

@@ -20,7 +20,6 @@ import io.reactivex.Single;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.data.GlobalRepository;
 import ru.nubby.playstream.model.Stream;
-import ru.nubby.playstream.data.twitchapi.RemoteStreamFullInfo;
 import ru.nubby.playstream.ui.stream.chat.ChatFragment;
 import ru.nubby.playstream.ui.stream.chat.ChatPresenter;
 import ru.nubby.playstream.ui.stream.streamplayer.StreamFragment;

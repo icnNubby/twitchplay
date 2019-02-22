@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
-import ru.nubby.playstream.SensitiveStorage;
 import ru.nubby.playstream.model.FollowRelations;
 import ru.nubby.playstream.model.Pagination;
 import ru.nubby.playstream.model.Quality;
@@ -46,8 +46,7 @@ public class RemoteRepository {
                 .flatMap(channelNameString -> TwitchApi
                         .getInstance()
                         .getStreamApiService()
-                        .getAccessToken(SensitiveStorage.getClientApiKey(),
-                                channelNameString.toLowerCase())
+                        .getAccessToken(channelNameString.toLowerCase())
                         .subscribeOn(Schedulers.io()));
 
         return Single
@@ -70,7 +69,7 @@ public class RemoteRepository {
                 .flatMap(urlToGetStreamPlaylist -> TwitchApi
                         .getInstance()
                         .getRawJsonHlsService()
-                        .getRawJsonFromPath(SensitiveStorage.getClientApiKey(), urlToGetStreamPlaylist)
+                        .getRawJsonFromPath(urlToGetStreamPlaylist)
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.computation())
                         .map(M3U8Parser::parseTwitchApiResponse)
@@ -81,8 +80,7 @@ public class RemoteRepository {
         return TwitchApi
                 .getInstance()
                 .getStreamHelixService()
-                .getUserDataListById(SensitiveStorage.getClientApiKey(),
-                        stream.getUserId())
+                .getUserDataListById(stream.getUserId())
                 .subscribeOn(Schedulers.io())
                 .filter(userDataList -> !userDataList.getData().isEmpty())
                 .map(userDataList -> userDataList.getData().get(0))
@@ -96,8 +94,7 @@ public class RemoteRepository {
         return TwitchApi
                 .getInstance()
                 .getStreamHelixService()
-                .getUserDataListByToken(SensitiveStorage.getClientApiKey(),
-                        "Bearer " + token)
+                .getUserDataListByToken("Bearer " + token)
                 .subscribeOn(Schedulers.io())
                 .filter(userDataList -> !userDataList.getData().isEmpty())
                 .map(userDataList -> userDataList.getData().get(0))
@@ -111,7 +108,7 @@ public class RemoteRepository {
         return TwitchApi
                 .getInstance()
                 .getStreamHelixService()
-                .updateStream(SensitiveStorage.getClientApiKey(), stream.getUserId())
+                .updateStream(stream.getUserId())
                 .subscribeOn(Schedulers.io())
                 .map(streamsRequest -> streamsRequest.getData().get(0))
                 .delay(30, TimeUnit.SECONDS)
@@ -124,7 +121,7 @@ public class RemoteRepository {
         return TwitchApi
                 .getInstance()
                 .getStreamHelixService()
-                .getTopStreams(SensitiveStorage.getClientApiKey())
+                .getTopStreams()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -133,7 +130,7 @@ public class RemoteRepository {
         return TwitchApi
                 .getInstance()
                 .getStreamHelixService()
-                .getMoreStreamsAfter(SensitiveStorage.getClientApiKey(), pagination.getCursor())
+                .getMoreStreamsAfter(pagination.getCursor())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -153,7 +150,7 @@ public class RemoteRepository {
                 .flatMap(userList -> TwitchApi
                         .getInstance()
                         .getStreamHelixService()
-                        .getAllStreamsByUserList(SensitiveStorage.getClientApiKey(), userList)
+                        .getAllStreamsByUserList(userList)
                         .toObservable())
                 .subscribeOn(Schedulers.computation())
                 .map(StreamsRequest::getData)
@@ -173,12 +170,30 @@ public class RemoteRepository {
                 .flatMap(userList -> TwitchApi
                         .getInstance()
                         .getStreamHelixService()
-                        .getAllStreamsByUserList(SensitiveStorage.getClientApiKey(), userList)
+                        .getAllStreamsByUserList(userList)
                         .toObservable())
                 .subscribeOn(Schedulers.computation())
                 .map(StreamsRequest::getData)
                 .flatMap(Observable::fromIterable)
                 .toSortedList()
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Completable followTargetUser(String token, String userId, String targetUserId){
+        return TwitchApi
+                .getInstance()
+                .getKrakenService()
+                .followTargetUser("Bearer " + token, userId, targetUserId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Completable unfollowTargetUser(String token, String userId, String targetUserId){
+        return TwitchApi
+                .getInstance()
+                .getKrakenService()
+                .unfollowTargetUser("Bearer " + token, userId, targetUserId)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -194,7 +209,7 @@ public class RemoteRepository {
                             return TwitchApi
                                     .getInstance()
                                     .getStreamHelixService()
-                                    .getUserFollowsById(SensitiveStorage.getClientApiKey(), userId)
+                                    .getUserFollowsById(userId)
                                     .doOnSuccess(page -> {
                                         if (page.getPagination() != null &&
                                                 page.getPagination().getCursor() != null)
@@ -206,7 +221,7 @@ public class RemoteRepository {
                             return TwitchApi
                                     .getInstance()
                                     .getStreamHelixService()
-                                    .getUserFollowsById(SensitiveStorage.getClientApiKey(), userId, aKey)
+                                    .getUserFollowsById(userId, aKey)
                                     .doOnSuccess(page -> {
                                         if (page.getPagination() != null &&
                                                 page.getPagination().getCursor() != null)

@@ -17,6 +17,9 @@ public interface FollowRelationsDao {
         @Query("SELECT * FROM follow_relations WHERE from_id = :fromId")
         Single<List<FollowRelations>> loadRelationsFromId(String fromId);
 
+        @Query("SELECT * FROM follow_relations WHERE from_id = :fromId AND to_id = :toId")
+        Single<List<FollowRelations>> findRelation(String fromId, String toId);
+
         @Insert(onConflict = OnConflictStrategy.REPLACE)
         Completable insertFollowRelationsEntry(FollowRelations followRelationsEntry);
 

@@ -33,6 +33,15 @@ public class FollowRelations {
     @SerializedName("followed_at")
     private String followedAt;
 
+    public FollowRelations(@NonNull String fromId, String fromName, @NonNull String toId,
+                           String toName, String followedAt) {
+        this.fromId = fromId;
+        this.fromName = fromName;
+        this.toId = toId;
+        this.toName = toName;
+        this.followedAt = followedAt;
+    }
+
     @NonNull
     public String getFromId() {
         return fromId;
@@ -72,14 +81,6 @@ public class FollowRelations {
     }
 
     public void setFollowedAt(String followedAt) {
-        this.followedAt = followedAt;
-    }
-
-    public FollowRelations(@NonNull String fromId, String fromName, @NonNull String toId, String toName, String followedAt) {
-        this.fromId = fromId;
-        this.fromName = fromName;
-        this.toId = toId;
-        this.toName = toName;
         this.followedAt = followedAt;
     }
 

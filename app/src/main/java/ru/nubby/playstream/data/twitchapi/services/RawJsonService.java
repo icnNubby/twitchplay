@@ -10,6 +10,6 @@ import retrofit2.http.Url;
 public interface RawJsonService {
 
     @GET()
-    Single<String> getRawJsonFromPath(@Header("client-id") String clientId, @Url String path);
+    Single<String> getRawJsonFromPath(@Url String path);
 
 }
