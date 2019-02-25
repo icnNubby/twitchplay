@@ -1,8 +1,9 @@
 // TODO future plans
 Bugs
     fix displaying appsecret at failed load in login activity
+    fix repeating streams in "top" tab
+    exclude unfollowed channel from following list, when returned
 More features gradually from nearest to farthest:
-    possibility to follow/unfollow channels
     saving information about users we follow (avatars, etc) to db
     notifications when in background
     sleep mode and setup to it

@@ -82,26 +82,26 @@ public interface Repository {
     /**
      * Makes a request to follow targetUser by its ID.
      *
-     * @param targetUser {@link String} target user's id.
+     * @param targetStream {@link Stream} target user's id.
      * @return {@link Completable} when succeeded or error.
      */
-    Completable followUser(String targetUser);
+    Completable followStream(Stream targetStream);
 
     /**
-     * Makes a request to unfollow targetUser by its ID.
+     * Makes a request to unfollow targetStream by its ID.
      *
-     * @param targetUser {@link String} target user's id.
+     * @param targetStream {@link Stream} target user's id.
      * @return {@link Completable} when succeeded or error.
      */
-    Completable unfollowUser(String targetUser);
+    Completable unfollowStream(Stream targetStream);
 
     /**
-     * Makes request to db and returns true if logged user follows targetUser.
+     * Makes request to db and returns true if logged user follows targetStream.
      * False if not.
-     * @param targetUser user, relation to whom is checked
+     * @param targetStream {@link Stream} stream, relation to whom is checked
      * @return {@link Single} Boolean value of follow existence
      */
-    Single<Boolean> isUserFollowed(String targetUser);
+    Single<Boolean> isStreamFollowed(Stream targetStream);
 
     /**
      * Gets current login info. If current login procedure was not complete - finishes it.

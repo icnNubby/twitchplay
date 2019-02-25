@@ -25,7 +25,7 @@ import ru.nubby.playstream.model.UserFollowsRequest;
 import ru.nubby.playstream.utils.M3U8Parser;
 
 /**
- * ATM couples FullInfo and List logics.
+ * //todo make interface contract for that class.
  */
 public class RemoteRepository {
     private final String TAG = RemoteRepository.class.getSimpleName();
@@ -53,7 +53,7 @@ public class RemoteRepository {
                 .zip(tokenSingle, channelName,
                         (streamToken, streamerName) ->
                                 String.format("%s.m3u8" +
-                                                "?streamToken=%s" +
+                                                "?token=%s" +
                                                 "&sig=%s" +
                                                 "&player=twitchweb" +
                                                 "&allow_audio_only=true" +
@@ -84,8 +84,6 @@ public class RemoteRepository {
                 .subscribeOn(Schedulers.io())
                 .filter(userDataList -> !userDataList.getData().isEmpty())
                 .map(userDataList -> userDataList.getData().get(0))
-                .doOnSuccess(login -> Log.d(TAG, "Login is " + login))
-                .doOnError(error -> Log.e(TAG, "Error while getting streamer info " + error, error))
                 .toSingle()
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -98,8 +96,6 @@ public class RemoteRepository {
                 .subscribeOn(Schedulers.io())
                 .filter(userDataList -> !userDataList.getData().isEmpty())
                 .map(userDataList -> userDataList.getData().get(0))
-                .doOnSuccess(userData -> Log.d(TAG, "Login is " + userData.getLogin()))
-                .doOnError(error -> Log.e(TAG, "Error while getting user info " + error, error))
                 .toSingle()
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -159,7 +155,8 @@ public class RemoteRepository {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Single<List<Stream>> getLiveStreamsFromRelationList(Single<List<FollowRelations>> singleFollowRelationsList) {
+    public Single<List<Stream>> getLiveStreamsFromRelationList(
+            Single<List<FollowRelations>> singleFollowRelationsList) {
         return singleFollowRelationsList
                 .subscribeOn(Schedulers.computation())
                 .toObservable()
@@ -183,7 +180,7 @@ public class RemoteRepository {
         return TwitchApi
                 .getInstance()
                 .getKrakenService()
-                .followTargetUser("Bearer " + token, userId, targetUserId)
+                .followTargetUser(userId, targetUserId, token)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -192,7 +189,7 @@ public class RemoteRepository {
         return TwitchApi
                 .getInstance()
                 .getKrakenService()
-                .unfollowTargetUser("Bearer " + token, userId, targetUserId)
+                .unfollowTargetUser(userId, targetUserId, token)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

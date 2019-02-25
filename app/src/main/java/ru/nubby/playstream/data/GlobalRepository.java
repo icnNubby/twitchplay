@@ -9,6 +9,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.data.database.LocalDataSource;
+import ru.nubby.playstream.data.sharedprefs.SharedPreferencesManager;
 import ru.nubby.playstream.data.twitchapi.RemoteRepository;
 import ru.nubby.playstream.model.FollowRelations;
 import ru.nubby.playstream.model.Pagination;
@@ -16,13 +17,13 @@ import ru.nubby.playstream.model.Quality;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.model.StreamsRequest;
 import ru.nubby.playstream.model.UserData;
-import ru.nubby.playstream.utils.SharedPreferencesManager;
 
 /**
  * Contains decision making on what kind of repo we should use.
  * Some logic definitely can be decoupled into usecases/interactors.
  * Although its already some sort of interactor.
  */
+//todo split into some usecases(or logically connected entities ex. UsersInteractor, StreamsInteractor, etc.)
 public class GlobalRepository implements Repository {
     public enum LoggedStatus {
         NOT_LOGGED, TOKEN_ONLY, LOGGED
@@ -74,8 +75,10 @@ public class GlobalRepository implements Repository {
                     .subscribeOn(Schedulers.io())
                     .flatMap(followRelationsList ->
                             mLocalDataSource
-                                    .insertFollowRelationsList(
-                                            followRelationsList.toArray(new FollowRelations[0]))
+                                    .deleteAllFollowRelationsEntries()
+                                    .andThen(mLocalDataSource
+                                            .insertFollowRelationsList(followRelationsList.toArray(
+                                                    new FollowRelations[0])))
                                     .andThen(Single.create(emitter ->
                                             emitter.onSuccess(followRelationsList))));
 
@@ -126,38 +129,48 @@ public class GlobalRepository implements Repository {
     }
 
     @Override
-    public Completable followUser(String targetUser) {
+    public Completable followStream(Stream targetStream) {
         return getCurrentLoginInfo()
                 .subscribeOn(Schedulers.io())
                 .flatMapCompletable(userData ->
                         mRemoteRepository
                                 .followTargetUser(SharedPreferencesManager.getUserAccessToken(),
-                                        userData.getId(), targetUser)
-                                .andThen(mLocalDataSource.insertFollowRelationsEntry(
-                                        new FollowRelations(userData.getId(), userData.getLogin(),
-                                                targetUser, "", ""))));
+                                        userData.getId(), targetStream.getUserId())
+                                .andThen(mLocalDataSource
+                                        .insertFollowRelationsEntry(
+                                                new FollowRelations(userData.getId(),
+                                                        userData.getLogin(),
+                                                        targetStream.getUserId(),
+                                                        targetStream.getStreamerLogin(),
+                                                        ""))
+                                        .subscribeOn(Schedulers.io())));
         //todo fix empty fields;
     }
 
     @Override
-    public Completable unfollowUser(String targetUser) {
+    public Completable unfollowStream(Stream targetStream) {
         return getCurrentLoginInfo()
                 .subscribeOn(Schedulers.io())
                 .flatMapCompletable(userData ->
                         mRemoteRepository
                                 .unfollowTargetUser(SharedPreferencesManager.getUserAccessToken(),
-                                        userData.getId(), targetUser)
-                                .andThen(mLocalDataSource.deleteFollowRelationsEntry(
-                                        new FollowRelations(userData.getId(), "",
-                                                targetUser, "", ""))));
+                                        userData.getId(), targetStream.getUserId())
+                                .andThen(mLocalDataSource
+                                        .deleteFollowRelationsEntry(
+                                                new FollowRelations(userData.getId(),
+                                                        userData.getLogin(),
+                                                        targetStream.getUserId(),
+                                                        targetStream.getStreamerLogin(), ""))
+                                        .subscribeOn(Schedulers.io())));
     }
 
     @Override
-    public Single<Boolean> isUserFollowed(String targetUser) {
+    public Single<Boolean> isStreamFollowed(Stream targetStream) {
         return getCurrentLoginInfo()
-                .flatMap(userData -> mLocalDataSource.findRelation(userData.getId(), targetUser))
+                .flatMap(userData -> mLocalDataSource.findRelation(userData.getId(),
+                        targetStream.getUserId()))
                 .flatMap(followRelationsList ->
-                        Single.create(emitter -> emitter.onSuccess(followRelationsList.isEmpty())));
+                        Single.create(emitter -> emitter.onSuccess(!followRelationsList.isEmpty())));
     }
 
     @Override

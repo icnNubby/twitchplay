@@ -14,6 +14,11 @@ import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.Quality;
 import ru.nubby.playstream.model.Stream;
 
+import static ru.nubby.playstream.ui.stream.streamplayer.StreamContract.View.InfoMessage.ERROR_CHANNEL_FOLLOW_UNFOLLOW;
+import static ru.nubby.playstream.ui.stream.streamplayer.StreamContract.View.InfoMessage.ERROR_FETCHING_ADDITIONAL_INFO;
+import static ru.nubby.playstream.ui.stream.streamplayer.StreamContract.View.InfoMessage.INFO_CHANNEL_FOLLOWED;
+import static ru.nubby.playstream.ui.stream.streamplayer.StreamContract.View.InfoMessage.INFO_CHANNEL_UNFOLLOWED;
+
 public class StreamPresenter implements StreamContract.Presenter {
     private final String TAG = "StreamPresenter";
 
@@ -49,13 +54,21 @@ public class StreamPresenter implements StreamContract.Presenter {
                             mStreamView.displayTitle(streamReturned.getTitle());
                             mStreamView.displayViewerCount(streamReturned.getViewerCount());
                             mFollowDisplayTask = mRepository
-                                    .isUserFollowed(streamReturned.getUserId())
+                                    .isStreamFollowed(streamReturned)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe(
                                             success -> {
                                                 mStreamView.displayFollowStatus(success);
                                                 mStreamView.enableFollow(true);
                                             },
-                                            error -> mStreamView.enableFollow(false)
+                                            error -> {
+                                                Log.e(TAG, "Follow error " + error, error);
+                                                mStreamView.enableFollow(false);
+                                                mStreamView.displayInfoMessage(
+                                                        ERROR_CHANNEL_FOLLOW_UNFOLLOW,
+                                                        mCurrentStream.getStreamerName());
+                                            }
                                     );
                         },
                         error -> {
@@ -96,25 +109,34 @@ public class StreamPresenter implements StreamContract.Presenter {
     @Override
     public void followOrUnfollowChannel() {
         if (mCurrentStream != null) {
-            String targetUser = mCurrentStream.getUserId();
             mFollowUnfollowTask = mRepository
-                    .isUserFollowed(mCurrentStream.getUserId())
+                    .isStreamFollowed(mCurrentStream)
+                    .subscribeOn(Schedulers.io())
                     .flatMapCompletable(result -> {
                         if (result) {
-                            return mRepository.unfollowUser(targetUser);
+                            return mRepository.unfollowStream(mCurrentStream);
                         } else {
-                            return mRepository.followUser(targetUser);
+                            return mRepository.followStream(mCurrentStream);
                         }
                     })
-                    .andThen(mRepository.isUserFollowed(targetUser))
-                    .subscribeOn(Schedulers.io())
+                    .andThen(mRepository.isStreamFollowed(mCurrentStream))
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(result -> {
                                 mStreamView.displayFollowStatus(result);
                                 mStreamView.enableFollow(true);
+                                if (result) {
+                                    mStreamView.displayInfoMessage(INFO_CHANNEL_FOLLOWED,
+                                            mCurrentStream.getStreamerName());
+                                } else {
+                                    mStreamView.displayInfoMessage(INFO_CHANNEL_UNFOLLOWED,
+                                            mCurrentStream.getStreamerName());
+                                }
                             },
                             error -> {
+                                Log.e(TAG, "Follow error " + error, error);
                                 mStreamView.enableFollow(false);
+                                mStreamView.displayInfoMessage(ERROR_CHANNEL_FOLLOW_UNFOLLOW,
+                                        mCurrentStream.getStreamerName());
                             });
         } else {
             mStreamView.enableFollow(false);
@@ -143,11 +165,14 @@ public class StreamPresenter implements StreamContract.Presenter {
                             if (!mQualities.isEmpty()) {
                                 mStreamView.displayStream(mQualityUrls.get(mQualities.get(original)));
                             } else {
-                                //TODO display error of fetching
+                                mStreamView.displayInfoMessage(ERROR_FETCHING_ADDITIONAL_INFO,
+                                        mCurrentStream.getStreamerName());
                             }
                             mStreamView.displayLoading(false);
                         },
                         error -> {
+                            mStreamView.displayInfoMessage(ERROR_FETCHING_ADDITIONAL_INFO,
+                                    mCurrentStream.getStreamerName());
                             mStreamView.displayLoading(false);
                             Log.e(TAG, "Error while fetching quality urls " + error, error);
                         });

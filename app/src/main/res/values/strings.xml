@@ -14,7 +14,7 @@
         <item string="quality_audio_only">audio only</item>
     </string-array>
 
-    <!-- Errors, translatable                           -->
+    <!-- Errors and info messages, translatable         -->
     <string name="login_failed">Login procedure failed, please retry.</string>
     <string name="error_no_stream_info_provided">No stream info provided.</string>
     <string name="system_user">System</string>
@@ -24,6 +24,13 @@
         <item name="error_while_reconnecting">Can not reconnect to chat.</item>
         <item name="error_while_first_connect">Can not connect to chat.</item>
         <item name="info_connected">Connected to chat.</item>
+    </string-array>
+
+    <string-array name="stream_info_messages">
+        <item name="info_channel_followed">Now you follow </item>
+        <item name="info_channel_unfollowed">You stop to follow </item>
+        <item name="error_channel_follow_unfollow">Can not follow this channel, please retry later.</item>
+        <item name="error_fetching_additional_info">Can not get stream info, please retry.</item>
     </string-array>
 
     <string-array name="streams_list_errors">

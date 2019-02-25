@@ -25,7 +25,8 @@ public interface TwitchHelixService {
     Single<UserFollowsRequest> getUserFollowsById(@Query("from_id") String userId);
 
     @GET("users/follows?first=100")
-    Single<UserFollowsRequest> getUserFollowsById(@Query("from_id") String userId, @Query("after") String cursor);
+    Single<UserFollowsRequest> getUserFollowsById(@Query("from_id") String userId,
+                                                  @Query("after") String cursor);
 
     @GET("streams")
     Single<StreamsRequest> updateStream(@Query("user_id") String userId);

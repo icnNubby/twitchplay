@@ -122,7 +122,8 @@ public class TwitchApi {
             Request newRequest;
 
             newRequest = request.newBuilder()
-                    .addHeader(SensitiveStorage.getHeaderClientId(), SensitiveStorage.getClientApiKey())
+                    .addHeader(SensitiveStorage.getHeaderClientId(),
+                            SensitiveStorage.getClientApiKey())
                     .build();
             return chain.proceed(newRequest);
         }

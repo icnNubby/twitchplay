@@ -1,4 +1,4 @@
-package ru.nubby.playstream.utils;
+package ru.nubby.playstream.data.sharedprefs;
 
 import android.content.Context;
 import android.content.SharedPreferences;

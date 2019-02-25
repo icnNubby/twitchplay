@@ -5,12 +5,13 @@ import android.util.Log;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.SensitiveStorage;
 import ru.nubby.playstream.data.Repository;
-import ru.nubby.playstream.utils.SharedPreferencesManager;
 
 public class LoginPresenter implements LoginContract.Presenter {
     private final String TAG = LoginPresenter.class.getSimpleName();
 
-    private final String LOGIN_URL = "https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id=" + SensitiveStorage.getClientApiKey() + "&redirect_uri=http%3A%2F%2Flocalhost&scope=user_read+user_follows_edit+user_subscriptions";
+    private final String LOGIN_URL = "https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id="
+                    + SensitiveStorage.getClientApiKey()
+                    + "&redirect_uri=http%3A%2F%2Flocalhost&scope=user_read+user_follows_edit+user_subscriptions";
 
     private LoginContract.View mLoginView;
     private Disposable mDisposableUserFetchTask;

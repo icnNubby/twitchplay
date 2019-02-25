@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -183,6 +184,17 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
                 .createMediaSource(Uri.parse(url));
         mExoPlayer.prepare(videoSource);
         mExoPlayer.setPlayWhenReady(true);
+    }
+
+    @Override
+    public void displayInfoMessage(InfoMessage message, String streamerName) {
+        String infoMessage =
+                getResources().getStringArray(R.array.stream_info_messages)[message.ordinal()];
+        if (message == InfoMessage.INFO_CHANNEL_UNFOLLOWED ||
+            message == InfoMessage.INFO_CHANNEL_FOLLOWED) {
+            infoMessage = infoMessage.concat(" " + streamerName);
+        }
+        Toast.makeText(getActivity(), infoMessage, Toast.LENGTH_LONG).show();
     }
 
     @Override

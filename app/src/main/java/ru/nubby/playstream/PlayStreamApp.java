@@ -8,7 +8,7 @@ import ru.nubby.playstream.data.GlobalRepository;
 import ru.nubby.playstream.data.database.AppDatabase;
 import ru.nubby.playstream.data.database.RoomLocalDataSource;
 import ru.nubby.playstream.data.twitchapi.RemoteRepository;
-import ru.nubby.playstream.utils.SharedPreferencesManager;
+import ru.nubby.playstream.data.sharedprefs.SharedPreferencesManager;
 
 public class PlayStreamApp extends Application {
 
