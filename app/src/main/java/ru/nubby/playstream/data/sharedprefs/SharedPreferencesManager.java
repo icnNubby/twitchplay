@@ -17,57 +17,50 @@ public class SharedPreferencesManager {
     private static final String PREF_USER_REFRESH_TOKEN = "oauth_refresh_token";
     private static final String PREF_TOKEN_EXPIRES_AT = "oauth_expires_at";
 
-    private static SharedPreferences mSharedPreferences;
-    private static SharedPreferencesManager sMSharedPreferencesManager;
+    private SharedPreferences mSharedPreferences;
 
-    private SharedPreferencesManager(Context context) {
+    public SharedPreferencesManager(Context context) {
         mSharedPreferences = context.getSharedPreferences(PREFERENCES_FILENAME, Context.MODE_PRIVATE);
     }
 
-    public static void init(Context context) {
-        if (sMSharedPreferencesManager == null) {
-            sMSharedPreferencesManager = new SharedPreferencesManager(context);
-        }
-    }
-
-    public static String getUserAccessToken() {
+    public String getUserAccessToken() {
         return mSharedPreferences.getString(PREF_USER_ACCESS_TOKEN, "");
     }
 
-    public static boolean setUserAccessToken(String token) {
+    public boolean setUserAccessToken(String token) {
         return mSharedPreferences
                 .edit()
                 .putString(PREF_USER_ACCESS_TOKEN, token)
                 .commit();
     }
 
-    public static String getUserRefreshToken() {
+    public String getUserRefreshToken() {
         return mSharedPreferences.getString(PREF_USER_REFRESH_TOKEN, "");
     }
 
-    public static boolean setUserRefreshToken(String token) {
+    public boolean setUserRefreshToken(String token) {
         return mSharedPreferences
                 .edit()
                 .putString(PREF_USER_REFRESH_TOKEN, token)
                 .commit();
     }
 
-    public static Long getTokenExpiresAt() {
+    public Long getTokenExpiresAt() {
         return mSharedPreferences.getLong(PREF_TOKEN_EXPIRES_AT, 0L);
     }
 
-    public static boolean setTokenExpiresAt(Long time) {
+    public boolean setTokenExpiresAt(Long time) {
         return mSharedPreferences
                 .edit()
                 .putLong(PREF_USER_REFRESH_TOKEN, time)
                 .commit();
     }
 
-    public static UserData getUserData() {
+    public UserData getUserData() {
         return new Gson().fromJson(mSharedPreferences.getString(PREF_USER_DATA, ""), UserData.class);
     }
 
-    public static boolean setUserData(UserData data) {
+    public boolean setUserData(UserData data) {
         return mSharedPreferences
                 .edit()
                 .putString(PREF_USER_DATA, new Gson().toJson(data, UserData.class))

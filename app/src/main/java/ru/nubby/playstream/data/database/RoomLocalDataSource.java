@@ -6,7 +6,7 @@ import io.reactivex.Completable;
 import io.reactivex.Single;
 import ru.nubby.playstream.model.FollowRelations;
 
-public class RoomLocalDataSource implements  LocalDataSource {
+public class RoomLocalDataSource implements LocalDataSource {
 
     private final FollowRelationsDao mFollowRelationsDao;
 

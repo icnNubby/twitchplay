@@ -33,19 +33,26 @@ public class GlobalRepository implements Repository {
 
     private final RemoteRepository mRemoteRepository;
     private final LocalDataSource mLocalDataSource;
+    private final SharedPreferencesManager mSharedPreferencesManager;
 
     private static GlobalRepository sInstance;
 
     private boolean firstLoad = true; //TODO IDK implement in some other way its too hacky
 
-    private GlobalRepository(@NonNull RemoteRepository remoteRepository, @NonNull LocalDataSource localDataSource) {
+    private GlobalRepository(@NonNull RemoteRepository remoteRepository,
+                             @NonNull LocalDataSource localDataSource,
+                             @NonNull SharedPreferencesManager sharedPreferencesManager) {
         mRemoteRepository = remoteRepository;
         mLocalDataSource = localDataSource;
+        mSharedPreferencesManager = sharedPreferencesManager;
     }
 
-    public synchronized static void init(@NonNull RemoteRepository remoteRepository, @NonNull LocalDataSource localDataSource) {
+    public synchronized static void init(@NonNull RemoteRepository remoteRepository,
+                                         @NonNull LocalDataSource localDataSource,
+                                         @NonNull SharedPreferencesManager sharedPreferencesManager) {
         if (sInstance == null) {
-            sInstance = new GlobalRepository(remoteRepository, localDataSource);
+            sInstance = new GlobalRepository(remoteRepository, localDataSource,
+                    sharedPreferencesManager);
         }
     }
 
@@ -134,7 +141,7 @@ public class GlobalRepository implements Repository {
                 .subscribeOn(Schedulers.io())
                 .flatMapCompletable(userData ->
                         mRemoteRepository
-                                .followTargetUser(SharedPreferencesManager.getUserAccessToken(),
+                                .followTargetUser(mSharedPreferencesManager.getUserAccessToken(),
                                         userData.getId(), targetStream.getUserId())
                                 .andThen(mLocalDataSource
                                         .insertFollowRelationsEntry(
@@ -153,7 +160,7 @@ public class GlobalRepository implements Repository {
                 .subscribeOn(Schedulers.io())
                 .flatMapCompletable(userData ->
                         mRemoteRepository
-                                .unfollowTargetUser(SharedPreferencesManager.getUserAccessToken(),
+                                .unfollowTargetUser(mSharedPreferencesManager.getUserAccessToken(),
                                         userData.getId(), targetStream.getUserId())
                                 .andThen(mLocalDataSource
                                         .deleteFollowRelationsEntry(
@@ -180,24 +187,24 @@ public class GlobalRepository implements Repository {
             return Single.create(emitter -> emitter.onError(new Throwable("Not logged in")));
         } else if (currentStatus == LoggedStatus.LOGGED) {
             return Single.create(emitter -> {
-                emitter.onSuccess(SharedPreferencesManager.getUserData());
+                emitter.onSuccess(mSharedPreferencesManager.getUserData());
             });
         } else { //LoggedStatus.TOKEN_ONLY
-            return getUserDataFromToken(SharedPreferencesManager.getUserAccessToken())
-                    .doOnSuccess(SharedPreferencesManager::setUserData);
+            return getUserDataFromToken(mSharedPreferencesManager.getUserAccessToken())
+                    .doOnSuccess(mSharedPreferencesManager::setUserData);
         }
     }
 
     @Override
     public Single<UserData> loginAttempt(String token) {
-        SharedPreferencesManager.setUserAccessToken(token);
+        mSharedPreferencesManager.setUserAccessToken(token);
         return getCurrentLoginInfo();
     }
 
     private LoggedStatus getCurrentLoggedStatus() {
-        String token = SharedPreferencesManager.getUserAccessToken();
+        String token = mSharedPreferencesManager.getUserAccessToken();
         if (token != null && !token.equals("")) {
-            UserData data = SharedPreferencesManager.getUserData();
+            UserData data = mSharedPreferencesManager.getUserData();
             if (data == null) {
                 return LoggedStatus.TOKEN_ONLY;
             } else {

@@ -19,10 +19,11 @@ public class PlayStreamApp extends Application {
             return;
         }
         LeakCanary.install(this);
-        SharedPreferencesManager.init(this);
         AppDatabase.init(this);
-        GlobalRepository.init(new RemoteRepository(),
-                new RoomLocalDataSource(AppDatabase.getInstance().appDao()));
+        GlobalRepository.init(
+                new RemoteRepository(),
+                new RoomLocalDataSource(AppDatabase.getInstance().appDao()),
+                new SharedPreferencesManager(this));
         //TODO fking use dagger already
     }
 }

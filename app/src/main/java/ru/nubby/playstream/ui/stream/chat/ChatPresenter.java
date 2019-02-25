@@ -56,10 +56,17 @@ public class ChatPresenter implements ChatContract.Presenter {
                                             success -> {
                                                 mChatView.displayInfoMessage(INFO_CONNECTED);
                                                 listenToChat();
+                                            },
+                                            error -> {
+                                                mChatView.displayInfoMessage(ERROR_FIRST_CONNECT);
                                             });
                             mChatView.displayLoading(false);
                         },
-                        error -> Log.e(TAG, "Error while fetching additional data", error));
+                        error -> {
+                            Log.e(TAG, "Error while fetching additional data", error);
+                            mChatView.displayInfoMessage(ERROR_FIRST_CONNECT);
+                            mChatView.displayLoading(false);
+                        });
     }
 
     @Override
