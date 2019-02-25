@@ -2,6 +2,7 @@ package ru.nubby.playstream.data;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Completable;
@@ -110,8 +111,7 @@ public class GlobalRepository implements Repository {
     @Override
     public Single<List<Stream>> getLiveStreamsFollowedByUser() {
         return getCurrentLoginInfo()
-                .flatMap(userData ->
-                        mRemoteRepository
+                .flatMap(userData -> mRemoteRepository
                                 .getLiveStreamsFromRelationList(getUserFollows(userData.getId())));
     }
 
@@ -122,7 +122,14 @@ public class GlobalRepository implements Repository {
 
     @Override
     public Single<UserData> getStreamerInfo(Stream stream) {
-        return mRemoteRepository.getStreamerInfo(stream);
+        return mLocalDataSource
+                .findUserDataById(stream.getUserId())
+                .switchIfEmpty(mRemoteRepository
+                        .getStreamerInfo(stream)
+                        .flatMap(userData ->
+                                mLocalDataSource
+                                        .insertUserData(userData)
+                                        .andThen(Single.just(userData))));
     }
 
     @Override
@@ -214,5 +221,13 @@ public class GlobalRepository implements Repository {
             return LoggedStatus.NOT_LOGGED;
         }
     }
+
+    /*
+    private Single<StreamsRequest> updateStreamsInfo(Single<StreamsRequest> streamsRequest) {
+        return streamsRequest
+                .map(StreamsRequest::getData)
+                .//todo continue here.
+    }
+    */
 
 }

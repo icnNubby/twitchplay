@@ -1,7 +1,5 @@
 package ru.nubby.playstream.data.twitchapi;
 
-import android.util.Log;
-
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +19,7 @@ import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.model.StreamToken;
 import ru.nubby.playstream.model.StreamsRequest;
 import ru.nubby.playstream.model.UserData;
+import ru.nubby.playstream.model.UserDataList;
 import ru.nubby.playstream.model.UserFollowsRequest;
 import ru.nubby.playstream.utils.M3U8Parser;
 
@@ -28,6 +27,7 @@ import ru.nubby.playstream.utils.M3U8Parser;
  * //todo make interface contract for that class.
  */
 public class RemoteRepository {
+
     private final String TAG = RemoteRepository.class.getSimpleName();
 
     public Single<HashMap<Quality, String>> getVideoUrl(Stream stream) {
@@ -86,6 +86,23 @@ public class RemoteRepository {
                 .map(userDataList -> userDataList.getData().get(0))
                 .toSingle()
                 .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Single<List<UserData>> getUserDataListByIdsList(List<String> streamIdList) {
+        return Observable
+                .fromIterable(streamIdList)
+                .subscribeOn(Schedulers.io())
+                .buffer(100)
+                .flatMap(idList -> TwitchApi
+                        .getInstance()
+                        .getStreamHelixService()
+                        .getUserDataListByIdsList(idList)
+                        .map(UserDataList::getData)
+                        .subscribeOn(Schedulers.io())
+                        .toObservable())
+                .subscribeOn(Schedulers.computation())
+                .flatMap(Observable::fromIterable)
+                .toSortedList();
     }
 
     public Single<UserData> getUserDataFromToken(String token) {

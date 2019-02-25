@@ -14,7 +14,9 @@ import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.model.UserData;
 import ru.nubby.playstream.ui.stream.StreamChatActivity;
 
 public class StreamListFragment extends Fragment implements StreamListContract.View {
@@ -67,7 +70,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
         mProgressBar = fragmentView.findViewById(R.id.stream_list_progress_bar);
         density = getActivity().getResources().getDisplayMetrics().density;
         fragmentView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-            streamCardWidth = mStreamListRecyclerView.getMeasuredWidth() / density ;
+            streamCardWidth = mStreamListRecyclerView.getMeasuredWidth() / density;
             streamCardHeight = streamCardWidth * 9 / 16;
             ((GridLayoutManager) mStreamListRecyclerView.getLayoutManager()).setSpanCount((int) streamCardWidth / 250);
         });
@@ -156,6 +159,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
         private TextView mTextViewStreamerName;
         private TextView mTextViewStreamViewerCount;
         private ImageView mStreamPreview;
+        private ImageView mAvatar;
 
         public void bind(Stream stream) {
             mStream = stream;
@@ -169,8 +173,12 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
             mPicasso // todo inject
                     .load(formattedUrl)
                     .placeholder(R.drawable.video_placeholder)
-                    .resize((int)(streamCardWidth * density), (int)(streamCardHeight * density))
+                    .resize((int) (streamCardWidth * density), (int) (streamCardHeight * density))
                     .into(mStreamPreview);
+            if (stream.getUserData() != null) {
+                mPicasso.load(stream.getUserData().getProfileImageUrl())
+                        .into(mAvatar);
+            }
         }
 
         public StreamListViewHolder(@NonNull View itemView) {
@@ -179,6 +187,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
             mTextViewStreamerName = itemView.findViewById(R.id.stream_streamer_name);
             mStreamPreview = itemView.findViewById(R.id.stream_preview_thumbnail);
             mTextViewStreamViewerCount = itemView.findViewById(R.id.stream_viewer_count);
+            mAvatar = itemView.findViewById(R.id.imageViewAvatar);
         }
 
         @Override
@@ -186,7 +195,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
             Intent startStream = new Intent(getContext(), StreamChatActivity.class);
             //TODO fix to some constant
             startStream.putExtra("stream_json", new Gson().toJson(mStream)); // SLOW, YES
-            startActivity(startStream );
+            startActivity(startStream);
         }
     }
 

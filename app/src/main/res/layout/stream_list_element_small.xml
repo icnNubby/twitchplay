@@ -56,10 +56,10 @@
             android:textColor="@color/colorBlack"
             android:textSize="14sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/imageView"
+            app:layout_constraintBottom_toBottomOf="@+id/imageViewAvatar"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView"
-            app:layout_constraintTop_toTopOf="@+id/imageView"
+            app:layout_constraintStart_toEndOf="@+id/imageViewAvatar"
+            app:layout_constraintTop_toTopOf="@+id/imageViewAvatar"
             tools:text="Streamer name" />
 
 
@@ -82,11 +82,11 @@
             app:layout_constraintBottom_toBottomOf="@+id/stream_preview_thumbnail"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/stream_preview_thumbnail"
-            app:layout_constraintTop_toBottomOf="@+id/imageView"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewAvatar"
             tools:text="Stream description" />
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/imageViewAvatar"
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:layout_marginStart="8dp"

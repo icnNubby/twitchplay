@@ -4,13 +4,17 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 /**
  *
  * <a href = "https://dev.twitch.tv/docs/api/reference/#get-users">User data.</a>
  */
+@Entity (tableName = "user_data")
 public class UserData {
 
+    @PrimaryKey
     @SerializedName("id")
     @NonNull
     private String id = "";

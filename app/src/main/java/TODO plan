@@ -2,11 +2,12 @@
 Bugs
     fix displaying appsecret at failed load in login activity
     fix repeating streams in "top" tab
-    exclude unfollowed channel from following list, when returned
+    exclude unfollowed channel from online stream list, when returned
     fix schedulers everywhere, think how to separate responsibilities between views and repo
     stop caching instantly on stopping of activity, we waste traffic
 More features gradually from nearest to farthest:
     saving information about users we follow (avatars, etc) to db
+    add games to db and to
     notifications when in background
     sleep mode and setup to it
     backnav!

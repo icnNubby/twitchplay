@@ -22,7 +22,9 @@ public class PlayStreamApp extends Application {
         AppDatabase.init(this);
         GlobalRepository.init(
                 new RemoteRepository(),
-                new RoomLocalDataSource(AppDatabase.getInstance().appDao()),
+                new RoomLocalDataSource(
+                        AppDatabase.getInstance().followRelationsDao(),
+                        AppDatabase.getInstance().userDataDao()),
                 new SharedPreferencesManager(this));
         //TODO fking use dagger already
     }

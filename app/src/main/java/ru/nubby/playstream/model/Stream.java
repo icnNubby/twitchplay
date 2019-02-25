@@ -1,6 +1,5 @@
 package ru.nubby.playstream.model;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -18,7 +17,7 @@ public class Stream implements Comparable<Stream> {
     @SerializedName("user_name")
     private String streamerName;
 
-    private String profileImageUrl;
+    private UserData userData;
 
     /**
      * This is always in latin letters(english alphabet), should be used in all queries instead of
@@ -76,11 +75,15 @@ public class Stream implements Comparable<Stream> {
         return Integer.valueOf(o.getViewerCount()) - Integer.valueOf(this.getViewerCount());
     }
 
-    public String getProfileImageUrl() {
-        return profileImageUrl;
+    public UserData getUserData() {
+        return userData;
     }
 
-    public void setProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
+    public void setUserData(UserData userData) throws IllegalArgumentException {
+        if (userData.getId().equals(userId)) {
+            this.userData = userData;
+        } else {
+            throw new IllegalArgumentException("Id's of userData and Stream objects must be the same.");
+        }
     }
 }

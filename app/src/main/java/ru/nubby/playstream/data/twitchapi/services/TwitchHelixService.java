@@ -19,6 +19,9 @@ public interface TwitchHelixService {
     Single<UserDataList> getUserDataListById(@Query("id") String streamId);
 
     @GET("users")
+    Single<UserDataList> getUserDataListByIdsList(@Query("id") List<String> streamIdList);
+
+    @GET("users")
     Single<UserDataList> getUserDataListByToken(@Header("Authorization") String token);
 
     @GET("users/follows?first=100")

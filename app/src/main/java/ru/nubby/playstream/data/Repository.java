@@ -2,6 +2,7 @@ package ru.nubby.playstream.data;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -56,12 +57,22 @@ public interface Repository {
     Single<HashMap<Quality, String>> getVideoUrl(Stream stream);
 
     /**
-     * Gets login name in latin for further queries.
+     * Gets {@link UserData} corresponding to that stream for further queries.
      *
      * @param stream {@link Stream} object
      * @return {@link Single} of login name string.
      */
     Single<UserData> getStreamerInfo(Stream stream);
+
+
+    /**
+     * Gets {@link UserData} map corresponding to that list of streams(bound by Id). Caches it in base.
+     * @param streams {@link Stream}  list of stream objects.
+     * @return {@link UserData} mapped to Id list of UserData objects.
+      */
+    /*
+    Single<List<Stream>> updateStreamsInfo(List<Stream> streams);
+    */
 
     /**
      * Gets {@link UserData} for currently logged user.

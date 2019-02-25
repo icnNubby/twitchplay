@@ -39,30 +39,18 @@ public class StreamListPresenter implements StreamListContract.Presenter {
     }
 
     @Override
-    public void getMoreStreams() {
-        if (mListState == StreamListNavigationState.MODE_TOP && mPagination != null) {
-            if (mDisposableFetchingTask != null) {
-                mDisposableFetchingTask.dispose();
-            }
-            mDisposableFetchingTask = mRepository
-                    .getStreams(mPagination)
-                    .subscribe(streams -> {
-                                if (mCurrentStreamList != null) {
-                                    mCurrentStreamList.addAll(streams.getData());
-                                } else {
-                                    mCurrentStreamList = streams.getData();
-                                }
-                                mStreamListView.addStreamList(streams.getData());
-                                mPagination = streams.getPagination();
-                            },
-                            e -> {
-                                mStreamListView.displayError(ERROR_BAD_CONNECTION);
-                                Log.e(TAG, "Error while fetching more streams", e);
-                            });
+    public void subscribe() {
+        if (forceReload && (mDisposableFetchingTask == null || mPagination == null)) {
+            forceReload = false;
+            updateStreams();
         } else {
-            Log.e(TAG, "Wrong mode to fetch more streams, pagination cursor = " +
-                    mPagination + ", state = " + mListState);
+            mStreamListView.displayStreamList(mCurrentStreamList);
         }
+    }
+
+    @Override
+    public void unsubscribe() {
+        if (mDisposableFetchingTask != null) mDisposableFetchingTask.dispose();
     }
 
     @Override
@@ -124,6 +112,33 @@ public class StreamListPresenter implements StreamListContract.Presenter {
     }
 
     @Override
+    public void getMoreStreams() {
+        if (mListState == StreamListNavigationState.MODE_TOP && mPagination != null) {
+            if (mDisposableFetchingTask != null) {
+                mDisposableFetchingTask.dispose();
+            }
+            mDisposableFetchingTask = mRepository
+                    .getStreams(mPagination)
+                    .subscribe(streams -> {
+                                if (mCurrentStreamList != null) {
+                                    mCurrentStreamList.addAll(streams.getData());
+                                } else {
+                                    mCurrentStreamList = streams.getData();
+                                }
+                                mStreamListView.addStreamList(streams.getData());
+                                mPagination = streams.getPagination();
+                            },
+                            e -> {
+                                mStreamListView.displayError(ERROR_BAD_CONNECTION);
+                                Log.e(TAG, "Error while fetching more streams", e);
+                            });
+        } else {
+            Log.e(TAG, "Wrong mode to fetch more streams, pagination cursor = " +
+                    mPagination + ", state = " + mListState);
+        }
+    }
+
+    @Override
     public void decideToReload(long interval) {
         if (interval >= UPDATE_INTERVAL_MILLIS) {
             if (mListState == StreamListNavigationState.MODE_TOP) {
@@ -134,18 +149,4 @@ public class StreamListPresenter implements StreamListContract.Presenter {
         }
     }
 
-    @Override
-    public void subscribe() {
-        if (forceReload && (mDisposableFetchingTask == null || mPagination == null)) {
-            forceReload = false;
-            updateStreams();
-        } else {
-            mStreamListView.displayStreamList(mCurrentStreamList);
-        }
-    }
-
-    @Override
-    public void unsubscribe() {
-        if (mDisposableFetchingTask != null) mDisposableFetchingTask.dispose();
-    }
 }
