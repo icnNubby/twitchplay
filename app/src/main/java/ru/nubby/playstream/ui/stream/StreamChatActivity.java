@@ -112,7 +112,7 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
 
         //TODO !THINK HOW TO DECOUPLE THAT
         Single<Stream> currentStreamUpdate = GlobalRepository.getInstance()
-                .getStreamerInfo(currentStream)
+                .getUserFromStreamer(currentStream)
                 .map(updatedLogin -> {
                     if (currentStream != null) {
                         currentStream.setStreamerLogin(updatedLogin.getLogin());

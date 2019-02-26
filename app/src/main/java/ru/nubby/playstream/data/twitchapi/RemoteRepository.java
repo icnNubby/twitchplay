@@ -30,7 +30,7 @@ public class RemoteRepository {
 
     private final String TAG = RemoteRepository.class.getSimpleName();
 
-    public Single<HashMap<Quality, String>> getVideoUrl(Stream stream) {
+    public Single<HashMap<Quality, String>> getQualityUrls(Stream stream) {
         Single<String> channelName;
 
         if (stream.getStreamerLogin() != null && !stream.getStreamerLogin().equals("")) {
@@ -84,15 +84,16 @@ public class RemoteRepository {
                 .subscribeOn(Schedulers.io())
                 .filter(userDataList -> !userDataList.getData().isEmpty())
                 .map(userDataList -> userDataList.getData().get(0))
-                .toSingle()
-                .observeOn(AndroidSchedulers.mainThread());
+                .toSingle();
     }
 
-    public Single<List<UserData>> getUserDataListByIdsList(List<String> streamIdList) {
+    public Single<List<UserData>> getUserDataListByStreamList(List<Stream> streamIdList) {
         return Observable
                 .fromIterable(streamIdList)
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.computation())
+                .map(Stream::getUserId)
                 .buffer(100)
+                .subscribeOn(Schedulers.io())
                 .flatMap(idList -> TwitchApi
                         .getInstance()
                         .getStreamHelixService()
@@ -102,7 +103,7 @@ public class RemoteRepository {
                         .toObservable())
                 .subscribeOn(Schedulers.computation())
                 .flatMap(Observable::fromIterable)
-                .toSortedList();
+                .toList();
     }
 
     public Single<UserData> getUserDataFromToken(String token) {
@@ -113,8 +114,7 @@ public class RemoteRepository {
                 .subscribeOn(Schedulers.io())
                 .filter(userDataList -> !userDataList.getData().isEmpty())
                 .map(userDataList -> userDataList.getData().get(0))
-                .toSingle()
-                .observeOn(AndroidSchedulers.mainThread());
+                .toSingle();
     }
 
     public Observable<Stream> getUpdatedStreamInfo(Stream stream) {
@@ -126,26 +126,23 @@ public class RemoteRepository {
                 .map(streamsRequest -> streamsRequest.getData().get(0))
                 .delay(30, TimeUnit.SECONDS)
                 .repeat()
-                .toObservable()
-                .observeOn(AndroidSchedulers.mainThread());
+                .toObservable();
     }
 
-    public Single<StreamsRequest> getStreams() {
+    public Single<StreamsRequest> getTopStreams() {
         return TwitchApi
                 .getInstance()
                 .getStreamHelixService()
                 .getTopStreams()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                .subscribeOn(Schedulers.io());
     }
 
-    public Single<StreamsRequest> getStreams(Pagination pagination) {
+    public Single<StreamsRequest> getTopStreams(Pagination pagination) {
         return TwitchApi
                 .getInstance()
                 .getStreamHelixService()
-                .getMoreStreamsAfter(pagination.getCursor())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                .getTopStreams(pagination.getCursor())
+                .subscribeOn(Schedulers.io());
     }
 
     public Single<List<FollowRelations>> getUserFollows(String userId) {
@@ -168,8 +165,7 @@ public class RemoteRepository {
                 .subscribeOn(Schedulers.computation())
                 .map(StreamsRequest::getData)
                 .flatMap(Observable::fromIterable)
-                .toSortedList()
-                .observeOn(AndroidSchedulers.mainThread());
+                .toSortedList();
     }
 
     public Single<List<Stream>> getLiveStreamsFromRelationList(
@@ -189,8 +185,7 @@ public class RemoteRepository {
                 .subscribeOn(Schedulers.computation())
                 .map(StreamsRequest::getData)
                 .flatMap(Observable::fromIterable)
-                .toSortedList()
-                .observeOn(AndroidSchedulers.mainThread());
+                .toSortedList();
     }
 
     public Completable followTargetUser(String token, String userId, String targetUserId){
@@ -198,8 +193,7 @@ public class RemoteRepository {
                 .getInstance()
                 .getKrakenService()
                 .followTargetUser(userId, targetUserId, token)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                .subscribeOn(Schedulers.io());
     }
 
     public Completable unfollowTargetUser(String token, String userId, String targetUserId){
@@ -207,11 +201,13 @@ public class RemoteRepository {
                 .getInstance()
                 .getKrakenService()
                 .unfollowTargetUser(userId, targetUserId, token)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                .subscribeOn(Schedulers.io());
     }
 
     private Observable<FollowRelations> getAllUserFollowRelations(String userId) {
+        //Paginated request
+        //first emit is with "start" key
+        //all further emits will be with pagination string aKey
         return Observable
                 .defer(() ->
                 {

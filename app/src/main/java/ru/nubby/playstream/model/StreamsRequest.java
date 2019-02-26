@@ -27,6 +27,10 @@ public class StreamsRequest {
         return data;
     }
 
+    public void setData(List<Stream> streams) {
+        this.data = streams;
+    }
+
     public Pagination getPagination() {
         return pagination;
     }

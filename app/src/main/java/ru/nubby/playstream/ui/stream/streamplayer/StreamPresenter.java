@@ -154,7 +154,7 @@ public class StreamPresenter implements StreamContract.Presenter {
         }
         mStreamView.displayLoading(true);
         mStreamResolutionsInfoTask = mRepository
-                .getVideoUrl(stream)
+                .getQualityUrls(stream)
                 .subscribe(fetchedQualityTable -> {
                             mQualityUrls = fetchedQualityTable;
                             mQualities = new ArrayList<>(mQualityUrls.keySet());
@@ -178,7 +178,7 @@ public class StreamPresenter implements StreamContract.Presenter {
                         });
 
         mStreamInfoUpdater = mRepository
-                .getUpdatedStreamInfo(stream)
+                .getUpdatableStreamInfo(stream)
                 .subscribe(streamUpdated -> {
                             mStreamView.displayTitle(streamUpdated.getTitle());
                             mStreamView.displayViewerCount(streamUpdated.getViewerCount());

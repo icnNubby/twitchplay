@@ -15,6 +15,9 @@ public interface TwitchHelixService {
     @GET("streams")
     Single<StreamsRequest> getTopStreams();
 
+    @GET("streams")
+    Single<StreamsRequest> getTopStreams(@Query("after") String cursor);
+
     @GET("users")
     Single<UserDataList> getUserDataListById(@Query("id") String streamId);
 
@@ -37,7 +40,5 @@ public interface TwitchHelixService {
     @GET("streams?first=100")
     Single<StreamsRequest> getAllStreamsByUserList(@Query("user_id") List<String> userId);
 
-    @GET("streams")
-    Single<StreamsRequest> getMoreStreamsAfter(@Query("after") String cursor);
 
 }

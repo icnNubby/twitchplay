@@ -16,17 +16,17 @@ import ru.nubby.playstream.model.UserData;
 
 public interface Repository {
     /**
-     * Gets stream list from remote or local(cached) repository
+     * Gets stream list from remote repository
      * @return list of top streams
      */
-    Single<StreamsRequest> getStreams();
+    Single<StreamsRequest> getTopStreams();
 
     /**
-     * Gets stream list from remote or local(cached) repository
+     * Gets stream list from remote repository
      * @param pagination {@link Pagination} cursor
      * @return list of streams after pagination cursor
      */
-    Single<StreamsRequest> getStreams(Pagination pagination);
+    Single<StreamsRequest> getTopStreams(Pagination pagination);
 
     /**
      * Gets user follows list from remote or local(cached) repository
@@ -54,7 +54,7 @@ public interface Repository {
      * @param stream {@link Stream}
      * @return HashMap of Qualities as keys, and Urls to hls resources as values
      */
-    Single<HashMap<Quality, String>> getVideoUrl(Stream stream);
+    Single<HashMap<Quality, String>> getQualityUrls(Stream stream);
 
     /**
      * Gets {@link UserData} corresponding to that stream for further queries.
@@ -62,7 +62,7 @@ public interface Repository {
      * @param stream {@link Stream} object
      * @return {@link Single} of login name string.
      */
-    Single<UserData> getStreamerInfo(Stream stream);
+    Single<UserData> getUserFromStreamer(Stream stream);
 
 
     /**
@@ -80,7 +80,7 @@ public interface Repository {
      * @param token String OAUTH2 token
      * @return {@link Single} of {@link UserData} object, related to logged user.
      */
-    Single<UserData> getUserDataFromToken(String token);
+    Single<UserData> getUserFromToken(String token);
 
     /**
      * Updates {@link Stream} information.
@@ -88,7 +88,7 @@ public interface Repository {
      * @param stream {@link Stream} object
      * @return {@link Single} of {@link Stream} with updated user counter.
      */
-    Observable<Stream> getUpdatedStreamInfo(Stream stream);
+    Observable<Stream> getUpdatableStreamInfo(Stream stream);
 
     /**
      * Makes a request to follow targetUser by its ID.

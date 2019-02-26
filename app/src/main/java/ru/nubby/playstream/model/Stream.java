@@ -17,8 +17,6 @@ public class Stream implements Comparable<Stream> {
     @SerializedName("user_name")
     private String streamerName;
 
-    private UserData userData;
-
     /**
      * This is always in latin letters(english alphabet), should be used in all queries instead of
      * invalid user_name fields in chinese symbols
@@ -37,6 +35,8 @@ public class Stream implements Comparable<Stream> {
 
     @SerializedName("thumbnail_url")
     private String thumbnailUrl;
+
+    private UserData userData;
 
     public String getTitle() {
         return title;

@@ -1,5 +1,8 @@
 package ru.nubby.playstream.data;
 
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +11,7 @@ import androidx.annotation.NonNull;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.data.database.LocalDataSource;
 import ru.nubby.playstream.data.sharedprefs.SharedPreferencesManager;
@@ -65,13 +69,19 @@ public class GlobalRepository implements Repository {
     }
 
     @Override
-    public Single<StreamsRequest> getStreams() {
-        return mRemoteRepository.getStreams();
+    public Single<StreamsRequest> getTopStreams() {
+        return mRemoteRepository
+                .getTopStreams()
+                .flatMap(this::fetchAdditionalInfo)
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     @Override
-    public Single<StreamsRequest> getStreams(Pagination pagination) {
-        return mRemoteRepository.getStreams(pagination);
+    public Single<StreamsRequest> getTopStreams(Pagination pagination) {
+        return mRemoteRepository
+                .getTopStreams(pagination)
+                .flatMap(this::fetchAdditionalInfo)
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     @Override
@@ -112,16 +122,20 @@ public class GlobalRepository implements Repository {
     public Single<List<Stream>> getLiveStreamsFollowedByUser() {
         return getCurrentLoginInfo()
                 .flatMap(userData -> mRemoteRepository
-                                .getLiveStreamsFromRelationList(getUserFollows(userData.getId())));
+                                .getLiveStreamsFromRelationList(getUserFollows(userData.getId())))
+                .flatMap(this::fetchAdditionalInfo)
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     @Override
-    public Single<HashMap<Quality, String>> getVideoUrl(Stream stream) {
-        return mRemoteRepository.getVideoUrl(stream);
+    public Single<HashMap<Quality, String>> getQualityUrls(Stream stream) {
+        return mRemoteRepository
+                .getQualityUrls(stream)
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     @Override
-    public Single<UserData> getStreamerInfo(Stream stream) {
+    public Single<UserData> getUserFromStreamer(Stream stream) {
         return mLocalDataSource
                 .findUserDataById(stream.getUserId())
                 .switchIfEmpty(mRemoteRepository
@@ -129,17 +143,26 @@ public class GlobalRepository implements Repository {
                         .flatMap(userData ->
                                 mLocalDataSource
                                         .insertUserData(userData)
-                                        .andThen(Single.just(userData))));
+                                        .andThen(Single.just(userData))))
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     @Override
-    public Single<UserData> getUserDataFromToken(String token) {
-        return mRemoteRepository.getUserDataFromToken(token);
+    public Single<UserData> getUserFromToken(String token) {
+        return mRemoteRepository
+                .getUserDataFromToken(token)
+                .flatMap(userData ->
+                        mLocalDataSource
+                                .insertUserData(userData)
+                                .andThen(Single.just(userData)))
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     @Override
-    public Observable<Stream> getUpdatedStreamInfo(Stream stream) {
-        return mRemoteRepository.getUpdatedStreamInfo(stream);
+    public Observable<Stream> getUpdatableStreamInfo(Stream stream) {
+        return mRemoteRepository
+                .getUpdatedStreamInfo(stream)
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     @Override
@@ -157,7 +180,8 @@ public class GlobalRepository implements Repository {
                                                         targetStream.getUserId(),
                                                         targetStream.getStreamerLogin(),
                                                         ""))
-                                        .subscribeOn(Schedulers.io())));
+                                        .subscribeOn(Schedulers.io())))
+                .observeOn(AndroidSchedulers.mainThread());
         //todo fix empty fields;
     }
 
@@ -175,7 +199,8 @@ public class GlobalRepository implements Repository {
                                                         userData.getLogin(),
                                                         targetStream.getUserId(),
                                                         targetStream.getStreamerLogin(), ""))
-                                        .subscribeOn(Schedulers.io())));
+                                        .subscribeOn(Schedulers.io())))
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     @Override
@@ -197,7 +222,7 @@ public class GlobalRepository implements Repository {
                 emitter.onSuccess(mSharedPreferencesManager.getUserData());
             });
         } else { //LoggedStatus.TOKEN_ONLY
-            return getUserDataFromToken(mSharedPreferencesManager.getUserAccessToken())
+            return getUserFromToken(mSharedPreferencesManager.getUserAccessToken())
                     .doOnSuccess(mSharedPreferencesManager::setUserData);
         }
     }
@@ -222,12 +247,43 @@ public class GlobalRepository implements Repository {
         }
     }
 
-    /*
-    private Single<StreamsRequest> updateStreamsInfo(Single<StreamsRequest> streamsRequest) {
-        return streamsRequest
-                .map(StreamsRequest::getData)
-                .//todo continue here.
-    }
-    */
+    private Single<StreamsRequest> fetchAdditionalInfo(final StreamsRequest streamsRequest) {
+        //makes deep copy of streamsRequest, modifies its "data" field (List<Streams>)
+        Gson gson = new Gson();
+        final StreamsRequest streamsRequestCopy =
+                gson.fromJson(gson.toJson(streamsRequest, StreamsRequest.class),StreamsRequest.class);
 
+        return fetchAdditionalInfo(streamsRequestCopy.getData())
+                .flatMap(streams -> {
+                    streamsRequestCopy.setData(streams);
+                    return Single.just(streamsRequestCopy);
+                });
+
+    }
+
+    private Single<List<Stream>> fetchAdditionalInfo(final List<Stream> streamList) {
+        //makes deep copy of streamList, modifies each element with fetched userdata
+        Gson gson = new Gson();
+        final List<Stream> streamListCopy = new ArrayList<>();
+        for (Stream item: streamList) {
+            streamListCopy.add(gson.fromJson(gson.toJson(item), Stream.class));
+        }
+        final Map<String, Integer> streamsMap = new HashMap<>();
+        for (int i = 0; i < streamListCopy.size(); i++) {
+            streamsMap.put(streamListCopy.get(i).getUserId(), i);
+        }
+
+
+        return mRemoteRepository
+                .getUserDataListByStreamList(streamListCopy)
+                .flatMap(userData -> {
+                    for (UserData item: userData) {
+                        Integer index = streamsMap.get(item.getId());
+                        if (index != null) {
+                            streamListCopy.get(index).setUserData(item);
+                        }
+                    }
+                    return Single.just(streamListCopy);
+                });
+    }
 }

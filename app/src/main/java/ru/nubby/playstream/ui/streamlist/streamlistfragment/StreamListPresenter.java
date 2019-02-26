@@ -92,7 +92,7 @@ public class StreamListPresenter implements StreamListContract.Presenter {
     public void getTopStreams() {
         mListState = StreamListNavigationState.MODE_TOP;
         mDisposableFetchingTask = mRepository
-                .getStreams()
+                .getTopStreams()
                 .doOnSubscribe(disposable -> {
                     mStreamListView.clearStreamList();
                     mCurrentStreamList = new ArrayList<>();
@@ -118,7 +118,7 @@ public class StreamListPresenter implements StreamListContract.Presenter {
                 mDisposableFetchingTask.dispose();
             }
             mDisposableFetchingTask = mRepository
-                    .getStreams(mPagination)
+                    .getTopStreams(mPagination)
                     .subscribe(streams -> {
                                 if (mCurrentStreamList != null) {
                                     mCurrentStreamList.addAll(streams.getData());

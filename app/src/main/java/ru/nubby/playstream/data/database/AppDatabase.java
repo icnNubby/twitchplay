@@ -7,8 +7,9 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import ru.nubby.playstream.model.FollowRelations;
+import ru.nubby.playstream.model.UserData;
 
-@Database(entities = {FollowRelations.class}, version = 1, exportSchema = false)
+@Database(entities = {FollowRelations.class, UserData.class}, version = 2, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static final String TAG = AppDatabase.class.getSimpleName();
@@ -21,6 +22,7 @@ public abstract class AppDatabase extends RoomDatabase {
             sInstance = Room.databaseBuilder(context.getApplicationContext(),
                     AppDatabase.class,
                     AppDatabase.DATABASE_NAME)
+                    .fallbackToDestructiveMigration()
                     .build();
         }
     }

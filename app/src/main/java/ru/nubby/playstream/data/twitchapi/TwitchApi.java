@@ -3,6 +3,8 @@ package ru.nubby.playstream.data.twitchapi;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.NonNull;
+import androidx.room.PrimaryKey;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -18,6 +20,7 @@ import ru.nubby.playstream.data.twitchapi.services.TwitchApiService;
 import ru.nubby.playstream.data.twitchapi.services.TwitchKrakenService;
 
 //TODO prob extract repeating path from retrofit builder to some private method, and build upon it
+//TODO should it be singleton??
 /**
  * Some of requests will not work with helix API, some will not work with old api API.
  * after building {@link TwitchApiService} object, you should know which endpoint to use
@@ -108,7 +111,6 @@ public class TwitchApi {
 
         return new OkHttpClient().newBuilder()
                 .connectTimeout(5000, TimeUnit.MILLISECONDS)
-                //TODO think what to do incase of reaaaaaaallly bbaaaaaaadd connetion
                 .readTimeout(5000, TimeUnit.MILLISECONDS)
                 .addInterceptor(logging)
                 .addInterceptor(tokenInterceptor)
@@ -117,7 +119,8 @@ public class TwitchApi {
 
     private class RequestTokenInterceptor implements Interceptor {
         @Override
-        public okhttp3.Response intercept(Chain chain) throws IOException {
+        @NonNull
+        public okhttp3.Response intercept(@NonNull Chain chain) throws IOException {
             Request request = chain.request();
             Request newRequest;
 
