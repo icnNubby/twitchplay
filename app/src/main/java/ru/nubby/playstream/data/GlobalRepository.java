@@ -13,7 +13,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import ru.nubby.playstream.data.database.LocalDataSource;
+import ru.nubby.playstream.data.database.LocalRepository;
 import ru.nubby.playstream.data.sharedprefs.SharedPreferencesManager;
 import ru.nubby.playstream.data.twitchapi.RemoteRepository;
 import ru.nubby.playstream.model.FollowRelations;
@@ -37,7 +37,7 @@ public class GlobalRepository implements Repository {
     private final String TAG = GlobalRepository.class.getSimpleName();
 
     private final RemoteRepository mRemoteRepository;
-    private final LocalDataSource mLocalDataSource;
+    private final LocalRepository mLocalRepository;
     private final SharedPreferencesManager mSharedPreferencesManager;
 
     private static GlobalRepository sInstance;
@@ -45,26 +45,27 @@ public class GlobalRepository implements Repository {
     private boolean firstLoad = true; //TODO IDK implement in some other way its too hacky
 
     private GlobalRepository(@NonNull RemoteRepository remoteRepository,
-                             @NonNull LocalDataSource localDataSource,
+                             @NonNull LocalRepository localRepository,
                              @NonNull SharedPreferencesManager sharedPreferencesManager) {
         mRemoteRepository = remoteRepository;
-        mLocalDataSource = localDataSource;
+        mLocalRepository = localRepository;
         mSharedPreferencesManager = sharedPreferencesManager;
     }
 
     public synchronized static void init(@NonNull RemoteRepository remoteRepository,
-                                         @NonNull LocalDataSource localDataSource,
+                                         @NonNull LocalRepository localRepository,
                                          @NonNull SharedPreferencesManager sharedPreferencesManager) {
         if (sInstance == null) {
-            sInstance = new GlobalRepository(remoteRepository, localDataSource,
+            sInstance = new GlobalRepository(remoteRepository, localRepository,
                     sharedPreferencesManager);
         }
     }
 
     @NonNull
     public static GlobalRepository getInstance() {
-        if (sInstance == null)
+        if (sInstance == null) {
             throw new NullPointerException("Global repository is not instantiated");
+        }
         return sInstance;
     }
 
@@ -92,16 +93,16 @@ public class GlobalRepository implements Repository {
                     .getUserFollows(userId)
                     .subscribeOn(Schedulers.io())
                     .flatMap(followRelationsList ->
-                            mLocalDataSource
+                            mLocalRepository
                                     .deleteAllFollowRelationsEntries()
-                                    .andThen(mLocalDataSource
+                                    .andThen(mLocalRepository
                                             .insertFollowRelationsList(followRelationsList.toArray(
                                                     new FollowRelations[0])))
                                     .andThen(Single.create(emitter ->
                                             emitter.onSuccess(followRelationsList))));
 
         } else {
-            return mLocalDataSource
+            return mLocalRepository
                     .getFollowRelationsEntriesById(userId)
                     .subscribeOn(Schedulers.io());
         }
@@ -112,8 +113,8 @@ public class GlobalRepository implements Repository {
         return getUserFollows(userId)
                 .subscribeOn(Schedulers.io())
                 .flatMap(list -> {
-                    mLocalDataSource.insertFollowRelationsList(list.toArray(new FollowRelations[0]));
-                    return mLocalDataSource.getFollowRelationsEntriesById(userId);
+                    mLocalRepository.insertFollowRelationsList(list.toArray(new FollowRelations[0]));
+                    return mLocalRepository.getFollowRelationsEntriesById(userId);
                 })
                 .map(followRelationsList -> true);
     }
@@ -121,9 +122,10 @@ public class GlobalRepository implements Repository {
     @Override
     public Single<List<Stream>> getLiveStreamsFollowedByUser() {
         return getCurrentLoginInfo()
+                .subscribeOn(Schedulers.io())
                 .flatMap(userData -> mRemoteRepository
-                                .getLiveStreamsFromRelationList(getUserFollows(userData.getId())))
-                .flatMap(this::fetchAdditionalInfo)
+                        .getLiveStreamsFromRelationList(getUserFollows(userData.getId())))
+                .flatMap(streams -> this.fetchAdditionalInfo(streams, false))
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -136,12 +138,13 @@ public class GlobalRepository implements Repository {
 
     @Override
     public Single<UserData> getUserFromStreamer(Stream stream) {
-        return mLocalDataSource
+        return mLocalRepository
                 .findUserDataById(stream.getUserId())
+                .subscribeOn(Schedulers.io())
                 .switchIfEmpty(mRemoteRepository
                         .getStreamerInfo(stream)
                         .flatMap(userData ->
-                                mLocalDataSource
+                                mLocalRepository
                                         .insertUserData(userData)
                                         .andThen(Single.just(userData))))
                 .observeOn(AndroidSchedulers.mainThread());
@@ -151,8 +154,9 @@ public class GlobalRepository implements Repository {
     public Single<UserData> getUserFromToken(String token) {
         return mRemoteRepository
                 .getUserDataFromToken(token)
+                .subscribeOn(Schedulers.io())
                 .flatMap(userData ->
-                        mLocalDataSource
+                        mLocalRepository
                                 .insertUserData(userData)
                                 .andThen(Single.just(userData)))
                 .observeOn(AndroidSchedulers.mainThread());
@@ -173,15 +177,14 @@ public class GlobalRepository implements Repository {
                         mRemoteRepository
                                 .followTargetUser(mSharedPreferencesManager.getUserAccessToken(),
                                         userData.getId(), targetStream.getUserId())
-                                .andThen(mLocalDataSource
+                                .andThen(mLocalRepository
                                         .insertFollowRelationsEntry(
                                                 new FollowRelations(userData.getId(),
                                                         userData.getLogin(),
                                                         targetStream.getUserId(),
                                                         targetStream.getStreamerLogin(),
                                                         ""))
-                                        .subscribeOn(Schedulers.io())))
-                .observeOn(AndroidSchedulers.mainThread());
+                                        .subscribeOn(Schedulers.io())));
         //todo fix empty fields;
     }
 
@@ -193,20 +196,19 @@ public class GlobalRepository implements Repository {
                         mRemoteRepository
                                 .unfollowTargetUser(mSharedPreferencesManager.getUserAccessToken(),
                                         userData.getId(), targetStream.getUserId())
-                                .andThen(mLocalDataSource
+                                .andThen(mLocalRepository
                                         .deleteFollowRelationsEntry(
                                                 new FollowRelations(userData.getId(),
                                                         userData.getLogin(),
                                                         targetStream.getUserId(),
                                                         targetStream.getStreamerLogin(), ""))
-                                        .subscribeOn(Schedulers.io())))
-                .observeOn(AndroidSchedulers.mainThread());
+                                        .subscribeOn(Schedulers.io())));
     }
 
     @Override
     public Single<Boolean> isStreamFollowed(Stream targetStream) {
         return getCurrentLoginInfo()
-                .flatMap(userData -> mLocalDataSource.findRelation(userData.getId(),
+                .flatMap(userData -> mLocalRepository.findRelation(userData.getId(),
                         targetStream.getUserId()))
                 .flatMap(followRelationsList ->
                         Single.create(emitter -> emitter.onSuccess(!followRelationsList.isEmpty())));
@@ -251,9 +253,9 @@ public class GlobalRepository implements Repository {
         //makes deep copy of streamsRequest, modifies its "data" field (List<Streams>)
         Gson gson = new Gson();
         final StreamsRequest streamsRequestCopy =
-                gson.fromJson(gson.toJson(streamsRequest, StreamsRequest.class),StreamsRequest.class);
+                gson.fromJson(gson.toJson(streamsRequest, StreamsRequest.class), StreamsRequest.class);
 
-        return fetchAdditionalInfo(streamsRequestCopy.getData())
+        return fetchAdditionalInfo(streamsRequestCopy.getData(), false)
                 .flatMap(streams -> {
                     streamsRequestCopy.setData(streams);
                     return Single.just(streamsRequestCopy);
@@ -261,29 +263,70 @@ public class GlobalRepository implements Repository {
 
     }
 
-    private Single<List<Stream>> fetchAdditionalInfo(final List<Stream> streamList) {
+    private Single<List<Stream>> fetchAdditionalInfo(final List<Stream> streamList,
+                                                     boolean forceUpdateDb) {
         //makes deep copy of streamList, modifies each element with fetched userdata
         Gson gson = new Gson();
         final List<Stream> streamListCopy = new ArrayList<>();
-        for (Stream item: streamList) {
+        for (Stream item : streamList) {
             streamListCopy.add(gson.fromJson(gson.toJson(item), Stream.class));
         }
-        final Map<String, Integer> streamsMap = new HashMap<>();
+        final Map<String, Integer> streamsIndexes = new HashMap<>();
         for (int i = 0; i < streamListCopy.size(); i++) {
-            streamsMap.put(streamListCopy.get(i).getUserId(), i);
+            streamsIndexes.put(streamListCopy.get(i).getUserId(), i);
         }
 
+        // 1. tries to fetch UserData from db by Id, updates streamListCopy with that data
+        // 2. for all streams id's that are not in db, performs net request, updates streamListCopy
+        // 3. writes fetched UserData from step 2 to db.
+        // if forceUpdateDb == true - skips step 1.
+        // result - updated streamListCopy
 
-        return mRemoteRepository
-                .getUserDataListByStreamList(streamListCopy)
-                .flatMap(userData -> {
-                    for (UserData item: userData) {
-                        Integer index = streamsMap.get(item.getId());
+        Observable<UserData> localSource;
+        if (!forceUpdateDb) {
+            localSource = Observable
+                    .fromIterable(streamListCopy)
+                    .subscribeOn(Schedulers.io())
+                    .map(Stream::getUserId)
+                    .flatMapMaybe(mLocalRepository::findUserDataById)
+                    .doOnEach(userDataNotification -> {
+                        UserData value = userDataNotification.getValue();
+                        if (value != null) {
+                            Integer index = streamsIndexes.get(value.getId());
+                            if (index != null) {
+                                streamListCopy
+                                        .get(index)
+                                        .setUserData(userDataNotification.getValue());
+                            }
+                        }
+                    });
+        } else {
+            localSource = Observable.empty();
+        }
+
+        Observable<UserData> remoteSource = Observable
+                .fromIterable(streamListCopy)
+                .filter(stream -> (stream.getUserData() == null || stream.getUserData().isEmpty()))
+                .toList()
+                .flatMap(mRemoteRepository::getUserDataListByStreamList)
+                .flatMapObservable(Observable::fromIterable)
+                .doOnEach(userDataNotification -> {
+                    UserData value = userDataNotification.getValue();
+                    if (value != null) {
+                        mLocalRepository.insertUserData(userDataNotification.getValue());
+                        Integer index = streamsIndexes.get(value.getId());
                         if (index != null) {
-                            streamListCopy.get(index).setUserData(item);
+                            streamListCopy
+                                    .get(index)
+                                    .setUserData(userDataNotification.getValue());
                         }
                     }
-                    return Single.just(streamListCopy);
                 });
+
+        return localSource
+                .concatWith(remoteSource)
+                .toList()
+                .flatMap(userDataList -> Single.just(streamListCopy));
+
     }
 }

@@ -12,7 +12,7 @@ import io.reactivex.Single;
 import ru.nubby.playstream.model.FollowRelations;
 import ru.nubby.playstream.model.UserData;
 
-public interface LocalDataSource {
+public interface LocalRepository {
 
     Single<List<FollowRelations>> getFollowRelationsEntriesById(String fromId);
 

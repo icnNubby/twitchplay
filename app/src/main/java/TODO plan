@@ -1,19 +1,17 @@
 // TODO future plans
 Bugs
     fix displaying appsecret at failed load in login activity
-    fix repeating streams in "top" tab
     exclude unfollowed channel from online stream list, when returned
     fix schedulers everywhere, think how to separate responsibilities between views and repo
-    stop caching instantly on stopping of activity, we waste traffic
-
+    figure out how to stop caching instantly on stopping of activity, we waste traffic
     think how to make use of picasso scaling.
+    add schedulers dependencies in presenters by di
 More features gradually from nearest to farthest:
-    saving information about users we follow (avatars, etc) to db
-    add games to db and to
+    ?add games to db and to
+    preferences screen finally
     notifications when in background
     sleep mode and setup to it
     backnav!
-    preferences screen finally
     chat answers
     chat emodzi displays
     emodzi update and storage locally

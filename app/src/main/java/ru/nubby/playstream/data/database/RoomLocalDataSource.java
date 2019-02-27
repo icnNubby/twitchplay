@@ -3,13 +3,12 @@ package ru.nubby.playstream.data.database;
 import java.util.List;
 
 import io.reactivex.Completable;
-import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import ru.nubby.playstream.model.FollowRelations;
 import ru.nubby.playstream.model.UserData;
 
-public class RoomLocalDataSource implements LocalDataSource {
+public class RoomLocalDataSource implements LocalRepository {
 
     private final FollowRelationsDao mFollowRelationsDao;
     private final UserDataDao mUserDataDao;

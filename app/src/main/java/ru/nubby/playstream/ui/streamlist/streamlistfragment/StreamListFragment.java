@@ -114,7 +114,6 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
             StreamListAdapter streamListAdapter = (StreamListAdapter) mStreamListRecyclerView.getAdapter();
             if (streamListAdapter != null) {
                 int sizeBefore = streamListAdapter.getItemCount();
-                streamListAdapter.addStreams(streams);
                 streamListAdapter.notifyItemRangeInserted(sizeBefore, streams.size());
             }
         }
@@ -230,8 +229,5 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
             return mStreamsList.size();
         }
 
-        public void addStreams(List<Stream> streams) {
-            mStreamsList.addAll(streams);
-        }
     }
 }

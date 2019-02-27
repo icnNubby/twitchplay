@@ -2,6 +2,9 @@ package ru.nubby.playstream.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 /**
  * Stream class. Contains information about user, stream title, viewer count, etc.
  * <a href = "https://dev.twitch.tv/docs/api/reference/#get-streams">Documentation here.</a>
@@ -11,6 +14,7 @@ public class Stream implements Comparable<Stream> {
     @SerializedName("title")
     private String title;
 
+    @NonNull
     @SerializedName("user_id")
     private String userId;
 
@@ -50,6 +54,7 @@ public class Stream implements Comparable<Stream> {
         return type;
     }
 
+    @NonNull
     public String getUserId() {
         return userId;
     }
@@ -85,5 +90,18 @@ public class Stream implements Comparable<Stream> {
         } else {
             throw new IllegalArgumentException("Id's of userData and Stream objects must be the same.");
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return userId.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof Stream)) {
+            return false;
+        }
+        return this.userId.equals(((Stream) obj).userId);
     }
 }

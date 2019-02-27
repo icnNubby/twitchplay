@@ -3,7 +3,10 @@ package ru.nubby.playstream.ui.streamlist.streamlistfragment;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.data.Repository;
@@ -16,7 +19,7 @@ import static ru.nubby.playstream.ui.streamlist.streamlistfragment.StreamListCon
 public class StreamListPresenter implements StreamListContract.Presenter {
 
     private static final String TAG = StreamListPresenter.class.getSimpleName();
-    private final long UPDATE_INTERVAL_MILLIS = 1000 * 60 * 5; //TODO 5 minutes
+    private final long UPDATE_INTERVAL_MILLIS = 1000 * 60 * 5; // 5 minutes
 
     private StreamListContract.View mStreamListView;
     private Disposable mDisposableFetchingTask;
@@ -24,6 +27,7 @@ public class StreamListPresenter implements StreamListContract.Presenter {
     private Repository mRepository;
 
     private List<Stream> mCurrentStreamList;
+    private Map<String, Stream> mCurrentStreamMap;
     private StreamListNavigationState mListState;
     private boolean forceReload;
 
@@ -73,11 +77,12 @@ public class StreamListPresenter implements StreamListContract.Presenter {
                 .doOnSubscribe(disposable -> {
                     mStreamListView.clearStreamList();
                     mCurrentStreamList = new ArrayList<>();
+                    mCurrentStreamMap = new HashMap<>();
                     mStreamListView.setupProgressBar(true);
                 })
                 .subscribe(streams -> {
-                            mCurrentStreamList = streams;
-                            mStreamListView.displayStreamList(streams);
+                            checkAndAddStreams(streams);
+                            mStreamListView.displayStreamList(mCurrentStreamList);
                             mStreamListView.setupProgressBar(false);
                             mPagination = null;
                         },
@@ -96,12 +101,13 @@ public class StreamListPresenter implements StreamListContract.Presenter {
                 .doOnSubscribe(disposable -> {
                     mStreamListView.clearStreamList();
                     mCurrentStreamList = new ArrayList<>();
+                    mCurrentStreamMap = new HashMap<>();
                     mStreamListView.setupProgressBar(true);
                 })
                 .subscribe(streams -> {
                             mStreamListView.setupProgressBar(false);
-                            mCurrentStreamList = streams.getData();
-                            mStreamListView.displayStreamList(streams.getData());
+                            checkAndAddStreams(streams.getData());
+                            mStreamListView.displayStreamList(mCurrentStreamList);
                             mPagination = streams.getPagination();
                         },
                         e -> {
@@ -120,12 +126,8 @@ public class StreamListPresenter implements StreamListContract.Presenter {
             mDisposableFetchingTask = mRepository
                     .getTopStreams(mPagination)
                     .subscribe(streams -> {
-                                if (mCurrentStreamList != null) {
-                                    mCurrentStreamList.addAll(streams.getData());
-                                } else {
-                                    mCurrentStreamList = streams.getData();
-                                }
-                                mStreamListView.addStreamList(streams.getData());
+                                List<Stream> added = checkAndAddStreams(streams.getData());
+                                mStreamListView.addStreamList(added);
                                 mPagination = streams.getPagination();
                             },
                             e -> {
@@ -147,6 +149,28 @@ public class StreamListPresenter implements StreamListContract.Presenter {
                 getFollowedStreams();
             }
         }
+    }
+
+    /**
+     * Checks incoming list for duplicates and add to current, also removing duplicates.
+     *
+     * @param streams {@link Stream} List.
+     * @return {@link Stream} list of added streams, without duplicates
+     */
+    private List<Stream> checkAndAddStreams(List<Stream> streams) {
+        List<Stream> moreStreams = new ArrayList<>(streams);
+        Iterator<Stream> checker = moreStreams.iterator();
+        while (checker.hasNext()) {
+            Stream nextStream = checker.next();
+            if (mCurrentStreamMap.containsKey(nextStream.getUserId())) {
+                checker.remove();
+            } else {
+                mCurrentStreamMap.put(nextStream.getUserId(),
+                        nextStream);
+            }
+        }
+        mCurrentStreamList.addAll(moreStreams);
+        return moreStreams;
     }
 
 }
