@@ -1,49 +1,40 @@
 <resources>
     <string name="app_name">Playstream</string>
 
-    <!-- Quality list, translatable                     -->
-    <string-array name="quality_list">
-        <item string="quality_default">original</item>
-        <item string="quality_108060">1080x60</item>
-        <item string="quality_108030">1080x30</item>
-        <item string="quality_72060">720x60</item>
-        <item string="quality_72030">720x30</item>
-        <item string="quality_480">480</item>
-        <item string="quality_360">360</item>
-        <item string="quality_240">240</item>
-        <item string="quality_audio_only">audio only</item>
-    </string-array>
-
     <!-- Errors and info messages, translatable         -->
     <string name="login_failed">Login procedure failed, please retry.</string>
     <string name="error_no_stream_info_provided">No stream info provided.</string>
     <string name="system_user">System</string>
 
-    <string-array name="chat_info_messages">
-        <item name="error_disconnected_from_chat">Disconnected from chat.</item>
-        <item name="error_while_reconnecting">Can not reconnect to chat.</item>
-        <item name="error_while_first_connect">Can not connect to chat.</item>
-        <item name="info_connected">Connected to chat.</item>
-    </string-array>
-
-    <string-array name="stream_info_messages">
-        <item name="info_channel_followed">Now you follow </item>
-        <item name="info_channel_unfollowed">You stop to follow </item>
-        <item name="error_channel_follow_unfollow">Can not follow this channel, please retry later.</item>
-        <item name="error_fetching_additional_info">Can not get stream info, please retry.</item>
-    </string-array>
-
-    <string-array name="streams_list_errors">
-        <item name="error_bad_connection">No internet connection, please retry later.</item>
-    </string-array>
-
     <!-- Menus, translatable                            -->
     <string name="login">Login</string>
+    <string name="preferences">Preferences</string>
+
     <string name="favourites">Follows</string>
     <string name="top_streams">Top streams</string>
 
     <!-- Title, translatable                            -->
     <string name="logged_in">Logged as: </string>
     <string name="not_logged_in">You are not logged in</string>
+
+    <!-- Preferences                                    -->
+    <string name="default_quality_summary">Default stream playback quality</string>
+    <string name="default_quality_title">Default quality</string>
+    <string name="default_quality_default_value">720x30</string>
+    <string name="default_quality_key"
+        translatable="false">default_quality</string>
+
+    <string name="default_stream_list_mode_summary">Default main screen mode</string>
+    <string name="default_stream_list_mode_title">Default mode</string>
+    <string name="default_stream_list_mode_default_value">0</string>
+    <string name="default_stream_list_mode_key"
+        translatable="false">default_stream_list_mode</string>
+
+    <string name="stream_list_item_size_summary">Size of stream preview on main screen</string>
+    <string name="stream_list_item_size_title">Preview size</string>
+    <string name="stream_list_item_size_default_value">1</string>
+    <string name="stream_list_item_size_key"
+        translatable="false">preview_size</string>
+
 
 </resources>

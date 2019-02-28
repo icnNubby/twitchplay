@@ -14,7 +14,8 @@ import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.domain.database.LocalRepository;
-import ru.nubby.playstream.domain.sharedprefs.SharedPreferencesManager;
+import ru.nubby.playstream.domain.sharedprefs.AuthorizationStorage;
+import ru.nubby.playstream.domain.sharedprefs.DefaultPreferences;
 import ru.nubby.playstream.domain.twitchapi.RemoteRepository;
 import ru.nubby.playstream.model.FollowRelations;
 import ru.nubby.playstream.model.Pagination;
@@ -38,7 +39,8 @@ public class GlobalRepository implements Repository {
 
     private final RemoteRepository mRemoteRepository;
     private final LocalRepository mLocalRepository;
-    private final SharedPreferencesManager mSharedPreferencesManager;
+    private final AuthorizationStorage mAuthorizationStorage;
+    private final DefaultPreferences mDefaultPreferences;
 
     private static GlobalRepository sInstance;
 
@@ -46,18 +48,21 @@ public class GlobalRepository implements Repository {
 
     private GlobalRepository(@NonNull RemoteRepository remoteRepository,
                              @NonNull LocalRepository localRepository,
-                             @NonNull SharedPreferencesManager sharedPreferencesManager) {
+                             @NonNull AuthorizationStorage authorizationStorage,
+                             @NonNull DefaultPreferences defaultPreferences) {
         mRemoteRepository = remoteRepository;
         mLocalRepository = localRepository;
-        mSharedPreferencesManager = sharedPreferencesManager;
+        mAuthorizationStorage = authorizationStorage;
+        mDefaultPreferences = defaultPreferences;
     }
 
     public synchronized static void init(@NonNull RemoteRepository remoteRepository,
                                          @NonNull LocalRepository localRepository,
-                                         @NonNull SharedPreferencesManager sharedPreferencesManager) {
+                                         @NonNull AuthorizationStorage authorizationStorage,
+                                         @NonNull DefaultPreferences defaultPreferences) {
         if (sInstance == null) {
             sInstance = new GlobalRepository(remoteRepository, localRepository,
-                    sharedPreferencesManager);
+                    authorizationStorage, defaultPreferences);
         }
     }
 
@@ -175,7 +180,7 @@ public class GlobalRepository implements Repository {
                 .subscribeOn(Schedulers.io())
                 .flatMapCompletable(userData ->
                         mRemoteRepository
-                                .followTargetUser(mSharedPreferencesManager.getUserAccessToken(),
+                                .followTargetUser(mAuthorizationStorage.getUserAccessToken(),
                                         userData.getId(), targetStream.getUserId())
                                 .andThen(mLocalRepository
                                         .insertFollowRelationsEntry(
@@ -194,7 +199,7 @@ public class GlobalRepository implements Repository {
                 .subscribeOn(Schedulers.io())
                 .flatMapCompletable(userData ->
                         mRemoteRepository
-                                .unfollowTargetUser(mSharedPreferencesManager.getUserAccessToken(),
+                                .unfollowTargetUser(mAuthorizationStorage.getUserAccessToken(),
                                         userData.getId(), targetStream.getUserId())
                                 .andThen(mLocalRepository
                                         .deleteFollowRelationsEntry(
@@ -221,24 +226,29 @@ public class GlobalRepository implements Repository {
             return Single.create(emitter -> emitter.onError(new Throwable("Not logged in")));
         } else if (currentStatus == LoggedStatus.LOGGED) {
             return Single.create(emitter -> {
-                emitter.onSuccess(mSharedPreferencesManager.getUserData());
+                emitter.onSuccess(mAuthorizationStorage.getUserData());
             });
         } else { //LoggedStatus.TOKEN_ONLY
-            return getUserFromToken(mSharedPreferencesManager.getUserAccessToken())
-                    .doOnSuccess(mSharedPreferencesManager::setUserData);
+            return getUserFromToken(mAuthorizationStorage.getUserAccessToken())
+                    .doOnSuccess(mAuthorizationStorage::setUserData);
         }
     }
 
     @Override
     public Single<UserData> loginAttempt(String token) {
-        mSharedPreferencesManager.setUserAccessToken(token);
+        mAuthorizationStorage.setUserAccessToken(token);
         return getCurrentLoginInfo();
     }
 
+    @Override
+    public DefaultPreferences getSharedPreferences() {
+        return mDefaultPreferences;
+    }
+
     private LoggedStatus getCurrentLoggedStatus() {
-        String token = mSharedPreferencesManager.getUserAccessToken();
+        String token = mAuthorizationStorage.getUserAccessToken();
         if (token != null && !token.equals("")) {
-            UserData data = mSharedPreferencesManager.getUserData();
+            UserData data = mAuthorizationStorage.getUserData();
             if (data == null) {
                 return LoggedStatus.TOKEN_ONLY;
             } else {

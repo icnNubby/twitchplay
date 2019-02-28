@@ -17,6 +17,7 @@ public interface StreamListContract {
         void addStreamList(List<Stream> streams);
         void setupProgressBar(boolean visible);
         void displayError(ErrorMessage message);
+        void setPreviewSize(int size);
     }
 
     interface Presenter extends BasePresenter {

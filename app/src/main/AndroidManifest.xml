@@ -31,7 +31,8 @@
             android:launchMode="singleTop"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
-            android:name="presentation.preferences.PreferencesActivity">
+            android:name=".presentation.preferences.PreferencesActivity"
+            android:parentActivityName=".presentation.streamlist.StreamListActivity">
         </activity>
 
     </application>

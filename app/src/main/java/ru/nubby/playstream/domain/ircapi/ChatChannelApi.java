@@ -55,8 +55,8 @@ public class ChatChannelApi {
         return Single.create(singleEmitter -> {
             try {
                 socket = new Socket(TWITCH_CHAT_SERVER, TWITCH_CHAT_PORT);
-                writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                 reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                 String loginRequest = "PASS " + oauthKey + "\r\n" +
                         "NICK " + user + "\r\n" +
                         "USER " + user + " \r\n";
@@ -80,8 +80,7 @@ public class ChatChannelApi {
                                     connected = false;
                                     emitter.onError(exception);
                                 } else {
-                                    Log.e(TAG, "Rx chain is disposed, but error thrown " +
-                                            "in chat listener, beware", exception);
+                                    Log.d(TAG, "Closing connections.");
                                 }
                             }
                         });
@@ -131,8 +130,8 @@ public class ChatChannelApi {
     private synchronized void closeConnection() throws IOException {
         if (connected) {
             if (!socket.isClosed()) {
-                socket.shutdownInput();
                 socket.shutdownOutput();
+                socket.shutdownInput();
                 socket.close();
             }
             //It WILL throw IOException, which will be catched while reading next line

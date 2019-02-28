@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:defaultValue="@string/default_quality_default_value"
+        android:dialogTitle="@string/default_quality_title"
+        android:entries="@array/quality_list"
+        android:entryValues="@array/quality_list"
+        android:key="@string/default_quality_key"
+        android:persistent="true"
+        android:summary="@string/default_quality_summary"
+        android:title="@string/default_quality_title" />
+    <ListPreference
+        android:defaultValue="@string/default_stream_list_mode_default_value"
+        android:dialogTitle="@string/default_stream_list_mode_title"
+        android:entries="@array/stream_list_modes"
+        android:entryValues="@array/stream_list_modes_values"
+        android:key="@string/default_stream_list_mode_key"
+        android:persistent="true"
+        android:summary="@string/default_stream_list_mode_summary"
+        android:title="@string/default_stream_list_mode_title" />
+
+    <ListPreference
+        android:dialogTitle="@string/stream_list_item_size_title"
+        android:defaultValue="@string/stream_list_item_size_default_value"
+        android:entries="@array/stream_list_item_size"
+        android:entryValues="@array/stream_list_item_size_values"
+        android:key="@string/stream_list_item_size_key"
+        android:persistent="true"
+        android:summary="@string/stream_list_item_size_summary"
+        android:title="@string/stream_list_item_size_title" />
+
+</PreferenceScreen>

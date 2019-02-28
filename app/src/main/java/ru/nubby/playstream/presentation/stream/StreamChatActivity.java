@@ -24,7 +24,7 @@ import ru.nubby.playstream.presentation.stream.chat.ChatFragment;
 import ru.nubby.playstream.presentation.stream.chat.ChatPresenter;
 import ru.nubby.playstream.presentation.stream.streamplayer.StreamFragment;
 import ru.nubby.playstream.presentation.stream.streamplayer.StreamPresenter;
-import ru.nubby.playstream.presentation.uihelpers.OnSwipeTouchListener;
+import ru.nubby.playstream.presentation.uiutils.OnSwipeTouchListener;
 
 /**
  * Should be called with extra JSON : gsonned model.Stream object

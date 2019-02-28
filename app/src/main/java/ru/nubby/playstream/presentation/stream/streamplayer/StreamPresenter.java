@@ -160,10 +160,17 @@ public class StreamPresenter implements StreamContract.Presenter {
                             mQualities = new ArrayList<>(mQualityUrls.keySet());
                             Collections.sort(mQualities);
                             mStreamView.setQualitiesMenu(mQualities);
-                            int original = mQualities.indexOf(Quality.QUALITY72030); //TODO get from prefs
-                            original = original >= 0 ? original : 0;
+                            Quality defaultQuality = mRepository
+                                            .getSharedPreferences()
+                                            .getDefaultQuality();
+                            Quality nextQuality = defaultQuality;
+                            String url = mQualityUrls.get(defaultQuality);
+                            while (url == null && nextQuality.ordinal() > 0) {
+                                nextQuality = Quality.values()[nextQuality.ordinal() - 1];
+                                url = mQualityUrls.get(nextQuality);
+                            }
                             if (!mQualities.isEmpty()) {
-                                mStreamView.displayStream(mQualityUrls.get(mQualities.get(original)));
+                                mStreamView.displayStream(url);
                             } else {
                                 mStreamView.displayInfoMessage(ERROR_FETCHING_ADDITIONAL_INFO,
                                         mCurrentStream.getStreamerName());

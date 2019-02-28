@@ -39,6 +39,7 @@ ext {
 
     app_dependencies = [
             appcompat: "androidx.appcompat:appcompat:$support_version",
+            preference: "androidx.preference:preference:$support_version",
             cardview: "androidx.cardview:cardview:$support_version",
             design: "com.google.android.material:material:$design_version",
             constraint: "androidx.constraintlayout:constraintlayout:$constraint_version",

@@ -36,14 +36,15 @@ public class StreamListPresenter implements StreamListContract.Presenter {
                                boolean forceReload,
                                Repository repository) {
         this.mStreamListView = streamListView;
-        mStreamListView.setPresenter(this);
-        mRepository = repository; //TODO INJECT
-        mListState = state;
+        this.mStreamListView.setPresenter(this);
+        this.mRepository = repository; //TODO INJECT
+        this.mListState = state;
         this.forceReload = forceReload;
     }
 
     @Override
     public void subscribe() {
+        mStreamListView.setPreviewSize(mRepository.getSharedPreferences().getPreviewSize());
         if (forceReload && (mDisposableFetchingTask == null || mPagination == null)) {
             forceReload = false;
             updateStreams();

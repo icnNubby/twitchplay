@@ -2,11 +2,11 @@ package ru.nubby.playstream.domain;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import ru.nubby.playstream.domain.sharedprefs.DefaultPreferences;
 import ru.nubby.playstream.model.FollowRelations;
 import ru.nubby.playstream.model.Pagination;
 import ru.nubby.playstream.model.Quality;
@@ -66,15 +66,6 @@ public interface Repository {
 
 
     /**
-     * Gets {@link UserData} map corresponding to that list of streams(bound by Id). Caches it in base.
-     * @param streams {@link Stream}  list of stream objects.
-     * @return {@link UserData} mapped to Id list of UserData objects.
-      */
-    /*
-    Single<List<Stream>> updateStreamsInfo(List<Stream> streams);
-    */
-
-    /**
      * Gets {@link UserData} for currently logged user.
      *
      * @param token String OAUTH2 token
@@ -126,5 +117,11 @@ public interface Repository {
      * @return {@link Single} of {@link UserData} object with logged user info.
      */
     Single<UserData> loginAttempt(String token);
+
+    /**
+     * Get shared preferences of the app.
+     * @return {@link DefaultPreferences} object to read shared preferences
+     */
+    DefaultPreferences getSharedPreferences();
 
 }

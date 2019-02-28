@@ -15,24 +15,25 @@ import ru.nubby.playstream.domain.GlobalRepository;
 import ru.nubby.playstream.domain.Repository;
 import ru.nubby.playstream.model.UserData;
 import ru.nubby.playstream.presentation.login.LoginActivity;
+import ru.nubby.playstream.presentation.preferences.PreferencesActivity;
 import ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListContract;
 import ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListFragment;
 import ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListPresenter;
 
 import static ru.nubby.playstream.presentation.streamlist.StreamListNavigationState.MODE_FAVOURITES;
+import static ru.nubby.playstream.presentation.streamlist.StreamListNavigationState.MODE_TOP;
 
 
 public class StreamListActivity extends AppCompatActivity implements StreamListActivityContract.View {
 
     private final String BUNDLE_NAVBAR_STATE = "navbar_state";
     private final String BUNDLE_TIME_STATE = "paused_at";
-    private final StreamListNavigationState DEFAULT_NAVIGATION_STATE = MODE_FAVOURITES; //TODO PREFS
 
     private StreamListContract.Presenter mFragmentPresenter;
     private StreamListActivityContract.Presenter mActivityPresenter;
     private Toolbar mToolbar;
     private BottomNavigationView mBottomNavigationView;
-    private StreamListNavigationState stateNavbar = DEFAULT_NAVIGATION_STATE;
+    private StreamListNavigationState stateNavbar;
 
     private long pausedAt;
 
@@ -52,11 +53,11 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
         }
 
         Repository globalRepo =  GlobalRepository.getInstance(); //TODO INJECT
-        boolean forceReload = false;
+
         if (savedInstanceState != null) {
             stateNavbar = (StreamListNavigationState) savedInstanceState.get(BUNDLE_NAVBAR_STATE);
         }
-        if (!fragmentStreamList.hasPresenterAttached() || forceReload) {
+        if (!fragmentStreamList.hasPresenterAttached()) {
             mFragmentPresenter = new StreamListPresenter(fragmentStreamList,
                     stateNavbar,
                     true,
@@ -65,12 +66,12 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
             mFragmentPresenter = fragmentStreamList.returnAttachedPresenter();
         }
 
-        new StreamListActivityPresenter(this, globalRepo); //TODO inject
+        new StreamListActivityPresenter(this, globalRepo, savedInstanceState == null); //TODO inject
 
         setSupportActionBar(findViewById(R.id.toolbar));
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
-        setSelectedNavBarItem();
         mBottomNavigationView.setOnNavigationItemSelectedListener(menuItem -> {
+
             switch (menuItem.getItemId()) {
                 case R.id.stream_list_navigation_favourites: {
                     mFragmentPresenter.getFollowedStreams();
@@ -79,7 +80,7 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
                 }
                 case R.id.stream_list_navigation_top_streams: {
                     mFragmentPresenter.getTopStreams();
-                    stateNavbar = StreamListNavigationState.MODE_TOP;
+                    stateNavbar = MODE_TOP;
                     break;
                 }
             }
@@ -98,6 +99,7 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
         super.onResume();
         mActivityPresenter.subscribe();
         if (pausedAt > 0) decideToUpdate(pausedAt);
+
     }
 
     @Override
@@ -127,18 +129,34 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
                 startLoggingActivity();
                 break;
             }
+            case R.id.menu_preferences: {
+                startPreferencesActivity();
+                break;
+            }
         }
         return true;
+    }
+
+    @Override
+    public void setDefaultNavBarState(StreamListNavigationState state, boolean forceReload) {
+        stateNavbar = state;
+        if (forceReload) {
+            setSelectedNavBarItem();
+        }
     }
 
     @Override
     public void displayLoggedStatus(UserData user) {
         if (!user.isEmpty()) {
             mToolbar.setTitle(getString(R.string.logged_in) + user.getLogin());
-            mBottomNavigationView.getMenu().findItem(R.id.stream_list_navigation_favourites).setEnabled(true);
+            mBottomNavigationView.getMenu()
+                    .findItem(R.id.stream_list_navigation_favourites)
+                    .setEnabled(true);
         } else {
             mToolbar.setTitle(getString(R.string.not_logged_in));
-            mBottomNavigationView.getMenu().findItem(R.id.stream_list_navigation_favourites).setEnabled(false);
+            mBottomNavigationView.getMenu()
+                    .findItem(R.id.stream_list_navigation_favourites)
+                    .setEnabled(false);
             mBottomNavigationView.setSelectedItemId(R.id.stream_list_navigation_top_streams);
         }
     }
@@ -164,7 +182,6 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
                 break;
             default:
                 currentNavbarItemRId = R.id.stream_list_navigation_favourites;
-                stateNavbar = DEFAULT_NAVIGATION_STATE;
         }
         mBottomNavigationView.setSelectedItemId(currentNavbarItemRId);
     }
@@ -178,6 +195,11 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
         if (mFragmentPresenter != null) {
             mFragmentPresenter.decideToReload(SystemClock.elapsedRealtime() - savedTime);
         }
+    }
+
+    private void startPreferencesActivity() {
+        Intent startPrefs = new Intent(this, PreferencesActivity.class);
+        startActivity(startPrefs);
     }
 
 }

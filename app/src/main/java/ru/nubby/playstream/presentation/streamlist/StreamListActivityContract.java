@@ -6,6 +6,7 @@ import ru.nubby.playstream.presentation.BaseView;
 
 public interface StreamListActivityContract {
     interface View extends BaseView<Presenter> {
+        void setDefaultNavBarState(StreamListNavigationState state, boolean forceReload);
         void displayLoggedStatus(UserData user);
     }
 

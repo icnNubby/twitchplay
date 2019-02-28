@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Quality list, translatable                     -->
+    <string-array name="quality_list">
+        <item string="quality_default">original</item>
+        <item string="quality_108060">1080x60</item>
+        <item string="quality_108030">1080x30</item>
+        <item string="quality_72060">720x60</item>
+        <item string="quality_72030">720x30</item>
+        <item string="quality_480">480</item>
+        <item string="quality_360">360</item>
+        <item string="quality_240">240</item>
+        <item string="quality_audio_only">audio only</item>
+    </string-array>
+
+    <!-- Errors and info messages, translatable         -->
+    <string-array name="chat_info_messages">
+        <item name="error_disconnected_from_chat">Disconnected from chat.</item>
+        <item name="error_while_reconnecting">Can not reconnect to chat.</item>
+        <item name="error_while_first_connect">Can not connect to chat.</item>
+        <item name="info_connected">Connected to chat.</item>
+    </string-array>
+
+    <string-array name="stream_info_messages">
+        <item name="info_channel_followed">Now you follow </item>
+        <item name="info_channel_unfollowed">You stop to follow </item>
+        <item name="error_channel_follow_unfollow">Can not follow this channel, please retry later.</item>
+        <item name="error_fetching_additional_info">Can not get stream info, looks like stream is offline.</item>
+    </string-array>
+
+    <string-array name="streams_list_errors">
+        <item name="error_bad_connection">No internet connection, please retry later.</item>
+    </string-array>
+
+    <!-- Main screen modes, translatable                 -->
+    <string-array name="stream_list_modes">
+        <item name="mode_favourites">Favourites</item>
+        <item name="mode_top_streams">Top streams</item>
+    </string-array>
+
+    <string-array name="stream_list_modes_values">
+        <item name="mode_favourites">0</item>
+        <item name="mode_top_streams">1</item>
+    </string-array>
+
+
+    <!-- Stream list item sizes, translatable            -->
+    <string-array name="stream_list_item_size">
+        <item name="size_big">Big</item>
+        <item name="size_small">Small</item>
+    </string-array>
+
+    <string-array name="stream_list_item_size_values">
+        <item name="size_big">0</item>
+        <item name="size_small">1</item>
+    </string-array>
+
+</resources>

@@ -1,11 +1,12 @@
 package ru.nubby.playstream.presentation.preferences;
 
-public class PreferencesActivityPresenter implements PreferencesContract.Presenter {
+public class PreferencesPresenter implements PreferencesContract.Presenter {
 
     private PreferencesContract.View mPreferencesView;
 
-    public PreferencesActivityPresenter(PreferencesContract.View view) {
+    public PreferencesPresenter(PreferencesContract.View view) {
         mPreferencesView = view;
+        mPreferencesView.setPresenter(this);
     }
 
     @Override

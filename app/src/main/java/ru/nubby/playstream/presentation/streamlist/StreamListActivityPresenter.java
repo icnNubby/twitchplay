@@ -7,6 +7,8 @@ import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.domain.Repository;
 import ru.nubby.playstream.model.UserData;
 
+import static ru.nubby.playstream.presentation.streamlist.StreamListNavigationState.values;
+
 public class StreamListActivityPresenter implements StreamListActivityContract.Presenter {
     private final String TAG = StreamListActivityPresenter.class.getSimpleName();
 
@@ -14,15 +16,23 @@ public class StreamListActivityPresenter implements StreamListActivityContract.P
     private Disposable mDisposableUserFetchTask;
     private Repository mRepository;
 
-    public StreamListActivityPresenter(StreamListActivityContract.View view, @NonNull Repository repository) {
+    private boolean mFirstLoad;
+
+    public StreamListActivityPresenter(StreamListActivityContract.View view,
+                                       @NonNull Repository repository,
+                                       boolean firstLoad) {
         mMainStreamListView = view;
         mMainStreamListView.setPresenter(this);
         mRepository = repository;
+        mFirstLoad = firstLoad;
     }
-
 
     @Override
     public void subscribe() {
+        int defaultState = mRepository.getSharedPreferences().getDefaultStreamListMode();
+        mMainStreamListView.setDefaultNavBarState(
+                values()[defaultState], mFirstLoad);
+
         mDisposableUserFetchTask = mRepository
                 .getCurrentLoginInfo()
                 .subscribe(
@@ -31,6 +41,7 @@ public class StreamListActivityPresenter implements StreamListActivityContract.P
                             mMainStreamListView.displayLoggedStatus(new UserData());
                             Log.e(TAG, "Error while fetching user data", error);
                         });
+        mFirstLoad = false;
 
     }
 

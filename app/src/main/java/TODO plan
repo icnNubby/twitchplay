@@ -6,9 +6,21 @@ Bugs
     figure out how to stop caching instantly on stopping of activity, we waste traffic
     think how to make use of picasso scaling.
     add schedulers dependencies in presenters by di
+
+Architecture
+    think how to implement presenters interaction one with another
+    ex:
+        navbar state might be Observable<State>
+        fullscreen mode might be Observable<Boolean>
+    etc.
+    links:
+        http://hannesdorfmann.com/android/mosby3-mvi-4
+        https://www.reddit.com/r/androiddev/comments/60neon/how_to_share_data_between_two_presenters_in_mvp/
+
+    think how to make states abit prettier (enums and how to organize them)
+
 More features gradually from nearest to farthest:
     ?add games to db and to
-    preferences screen finally
     notifications when in background
     sleep mode and setup to it
     backnav!
@@ -16,6 +28,7 @@ More features gradually from nearest to farthest:
     chat emodzi displays
     emodzi update and storage locally
     user view screen (prob with possibilities to edit urself)
+    suggestions
     subscriptions workaround (? figure out how it works)
     syncing it periodically (prob on weekly basis? it doesnot change too often)
     animations (learning some ui stuff)
