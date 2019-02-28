@@ -4,11 +4,11 @@ import android.app.Application;
 
 import com.squareup.leakcanary.LeakCanary;
 
-import ru.nubby.playstream.data.GlobalRepository;
-import ru.nubby.playstream.data.database.AppDatabase;
-import ru.nubby.playstream.data.database.RoomLocalDataSource;
-import ru.nubby.playstream.data.twitchapi.RemoteRepository;
-import ru.nubby.playstream.data.sharedprefs.SharedPreferencesManager;
+import ru.nubby.playstream.domain.GlobalRepository;
+import ru.nubby.playstream.domain.database.AppDatabase;
+import ru.nubby.playstream.domain.database.RoomLocalDataSource;
+import ru.nubby.playstream.domain.twitchapi.RemoteRepository;
+import ru.nubby.playstream.domain.sharedprefs.SharedPreferencesManager;
 
 public class PlayStreamApp extends Application {
 

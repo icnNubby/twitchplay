@@ -14,21 +14,25 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ui.streamlist.StreamListActivity">
+        <activity android:name=".presentation.streamlist.StreamListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.stream.StreamChatActivity"
+            android:name=".presentation.stream.StreamChatActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:launchMode="singleTop"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
-            android:name=".ui.login.LoginActivity"
+            android:name=".presentation.login.LoginActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:launchMode="singleTop"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity
+            android:name="presentation.preferences.PreferencesActivity">
+        </activity>
+
     </application>
 </manifest>

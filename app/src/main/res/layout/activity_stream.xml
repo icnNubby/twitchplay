@@ -7,7 +7,7 @@
     android:baselineAligned="false"
     android:orientation="horizontal"
     android:background="@color/colorBlack"
-    tools:context=".ui.stream.StreamChatActivity">
+    tools:context=".presentation.stream.StreamChatActivity">
 
     <FrameLayout
         android:id="@+id/fragment_player_container"
