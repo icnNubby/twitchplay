@@ -18,7 +18,7 @@ public class M3U8Parser {
 
     /**
      * Parses kinda non standart twitch M3U8 playlist.
-     * Maps it to HashMap indexed by {@link Quality}, valued by {@link String} url of HLS resource.
+     * Maps it to HashMap indexed by {@link Quality}, valued by url of HLS resource.
      */
     public static HashMap<Quality, String> parseTwitchApiResponse(String playlist) {
         String[] lines = playlist.split("\n");

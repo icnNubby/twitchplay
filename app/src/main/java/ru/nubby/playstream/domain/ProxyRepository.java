@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import androidx.annotation.NonNull;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -30,48 +32,29 @@ import ru.nubby.playstream.model.UserData;
  * Although its already some sort of interactor.
  */
 //todo split into some usecases(or logically connected entities ex. UsersInteractor, StreamsInteractor, etc.)
-public class GlobalRepository implements Repository {
+public class ProxyRepository implements Repository {
     public enum LoggedStatus {
         NOT_LOGGED, TOKEN_ONLY, LOGGED
     }
 
-    private final String TAG = GlobalRepository.class.getSimpleName();
+    private final String TAG = ProxyRepository.class.getSimpleName();
 
     private final RemoteRepository mRemoteRepository;
     private final LocalRepository mLocalRepository;
     private final AuthorizationStorage mAuthorizationStorage;
     private final DefaultPreferences mDefaultPreferences;
 
-    private static GlobalRepository sInstance;
-
     private boolean firstLoad = true; //TODO IDK implement in some other way its too hacky
 
-    private GlobalRepository(@NonNull RemoteRepository remoteRepository,
-                             @NonNull LocalRepository localRepository,
-                             @NonNull AuthorizationStorage authorizationStorage,
-                             @NonNull DefaultPreferences defaultPreferences) {
+    @Inject
+    private ProxyRepository(@NonNull RemoteRepository remoteRepository,
+                            @NonNull LocalRepository localRepository,
+                            @NonNull AuthorizationStorage authorizationStorage,
+                            @NonNull DefaultPreferences defaultPreferences) {
         mRemoteRepository = remoteRepository;
         mLocalRepository = localRepository;
         mAuthorizationStorage = authorizationStorage;
         mDefaultPreferences = defaultPreferences;
-    }
-
-    public synchronized static void init(@NonNull RemoteRepository remoteRepository,
-                                         @NonNull LocalRepository localRepository,
-                                         @NonNull AuthorizationStorage authorizationStorage,
-                                         @NonNull DefaultPreferences defaultPreferences) {
-        if (sInstance == null) {
-            sInstance = new GlobalRepository(remoteRepository, localRepository,
-                    authorizationStorage, defaultPreferences);
-        }
-    }
-
-    @NonNull
-    public static GlobalRepository getInstance() {
-        if (sInstance == null) {
-            throw new NullPointerException("Global repository is not instantiated");
-        }
-        return sInstance;
     }
 
     @Override

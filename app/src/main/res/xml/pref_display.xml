@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ListPreference
         android:defaultValue="@string/default_quality_default_value"
@@ -9,7 +10,8 @@
         android:key="@string/default_quality_key"
         android:persistent="true"
         android:summary="@string/default_quality_summary"
-        android:title="@string/default_quality_title" />
+        android:title="@string/default_quality_title"
+        app:iconSpaceReserved="false"/>
     <ListPreference
         android:defaultValue="@string/default_stream_list_mode_default_value"
         android:dialogTitle="@string/default_stream_list_mode_title"
@@ -18,7 +20,8 @@
         android:key="@string/default_stream_list_mode_key"
         android:persistent="true"
         android:summary="@string/default_stream_list_mode_summary"
-        android:title="@string/default_stream_list_mode_title" />
+        android:title="@string/default_stream_list_mode_title"
+        app:iconSpaceReserved="false"/>
 
     <ListPreference
         android:dialogTitle="@string/stream_list_item_size_title"
@@ -28,6 +31,7 @@
         android:key="@string/stream_list_item_size_key"
         android:persistent="true"
         android:summary="@string/stream_list_item_size_summary"
-        android:title="@string/stream_list_item_size_title" />
+        android:title="@string/stream_list_item_size_title"
+        app:iconSpaceReserved="false"/>
 
 </PreferenceScreen>

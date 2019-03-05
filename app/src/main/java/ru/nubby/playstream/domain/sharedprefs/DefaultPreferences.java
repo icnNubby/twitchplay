@@ -21,7 +21,6 @@ public class DefaultPreferences {
         String value = mSharedPreferences.getString(
                 mContext.getString(R.string.default_stream_list_mode_key),
                 mContext.getString(R.string.default_stream_list_mode_default_value));
-
         if (value != null) {
             return Integer.valueOf(value);
         } else {

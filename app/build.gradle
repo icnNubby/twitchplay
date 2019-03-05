@@ -36,6 +36,10 @@ dependencies {
     implementation dependencies.constraint
     implementation dependencies.rxandroid
     implementation dependencies.rxjava
+    implementation dependencies.dagger2
+    implementation dependencies.dagger2_android
+    implementation dependencies.dagger2_android_support
+
     implementation dependencies.retrofit
     implementation dependencies.retrofit_converter_gson
     implementation dependencies.retrofit_converter_scalar
@@ -48,7 +52,10 @@ dependencies {
     debugImplementation dependencies.leakcanary_fragments
     implementation dependencies.room
     implementation dependencies.room_rxjava
+
     annotationProcessor dependencies.room_annotations
+    annotationProcessor dependencies.dagger2_compiler
+    annotationProcessor dependencies.dagger2_annotations
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

@@ -22,7 +22,7 @@ public class Stream implements Comparable<Stream> {
     private String streamerName;
 
     /**
-     * This is always in latin letters(english alphabet), should be used in all queries instead of
+     * This is always in latin letters(english alphabet), should be used in some queries instead of
      * invalid user_name fields in chinese symbols
      */
     @SerializedName("user_login")

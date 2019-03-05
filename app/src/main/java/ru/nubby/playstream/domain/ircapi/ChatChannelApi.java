@@ -12,7 +12,7 @@ import java.net.UnknownHostException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.reactivex.Maybe;
+import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import ru.nubby.playstream.model.ChatMessage;
@@ -24,7 +24,7 @@ public class ChatChannelApi {
     private final String TWITCH_CHAT_SERVER = "irc.twitch.tv";
     private final int TWITCH_CHAT_PORT = 6667;
 
-    private static final Pattern stdVarPattern =
+    private static final Pattern STD_VAR_PATTERN =
             Pattern.compile("color=(#?\\w*);display-name=(\\w+).*;mod=(0|1);room-id=\\d+;.*subscriber=(0|1);.*turbo=(0|1);.* PRIVMSG #\\S* :(.*)");
 
     private final String user;
@@ -40,7 +40,9 @@ public class ChatChannelApi {
     private Observable<String> readerObservable;
 
 
-    public ChatChannelApi(String user, String oauthKey, String channelName) {
+    public ChatChannelApi(@NonNull String user,
+                          @NonNull String oauthKey,
+                          @NonNull String channelName) {
         this.user = user;
         this.oauthKey = oauthKey;
         this.channelName = channelName.toLowerCase();
@@ -106,7 +108,7 @@ public class ChatChannelApi {
                     } else if (line.startsWith("PING")) {
                         sendMessage("PONG " + line.substring(5));
                     } else if (line.contains("PRIVMSG")) {
-                        Matcher matcher = stdVarPattern.matcher(line);
+                        Matcher matcher = STD_VAR_PATTERN.matcher(line);
                         if (matcher.find()) {
                             String color = matcher.group(1);
                             String author = matcher.group(2);

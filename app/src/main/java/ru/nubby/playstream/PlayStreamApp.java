@@ -1,18 +1,19 @@
 package ru.nubby.playstream;
 
-import android.app.Application;
-
 import com.squareup.leakcanary.LeakCanary;
 
 import androidx.preference.PreferenceManager;
-import ru.nubby.playstream.domain.GlobalRepository;
+import dagger.android.AndroidInjector;
+import dagger.android.DaggerApplication;
+import ru.nubby.playstream.domain.ProxyRepository;
 import ru.nubby.playstream.domain.database.AppDatabase;
 import ru.nubby.playstream.domain.database.RoomLocalDataSource;
 import ru.nubby.playstream.domain.sharedprefs.DefaultPreferences;
 import ru.nubby.playstream.domain.twitchapi.RemoteRepository;
 import ru.nubby.playstream.domain.sharedprefs.AuthorizationStorage;
+import ru.nubby.playstream.domain.twitchapi.TwitchApiModule;
 
-public class PlayStreamApp extends Application {
+public class PlayStreamApp extends DaggerApplication {
 
     @Override
     public void onCreate() {
@@ -21,9 +22,8 @@ public class PlayStreamApp extends Application {
             return;
         }
         LeakCanary.install(this);
-        AppDatabase.init(this);
-        GlobalRepository.init(
-                new RemoteRepository(),
+        ProxyRepository.init(
+                new RemoteRepository(TwitchApiModule.getInstance()),
                 new RoomLocalDataSource(
                         AppDatabase.getInstance().followRelationsDao(),
                         AppDatabase.getInstance().userDataDao()),
@@ -33,5 +33,10 @@ public class PlayStreamApp extends Application {
         PreferenceManager.setDefaultValues(this, R.xml.pref_display, false);
 
         //TODO fking use dagger already
+    }
+
+    @Override
+    protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
+        return DaggerAppComponent;
     }
 }

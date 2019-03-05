@@ -17,7 +17,7 @@ Architecture
         http://hannesdorfmann.com/android/mosby3-mvi-4
         https://www.reddit.com/r/androiddev/comments/60neon/how_to_share_data_between_two_presenters_in_mvp/
 
-    think how to make states abit prettier (enums and how to organize them)
+    think how to make states abit prettier (enums?)
 
 More features gradually from nearest to farthest:
     ?add games to db and to
@@ -38,9 +38,6 @@ Development stuff:
     add DI
     add atleast unittests
     add CI
-
-Things to think at:
-    better architecture? does app need it?
 
 
 Kinda here you may stop.

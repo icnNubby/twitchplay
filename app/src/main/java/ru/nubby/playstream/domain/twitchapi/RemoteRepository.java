@@ -6,12 +6,19 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
+import ru.nubby.playstream.domain.twitchapi.services.RawJsonService;
+import ru.nubby.playstream.domain.twitchapi.services.TwitchApiService;
+import ru.nubby.playstream.domain.twitchapi.services.TwitchHelixService;
+import ru.nubby.playstream.domain.twitchapi.services.TwitchKrakenService;
 import ru.nubby.playstream.model.FollowRelations;
 import ru.nubby.playstream.model.Pagination;
 import ru.nubby.playstream.model.Quality;
@@ -26,9 +33,26 @@ import ru.nubby.playstream.utils.M3U8Parser;
 /**
  * //todo make interface contract for that class.
  */
+@Singleton
 public class RemoteRepository {
 
     private final String TAG = RemoteRepository.class.getSimpleName();
+
+    private final RawJsonService mRawJsonService;
+    private final TwitchApiService mTwitchApiService;
+    private final TwitchKrakenService mTwitchKrakenService;
+    private final TwitchHelixService mTwitchHelixService;
+
+    @Inject
+    public RemoteRepository(RawJsonService rawJsonService,
+                            TwitchApiService twitchApiService,
+                            TwitchKrakenService twitchKrakenService,
+                            TwitchHelixService twitchHelixService) {
+        mRawJsonService = rawJsonService;
+        mTwitchApiService = twitchApiService;
+        mTwitchKrakenService = twitchKrakenService;
+        mTwitchHelixService = twitchHelixService;
+    }
 
     public Single<HashMap<Quality, String>> getQualityUrls(Stream stream) {
         Single<String> channelName;
@@ -43,9 +67,7 @@ public class RemoteRepository {
         }
 
         Single<StreamToken> tokenSingle = channelName
-                .flatMap(channelNameString -> TwitchApi
-                        .getInstance()
-                        .getStreamApiService()
+                .flatMap(channelNameString -> mTwitchApiService
                         .getAccessToken(channelNameString.toLowerCase())
                         .subscribeOn(Schedulers.io()));
 
@@ -66,9 +88,7 @@ public class RemoteRepository {
                                                 .replaceAll("%2C", ","),
                                         streamToken.getSig(),
                                         "" + new Random().nextInt(6)))
-                .flatMap(urlToGetStreamPlaylist -> TwitchApi
-                        .getInstance()
-                        .getRawJsonHlsService()
+                .flatMap(urlToGetStreamPlaylist -> mRawJsonService
                         .getRawJsonFromPath(urlToGetStreamPlaylist)
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.computation())
@@ -77,9 +97,7 @@ public class RemoteRepository {
     }
 
     public Single<UserData> getStreamerInfo(Stream stream) {
-        return TwitchApi
-                .getInstance()
-                .getStreamHelixService()
+        return mTwitchHelixService
                 .getUserDataListById(stream.getUserId())
                 .subscribeOn(Schedulers.io())
                 .filter(userDataList -> !userDataList.getData().isEmpty())
@@ -94,9 +112,7 @@ public class RemoteRepository {
                 .map(Stream::getUserId)
                 .buffer(100)
                 .subscribeOn(Schedulers.io())
-                .flatMap(idList -> TwitchApi
-                        .getInstance()
-                        .getStreamHelixService()
+                .flatMap(idList -> mTwitchHelixService
                         .getUserDataListByIdsList(idList)
                         .map(UserDataList::getData)
                         .subscribeOn(Schedulers.io())
@@ -107,9 +123,7 @@ public class RemoteRepository {
     }
 
     public Single<UserData> getUserDataFromToken(String token) {
-        return TwitchApi
-                .getInstance()
-                .getStreamHelixService()
+        return mTwitchHelixService
                 .getUserDataListByToken("Bearer " + token)
                 .subscribeOn(Schedulers.io())
                 .filter(userDataList -> !userDataList.getData().isEmpty())
@@ -118,9 +132,7 @@ public class RemoteRepository {
     }
 
     public Observable<Stream> getUpdatedStreamInfo(Stream stream) {
-        return TwitchApi
-                .getInstance()
-                .getStreamHelixService()
+        return mTwitchHelixService
                 .updateStream(stream.getUserId())
                 .subscribeOn(Schedulers.io())
                 .map(streamsRequest -> streamsRequest.getData().get(0))
@@ -130,17 +142,13 @@ public class RemoteRepository {
     }
 
     public Single<StreamsRequest> getTopStreams() {
-        return TwitchApi
-                .getInstance()
-                .getStreamHelixService()
+        return mTwitchHelixService
                 .getTopStreams()
                 .subscribeOn(Schedulers.io());
     }
 
     public Single<StreamsRequest> getTopStreams(Pagination pagination) {
-        return TwitchApi
-                .getInstance()
-                .getStreamHelixService()
+        return mTwitchHelixService
                 .getTopStreams(pagination.getCursor())
                 .subscribeOn(Schedulers.io());
     }
@@ -157,9 +165,7 @@ public class RemoteRepository {
                 .subscribeOn(Schedulers.io())
                 .map(FollowRelations::getToId)
                 .buffer(100)
-                .flatMap(userList -> TwitchApi
-                        .getInstance()
-                        .getStreamHelixService()
+                .flatMap(userList -> mTwitchHelixService
                         .getAllStreamsByUserList(userList)
                         .toObservable())
                 .subscribeOn(Schedulers.computation())
@@ -177,9 +183,7 @@ public class RemoteRepository {
                 .map(FollowRelations::getToId)
                 .buffer(100)
                 .subscribeOn(Schedulers.io())
-                .flatMap(userList -> TwitchApi
-                        .getInstance()
-                        .getStreamHelixService()
+                .flatMap(userList -> mTwitchHelixService
                         .getAllStreamsByUserList(userList)
                         .toObservable())
                 .subscribeOn(Schedulers.computation())
@@ -189,17 +193,13 @@ public class RemoteRepository {
     }
 
     public Completable followTargetUser(String token, String userId, String targetUserId){
-        return TwitchApi
-                .getInstance()
-                .getKrakenService()
+        return mTwitchKrakenService
                 .followTargetUser(userId, targetUserId, token)
                 .subscribeOn(Schedulers.io());
     }
 
     public Completable unfollowTargetUser(String token, String userId, String targetUserId){
-        return TwitchApi
-                .getInstance()
-                .getKrakenService()
+        return mTwitchKrakenService
                 .unfollowTargetUser(userId, targetUserId, token)
                 .subscribeOn(Schedulers.io());
     }
@@ -216,9 +216,7 @@ public class RemoteRepository {
                     return pagecontrol.concatMap(aKey ->
                     {
                         if (aKey != null && aKey.equals("start")) {
-                            return TwitchApi
-                                    .getInstance()
-                                    .getStreamHelixService()
+                            return mTwitchHelixService
                                     .getUserFollowsById(userId)
                                     .doOnSuccess(page -> {
                                         if (page.getPagination() != null &&
@@ -228,9 +226,7 @@ public class RemoteRepository {
                                     })
                                     .toObservable();
                         } else if (aKey != null) {
-                            return TwitchApi
-                                    .getInstance()
-                                    .getStreamHelixService()
+                            return mTwitchHelixService
                                     .getUserFollowsById(userId, aKey)
                                     .doOnSuccess(page -> {
                                         if (page.getPagination() != null &&

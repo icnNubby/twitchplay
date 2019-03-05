@@ -157,9 +157,12 @@ public class StreamPresenter implements StreamContract.Presenter {
                 .getQualityUrls(stream)
                 .subscribe(fetchedQualityTable -> {
                             mQualityUrls = fetchedQualityTable;
+                            //set available qualities to menu, sorted
                             mQualities = new ArrayList<>(mQualityUrls.keySet());
                             Collections.sort(mQualities);
                             mStreamView.setQualitiesMenu(mQualities);
+
+                            //get url for default or if not exists for closest better quality.
                             Quality defaultQuality = mRepository
                                             .getSharedPreferences()
                                             .getDefaultQuality();
@@ -169,7 +172,7 @@ public class StreamPresenter implements StreamContract.Presenter {
                                 nextQuality = Quality.values()[nextQuality.ordinal() - 1];
                                 url = mQualityUrls.get(nextQuality);
                             }
-                            if (!mQualities.isEmpty()) {
+                            if (!mQualities.isEmpty() || url == null) {
                                 mStreamView.displayStream(url);
                             } else {
                                 mStreamView.displayInfoMessage(ERROR_FETCHING_ADDITIONAL_INFO,

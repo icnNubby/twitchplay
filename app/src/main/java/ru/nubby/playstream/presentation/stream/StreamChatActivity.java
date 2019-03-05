@@ -18,7 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import io.reactivex.Single;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.domain.GlobalRepository;
+import ru.nubby.playstream.domain.ProxyRepository;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.presentation.stream.chat.ChatFragment;
 import ru.nubby.playstream.presentation.stream.chat.ChatPresenter;
@@ -111,7 +111,7 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
         }
 
         //TODO !THINK HOW TO DECOUPLE THAT
-        Single<Stream> currentStreamUpdate = GlobalRepository.getInstance()
+        Single<Stream> currentStreamUpdate = ProxyRepository.getInstance()
                 .getUserFromStreamer(currentStream)
                 .map(updatedLogin -> {
                     if (currentStream != null) {
@@ -122,7 +122,7 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
         //TODO !THINK HOW TO DECOUPLE THAT
 
         if (!streamFragment.hasPresenterAttached()) {
-            new StreamPresenter(streamFragment, currentStreamUpdate, GlobalRepository.getInstance());
+            new StreamPresenter(streamFragment, currentStreamUpdate, ProxyRepository.getInstance());
         }
         if (!chatFragment.hasPresenterAttached()) {
             new ChatPresenter(chatFragment, currentStreamUpdate);

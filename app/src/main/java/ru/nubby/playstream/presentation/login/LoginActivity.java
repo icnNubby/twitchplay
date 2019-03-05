@@ -14,7 +14,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.domain.GlobalRepository;
+import ru.nubby.playstream.domain.ProxyRepository;
 
 public class LoginActivity extends AppCompatActivity implements LoginContract.View {
     private final String TAG = this.getClass().getSimpleName();
@@ -78,7 +78,7 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         mWebViewProgress.setIndeterminate(true);
         mWebViewProgress.setVisibility(View.VISIBLE);
 
-        new LoginPresenter(this, GlobalRepository.getInstance()); //TODO INJECT
+        new LoginPresenter(this, ProxyRepository.getInstance()); //TODO INJECT
     }
 
     @Override

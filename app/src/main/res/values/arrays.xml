@@ -2,6 +2,7 @@
 <resources>
 
     <!-- Quality list, translatable                     -->
+    <!-- ORDER MATTERS!                                 -->
     <string-array name="quality_list">
         <item string="quality_default">original</item>
         <item string="quality_108060">1080x60</item>
@@ -15,6 +16,7 @@
     </string-array>
 
     <!-- Errors and info messages, translatable         -->
+    <!-- ORDER MATTERS!                                 -->
     <string-array name="chat_info_messages">
         <item name="error_disconnected_from_chat">Disconnected from chat.</item>
         <item name="error_while_reconnecting">Can not reconnect to chat.</item>
@@ -22,6 +24,7 @@
         <item name="info_connected">Connected to chat.</item>
     </string-array>
 
+    <!-- ORDER MATTERS!                                 -->
     <string-array name="stream_info_messages">
         <item name="info_channel_followed">Now you follow </item>
         <item name="info_channel_unfollowed">You stop to follow </item>
@@ -29,6 +32,7 @@
         <item name="error_fetching_additional_info">Can not get stream info, looks like stream is offline.</item>
     </string-array>
 
+    <!-- ORDER MATTERS!                                 -->
     <string-array name="streams_list_errors">
         <item name="error_bad_connection">No internet connection, please retry later.</item>
     </string-array>

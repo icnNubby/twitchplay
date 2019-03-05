@@ -11,7 +11,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.domain.GlobalRepository;
+import ru.nubby.playstream.domain.ProxyRepository;
 import ru.nubby.playstream.domain.Repository;
 import ru.nubby.playstream.model.UserData;
 import ru.nubby.playstream.presentation.login.LoginActivity;
@@ -52,7 +52,7 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
                     .commit();
         }
 
-        Repository globalRepo =  GlobalRepository.getInstance(); //TODO INJECT
+        Repository globalRepo =  ProxyRepository.getInstance(); //TODO INJECT
 
         if (savedInstanceState != null) {
             stateNavbar = (StreamListNavigationState) savedInstanceState.get(BUNDLE_NAVBAR_STATE);
