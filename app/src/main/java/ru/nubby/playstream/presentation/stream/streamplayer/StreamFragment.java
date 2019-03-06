@@ -114,7 +114,7 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.subscribe();
+        mPresenter.subscribe(this);
         mVideoView.onResume();
         mExoPlayer.setPlayWhenReady(true);
     }
@@ -146,11 +146,6 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
     public void onDetach() {
         super.onDetach();
         mActivityCallbacks = null;
-    }
-
-    @Override
-    public void setPresenter(StreamContract.Presenter fragmentPresenter) {
-        mPresenter = fragmentPresenter;
     }
 
     @Override

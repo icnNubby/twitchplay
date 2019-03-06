@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import javax.inject.Inject;
+
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -34,17 +36,18 @@ public class StreamPresenter implements StreamContract.Presenter {
 
     private Stream mCurrentStream;
 
-    private Repository mRepository; //TODO inject
+    private Repository mRepository;
 
-    public StreamPresenter(StreamContract.View streamView, Single<Stream> stream, Repository repository) {
-        this.mStreamView = streamView;
+    @Inject
+    public StreamPresenter(Single<Stream> stream,
+                           Repository repository) {
         mStreamRequest = stream;
-        streamView.setPresenter(this);
         mRepository = repository;
     }
 
     @Override
-    public void subscribe() {
+    public void subscribe(StreamContract.View view) {
+        mStreamView = view;
         mStreamAdditionalInfoTask = mStreamRequest
                 .doOnSubscribe(streamReturned -> mStreamView.displayLoading(true))
                 .subscribe(streamReturned -> {
@@ -98,6 +101,7 @@ public class StreamPresenter implements StreamContract.Presenter {
         }
 
         mCurrentStream = null;
+        mStreamView = null;
     }
 
     @Override

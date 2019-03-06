@@ -5,6 +5,8 @@ import com.google.android.exoplayer2.util.Log;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -28,19 +30,19 @@ public class ChatPresenter implements ChatContract.Presenter {
     private ChatChannelApi mChatApi = null;
     private Disposable mChatInitializer;
 
-    public ChatPresenter(ChatContract.View chatView, Single<Stream> stream) {
-        mChatView = chatView;
+    @Inject
+    public ChatPresenter(Single<Stream> stream) {
         mStreamSingle = stream;
-        mChatView.setPresenter(this);
     }
 
     @Override
-    public void subscribe() {
+    public void subscribe(ChatContract.View view) {
+        mChatView = view;
         mDisposableStreamAdditionalInfo = mStreamSingle
                 .doOnSubscribe(streamReturned -> mChatView.displayLoading(true))
                 .subscribe(
                         streamReturned -> {
-                            mChatApi = new ChatChannelApi(
+                            mChatApi = new ChatChannelApi( //TODO ?DI?
                                     SensitiveStorage.getDefaultChatBotName(),
                                     SensitiveStorage.getDefaultChatBotToken(),
                                     streamReturned.getStreamerLogin());
@@ -82,6 +84,7 @@ public class ChatPresenter implements ChatContract.Presenter {
         if (mDisposableStreamAdditionalInfo != null && !mDisposableStreamAdditionalInfo.isDisposed()) {
             mDisposableStreamAdditionalInfo.dispose();
         }
+        mChatView = null;
     }
 
     private void listenToChat() {

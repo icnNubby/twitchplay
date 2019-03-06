@@ -11,17 +11,27 @@ import android.webkit.WebViewDatabase;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import javax.inject.Inject;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import dagger.android.support.DaggerAppCompatActivity;
 import ru.nubby.playstream.R;
+import ru.nubby.playstream.di.ActivityScoped;
 import ru.nubby.playstream.domain.ProxyRepository;
 
-public class LoginActivity extends AppCompatActivity implements LoginContract.View {
+@ActivityScoped
+public class LoginActivity extends DaggerAppCompatActivity implements LoginContract.View {
     private final String TAG = this.getClass().getSimpleName();
 
     private WebView mWebView;
     private ProgressBar mWebViewProgress;
-    private LoginContract.Presenter mLoginPresenter;
+    @Inject
+    LoginContract.Presenter mLoginPresenter;
+
+    @Inject
+    LoginActivity() {
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -84,7 +94,7 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
     @Override
     protected void onResume() {
         super.onResume();
-        mLoginPresenter.subscribe();
+        mLoginPresenter.subscribe(this);
     }
 
     @Override
@@ -95,11 +105,6 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
 
     public void loadUrl(String url) {
         mWebView.loadUrl(url);
-    }
-
-    @Override
-    public void setPresenter(LoginContract.Presenter presenter) {
-        mLoginPresenter = presenter;
     }
 
     @Override

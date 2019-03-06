@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Completable;
@@ -32,6 +33,7 @@ import ru.nubby.playstream.model.UserData;
  * Although its already some sort of interactor.
  */
 //todo split into some usecases(or logically connected entities ex. UsersInteractor, StreamsInteractor, etc.)
+@Singleton
 public class ProxyRepository implements Repository {
     public enum LoggedStatus {
         NOT_LOGGED, TOKEN_ONLY, LOGGED
@@ -47,7 +49,7 @@ public class ProxyRepository implements Repository {
     private boolean firstLoad = true; //TODO IDK implement in some other way its too hacky
 
     @Inject
-    private ProxyRepository(@NonNull RemoteRepository remoteRepository,
+    public ProxyRepository(@NonNull RemoteRepository remoteRepository,
                             @NonNull LocalRepository localRepository,
                             @NonNull AuthorizationStorage authorizationStorage,
                             @NonNull DefaultPreferences defaultPreferences) {

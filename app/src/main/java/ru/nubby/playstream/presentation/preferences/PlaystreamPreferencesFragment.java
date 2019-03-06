@@ -2,12 +2,15 @@ package ru.nubby.playstream.presentation.preferences;
 
 import android.os.Bundle;
 
+import javax.inject.Inject;
+
 import androidx.preference.PreferenceFragmentCompat;
 import ru.nubby.playstream.R;
 
 public class PlaystreamPreferencesFragment extends PreferenceFragmentCompat
         implements PreferencesContract.View {
 
+    @Inject
     private PreferencesContract.Presenter mPresenter;
 
     public static PlaystreamPreferencesFragment newInstance() {
@@ -26,13 +29,20 @@ public class PlaystreamPreferencesFragment extends PreferenceFragmentCompat
     }
 
     @Override
-    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-
+    public void onResume() {
+        super.onResume();
+        mPresenter.subscribe(this);
     }
 
     @Override
-    public void setPresenter(PreferencesContract.Presenter fragmentPresenter) {
-        mPresenter = fragmentPresenter;
+    public void onPause() {
+        super.onPause();
+        mPresenter.unsubscribe();
+    }
+
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+
     }
 
     @Override

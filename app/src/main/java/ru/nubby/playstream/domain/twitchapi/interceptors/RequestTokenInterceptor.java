@@ -8,6 +8,9 @@ import okhttp3.Request;
 import okhttp3.Response;
 import ru.nubby.playstream.SensitiveStorage;
 
+/**
+ * An interceptor that adds custom header to all request
+ */
 public final class RequestTokenInterceptor implements Interceptor {
     @Override
     @NonNull

@@ -5,7 +5,7 @@ import ru.nubby.playstream.presentation.BasePresenter;
 import ru.nubby.playstream.presentation.BaseView;
 
 public interface ChatContract {
-    interface View extends BaseView<Presenter> {
+    interface View extends BaseView  {
         enum InfoMessage {
             ERROR_DISCONNECTED, ERROR_RECONNECT, ERROR_FIRST_CONNECT, INFO_CONNECTED
         }
@@ -14,6 +14,6 @@ public interface ChatContract {
         void displayLoading(boolean loadingState);
     }
 
-    interface Presenter extends BasePresenter {
+    interface Presenter extends BasePresenter<View> {
     }
 }

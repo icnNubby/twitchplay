@@ -2,6 +2,8 @@ package ru.nubby.playstream.presentation.login;
 
 import android.util.Log;
 
+import javax.inject.Inject;
+
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.SensitiveStorage;
 import ru.nubby.playstream.domain.Repository;
@@ -18,14 +20,14 @@ public class LoginPresenter implements LoginContract.Presenter {
 
     private Repository mRepository;
 
-    LoginPresenter(LoginContract.View loginView, Repository repository) {
-        mLoginView = loginView;
-        mLoginView.setPresenter(this);
+    @Inject
+    LoginPresenter(Repository repository) {
         mRepository = repository;
     }
 
     @Override
-    public void subscribe() {
+    public void subscribe(LoginContract.View view) {
+        mLoginView = view;
         mLoginView.loadUrl(LOGIN_URL);
     }
 
@@ -34,6 +36,7 @@ public class LoginPresenter implements LoginContract.Presenter {
         if (mDisposableUserFetchTask != null && mDisposableUserFetchTask.isDisposed()) {
             mDisposableUserFetchTask.dispose();
         }
+        mLoginView = null;
     }
 
     @Override

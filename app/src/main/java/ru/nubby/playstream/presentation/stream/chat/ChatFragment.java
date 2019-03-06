@@ -53,7 +53,7 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.subscribe();
+        mPresenter.subscribe(this);
     }
 
     @Override
@@ -67,11 +67,6 @@ public class ChatFragment extends Fragment implements ChatContract.View {
         super.onDestroyView();
         mChatRecyclerview = null;
         mProgressBar = null;
-    }
-
-    @Override
-    public void setPresenter(ChatContract.Presenter fragmentPresenter) {
-        mPresenter = fragmentPresenter;
     }
 
     @Override

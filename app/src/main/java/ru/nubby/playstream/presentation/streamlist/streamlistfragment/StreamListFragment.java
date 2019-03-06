@@ -29,7 +29,7 @@ import ru.nubby.playstream.presentation.stream.StreamChatActivity;
 public class StreamListFragment extends Fragment implements StreamListContract.View {
     private final String TAG = StreamListFragment.class.getSimpleName();
 
-    private Picasso mPicasso;
+    private Picasso mPicasso; // Inject
 
     private RecyclerView mStreamListRecyclerView;
     private StreamListContract.Presenter mPresenter;
@@ -81,7 +81,7 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.subscribe();
+        mPresenter.subscribe(this);
     }
 
     @Override
@@ -119,11 +119,6 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
                 streamListAdapter.notifyItemRangeInserted(sizeBefore, streams.size());
             }
         }
-    }
-
-    @Override
-    public void setPresenter(@NonNull StreamListContract.Presenter fragmentPresenter) {
-        mPresenter = fragmentPresenter;
     }
 
     @Override

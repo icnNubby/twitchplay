@@ -32,7 +32,7 @@ import ru.nubby.playstream.domain.twitchapi.services.TwitchKrakenService;
  */
 @Module
 public class TwitchApiModule {
-    private final int TIMEOUT = 5000;
+    private final int TIMEOUT = 5000; //todo might be given outside
 
     private static final String BASE_URL_HELIX = "https://api.twitch.tv/helix/";
     private static final String BASE_URL_KRAKEN = "https://api.twitch.tv/kraken/";
@@ -56,16 +56,8 @@ public class TwitchApiModule {
     @Provides
     @Singleton
     @NonNull
-    public HostSelectionInterceptor provideHostSelectionInterceptor() {
-        return new HostSelectionInterceptor();
-    }
-
-    @Provides
-    @Singleton
-    @NonNull
     public OkHttpClient provideOkHttpClient(HttpLoggingInterceptor loggingInterceptor,
-                                            RequestTokenInterceptor tokenInterceptor,
-                                            HostSelectionInterceptor hostSelectionInterceptor) {
+                                            RequestTokenInterceptor tokenInterceptor) {
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         return new OkHttpClient().newBuilder()
@@ -73,7 +65,6 @@ public class TwitchApiModule {
                 .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
                 .addInterceptor(loggingInterceptor)
                 .addInterceptor(tokenInterceptor)
-                .addInterceptor(hostSelectionInterceptor)
                 .build();
     }
 
@@ -99,52 +90,50 @@ public class TwitchApiModule {
     @Provides
     @Singleton
     @NonNull
-    public Retrofit provideRetrofit(OkHttpClient okHttpClient,
+    public Retrofit.Builder provideRetrofitBuilder(OkHttpClient okHttpClient,
                                     RxJava2CallAdapterFactory callAdapterFactory,
                                     AnnotatedConverterFactory annotatedConverterFactory) {
         return new Retrofit.Builder()
                 .client(okHttpClient)
                 .addCallAdapterFactory(callAdapterFactory)
-                .addConverterFactory(annotatedConverterFactory)
-                .build();
+                .addConverterFactory(annotatedConverterFactory);
     }
 
     @Provides
     @Singleton
-    public TwitchHelixService provideStreamHelixService(Retrofit retrofit,
-                                                    HostSelectionInterceptor interceptor) {
-        interceptor.setHost(BASE_URL_HELIX);
-        return retrofit
+    public TwitchHelixService provideStreamHelixService(Retrofit.Builder retrofitBuilder) {
+        return retrofitBuilder
+                .baseUrl(BASE_URL_HELIX)
+                .build()
                 .create(TwitchHelixService.class);
     }
 
     @Provides
     @Singleton
-    public TwitchApiService provideStreamApiService(Retrofit retrofit,
-                                                HostSelectionInterceptor interceptor) {
-        interceptor.setHost(BASE_URL_API);
-        return retrofit
+    public TwitchApiService provideStreamApiService(Retrofit.Builder retrofitBuilder) {
+        return retrofitBuilder
+                .baseUrl(BASE_URL_API)
+                .build()
                 .create(TwitchApiService.class);
 
     }
 
     @Provides
     @Singleton
-    public RawJsonService provideRawJsonHlsService(Retrofit retrofit,
-                                               HostSelectionInterceptor interceptor) {
-        interceptor.setHost(BASE_URL_USHER_HLS);
-        return retrofit
+    public RawJsonService provideRawJsonHlsService(Retrofit.Builder retrofitBuilder) {
+        return retrofitBuilder
+                .baseUrl(BASE_URL_USHER_HLS)
+                .build()
                 .create(RawJsonService.class);
     }
 
     @Provides
     @Singleton
-    public TwitchKrakenService provideKrakenService(Retrofit retrofit,
-                                                HostSelectionInterceptor interceptor) {
-        interceptor.setHost(BASE_URL_KRAKEN);
-        return retrofit
+    public TwitchKrakenService provideKrakenService(Retrofit.Builder retrofitBuilder) {
+        return retrofitBuilder
+                .baseUrl(BASE_URL_KRAKEN)
+                .build()
                 .create(TwitchKrakenService.class);
     }
-
 
 }

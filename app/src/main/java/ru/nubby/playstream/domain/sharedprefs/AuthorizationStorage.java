@@ -5,8 +5,12 @@ import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import ru.nubby.playstream.model.UserData;
 
+@Singleton
 public class AuthorizationStorage {
     private static final String PREFERENCES_FILENAME = "playstream";//todo change
 
@@ -15,6 +19,7 @@ public class AuthorizationStorage {
 
     private SharedPreferences mSharedPreferences;
 
+    @Inject
     public AuthorizationStorage(Context context) {
         mSharedPreferences = context.getSharedPreferences(PREFERENCES_FILENAME, Context.MODE_PRIVATE);
     }

@@ -1,21 +1,22 @@
 package ru.nubby.playstream.presentation.preferences;
 
+import javax.inject.Inject;
+
 public class PreferencesPresenter implements PreferencesContract.Presenter {
 
     private PreferencesContract.View mPreferencesView;
 
-    public PreferencesPresenter(PreferencesContract.View view) {
-        mPreferencesView = view;
-        mPreferencesView.setPresenter(this);
+    @Inject
+    PreferencesPresenter() {
     }
 
     @Override
-    public void subscribe() {
-
+    public void subscribe(PreferencesContract.View view) {
+        mPreferencesView = view;
     }
 
     @Override
     public void unsubscribe() {
-
+        mPreferencesView = null;
     }
 }

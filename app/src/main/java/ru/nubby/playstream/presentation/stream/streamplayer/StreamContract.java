@@ -7,7 +7,7 @@ import ru.nubby.playstream.presentation.BaseView;
 import ru.nubby.playstream.model.Quality;
 
 public interface StreamContract {
-    interface View extends BaseView<Presenter> {
+    interface View extends BaseView {
         enum InfoMessage {
             INFO_CHANNEL_FOLLOWED, INFO_CHANNEL_UNFOLLOWED, ERROR_CHANNEL_FOLLOW_UNFOLLOW,
             ERROR_FETCHING_ADDITIONAL_INFO
@@ -23,7 +23,7 @@ public interface StreamContract {
         void enableFollow(boolean enabled);
     }
 
-    interface Presenter extends BasePresenter {
+    interface Presenter extends BasePresenter<View> {
         void playChosenQuality(Quality quality);
         void followOrUnfollowChannel();
     }

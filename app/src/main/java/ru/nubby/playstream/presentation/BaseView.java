@@ -1,8 +1,7 @@
 package ru.nubby.playstream.presentation;
 
-public interface BaseView<T> {
+public interface BaseView {
 
-    void setPresenter(T fragmentPresenter);
     boolean hasPresenterAttached();
 
 }

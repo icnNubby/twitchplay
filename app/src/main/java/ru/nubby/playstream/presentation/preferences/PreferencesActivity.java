@@ -2,12 +2,16 @@ package ru.nubby.playstream.presentation.preferences;
 
 import android.os.Bundle;
 
+import javax.inject.Inject;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import ru.nubby.playstream.R;
 
 public class PreferencesActivity extends AppCompatActivity{
+
+    @Inject
     PreferencesContract.Presenter mPresenter;
 
     @Override
@@ -22,7 +26,6 @@ public class PreferencesActivity extends AppCompatActivity{
                     .add(R.id.fragment_container, fragmentPreferences)
                     .commit();
         }
-        mPresenter = new PreferencesPresenter(fragmentPreferences);//todo inject
         Toolbar appBar = findViewById(R.id.toolbar);
         setSupportActionBar(appBar);
         if (getSupportActionBar() != null) {

@@ -3,15 +3,20 @@ package ru.nubby.playstream.domain.sharedprefs;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import androidx.preference.PreferenceManager;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.model.Quality;
 
+@Singleton
 public class DefaultPreferences {
 
     private SharedPreferences mSharedPreferences;
-    private Context mContext; //BEWARE of leaks
+    private Context mContext;
 
+    @Inject
     public DefaultPreferences(Context context) {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         mContext = context;

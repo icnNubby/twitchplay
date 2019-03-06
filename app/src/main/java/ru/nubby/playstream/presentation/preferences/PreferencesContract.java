@@ -4,9 +4,9 @@ import ru.nubby.playstream.presentation.BasePresenter;
 import ru.nubby.playstream.presentation.BaseView;
 
 public interface PreferencesContract {
-    interface View extends BaseView<PreferencesContract.Presenter> {
+    interface View extends BaseView {
     }
 
-    interface Presenter extends BasePresenter {
+    interface Presenter extends BasePresenter<View> {
     }
 }

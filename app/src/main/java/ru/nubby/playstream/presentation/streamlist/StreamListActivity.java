@@ -97,7 +97,7 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
     @Override
     protected void onResume() {
         super.onResume();
-        mActivityPresenter.subscribe();
+        mActivityPresenter.subscribe(this);
         if (pausedAt > 0) decideToUpdate(pausedAt);
 
     }
@@ -159,11 +159,6 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
                     .setEnabled(false);
             mBottomNavigationView.setSelectedItemId(R.id.stream_list_navigation_top_streams);
         }
-    }
-
-    @Override
-    public void setPresenter(StreamListActivityContract.Presenter presenter) {
-        mActivityPresenter = presenter;
     }
 
     @Override

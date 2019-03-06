@@ -1,4 +1,4 @@
-package ru.nubby.playstream.domain.twitchapi;
+package ru.nubby.playstream.di;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -7,5 +7,5 @@ import javax.inject.Scope;
 
 @Scope
 @Retention(RetentionPolicy.RUNTIME)
-public @interface UrlScope {
+public @interface ActivityScoped {
 }

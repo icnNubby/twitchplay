@@ -8,7 +8,7 @@ import ru.nubby.playstream.model.Stream;
 
 public interface StreamListContract {
 
-    interface View extends BaseView<Presenter> {
+    interface View extends BaseView {
         enum ErrorMessage {
             ERROR_BAD_CONNECTION
         }
@@ -20,7 +20,7 @@ public interface StreamListContract {
         void setPreviewSize(int size);
     }
 
-    interface Presenter extends BasePresenter {
+    interface Presenter extends BasePresenter<View> {
         void getMoreStreams();
         void updateStreams();
         void getFollowedStreams();

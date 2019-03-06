@@ -1,11 +1,29 @@
 package ru.nubby.playstream.di;
 
-import dagger.Component;
-import ru.nubby.playstream.domain.ProxyRepository;
-import ru.nubby.playstream.domain.sharedprefs.AuthorizationStorage;
-import ru.nubby.playstream.domain.sharedprefs.DefaultPreferences;
+import android.app.Application;
 
-@Component(modules = {AppModule.class, AuthorizationStorage.class, DefaultPreferences.class})
-public interface AppComponent {
-    void inject(ProxyRepository proxyRepository);
+import javax.inject.Singleton;
+
+import dagger.BindsInstance;
+import dagger.Component;
+import dagger.android.AndroidInjector;
+import dagger.android.support.AndroidSupportInjectionModule;
+import ru.nubby.playstream.PlayStreamApp;
+import ru.nubby.playstream.domain.twitchapi.TwitchApiModule;
+
+@Singleton
+@Component(modules = {AppModule.class,
+//        PreferencesModule.class,
+        TwitchApiModule.class,
+        AndroidSupportInjectionModule.class})
+public interface AppComponent  extends AndroidInjector<PlayStreamApp> {
+
+    @Component.Builder
+    interface Builder {
+
+        @BindsInstance
+        AppComponent.Builder application(Application application);
+
+        AppComponent build();
+    }
 }

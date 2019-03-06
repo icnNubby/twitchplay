@@ -5,11 +5,11 @@ import ru.nubby.playstream.presentation.BasePresenter;
 import ru.nubby.playstream.presentation.BaseView;
 
 public interface StreamListActivityContract {
-    interface View extends BaseView<Presenter> {
+    interface View extends BaseView {
         void setDefaultNavBarState(StreamListNavigationState state, boolean forceReload);
         void displayLoggedStatus(UserData user);
     }
 
-    interface Presenter extends BasePresenter {
+    interface Presenter extends BasePresenter<View> {
     }
 }

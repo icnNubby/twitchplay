@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.domain.Repository;
 import ru.nubby.playstream.model.Pagination;
@@ -31,19 +33,18 @@ public class StreamListPresenter implements StreamListContract.Presenter {
     private StreamListNavigationState mListState;
     private boolean forceReload;
 
-    public StreamListPresenter(StreamListContract.View streamListView,
-                               StreamListNavigationState state,
+    @Inject
+    public StreamListPresenter(StreamListNavigationState state,
                                boolean forceReload,
                                Repository repository) {
-        this.mStreamListView = streamListView;
-        this.mStreamListView.setPresenter(this);
-        this.mRepository = repository; //TODO INJECT
+        this.mRepository = repository;
         this.mListState = state;
         this.forceReload = forceReload;
     }
 
     @Override
-    public void subscribe() {
+    public void subscribe(StreamListContract.View view) {
+        mStreamListView = view;
         mStreamListView.setPreviewSize(mRepository.getSharedPreferences().getPreviewSize());
         if (forceReload && (mDisposableFetchingTask == null || mPagination == null)) {
             forceReload = false;
@@ -56,6 +57,7 @@ public class StreamListPresenter implements StreamListContract.Presenter {
     @Override
     public void unsubscribe() {
         if (mDisposableFetchingTask != null) mDisposableFetchingTask.dispose();
+        mStreamListView = null;
     }
 
     @Override

@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.domain.Repository;
 import ru.nubby.playstream.model.UserData;
+import ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListContract;
 
 import static ru.nubby.playstream.presentation.streamlist.StreamListNavigationState.values;
 
@@ -18,17 +19,15 @@ public class StreamListActivityPresenter implements StreamListActivityContract.P
 
     private boolean mFirstLoad;
 
-    public StreamListActivityPresenter(StreamListActivityContract.View view,
-                                       @NonNull Repository repository,
+    public StreamListActivityPresenter(@NonNull Repository repository,
                                        boolean firstLoad) {
-        mMainStreamListView = view;
-        mMainStreamListView.setPresenter(this);
         mRepository = repository;
         mFirstLoad = firstLoad;
     }
 
     @Override
-    public void subscribe() {
+    public void subscribe(StreamListActivityContract.View view) {
+        mMainStreamListView = view;
         int defaultState = mRepository.getSharedPreferences().getDefaultStreamListMode();
         mMainStreamListView.setDefaultNavBarState(
                 values()[defaultState], mFirstLoad);
@@ -45,9 +44,11 @@ public class StreamListActivityPresenter implements StreamListActivityContract.P
 
     }
 
+
     @Override
     public void unsubscribe() {
         if (mDisposableUserFetchTask != null && !mDisposableUserFetchTask.isDisposed())
             mDisposableUserFetchTask.dispose();
+        mMainStreamListView = null;
     }
 }
