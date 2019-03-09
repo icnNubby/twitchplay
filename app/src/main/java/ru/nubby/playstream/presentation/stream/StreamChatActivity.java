@@ -14,8 +14,11 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import javax.inject.Inject;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import dagger.android.support.DaggerAppCompatActivity;
 import io.reactivex.Single;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.domain.ProxyRepository;
@@ -29,7 +32,7 @@ import ru.nubby.playstream.presentation.uiutils.OnSwipeTouchListener;
 /**
  * Should be called with extra JSON : gsonned model.Stream object
  */
-public class StreamChatActivity extends AppCompatActivity implements StreamFragment.StreamActivityCallbacks {
+public class StreamChatActivity extends DaggerAppCompatActivity implements StreamFragment.StreamActivityCallbacks {
 
     private final static String BUNDLE_FULLSCREEN_ON = "fullscreen_on";
 
@@ -38,7 +41,11 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
     private LinearLayout mStreamLinearLayout;
     private OnSwipeTouchListener mOnSwipeTouchListener;
 
-    private StreamFragment mStreamFragment;
+    @Inject
+    StreamFragment mStreamFragment;
+
+    @Inject
+    ChatFragment mChatFragment;
 
     private boolean fullscreenOn;
 
@@ -46,19 +53,7 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String jsonStream = null;
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            jsonStream = extras.getString("stream_json");
-        }
-        if (jsonStream == null) {
-            Toast.makeText(this, getText(R.string.error_no_stream_info_provided), Toast.LENGTH_SHORT).show();
-            finish(); //we cant start stream from nothing
-        }
-        Stream currentStream = new Gson().fromJson(jsonStream, Stream.class); //TODO inject?
-        if (currentStream == null) {
-            finish();
-        }
+
 
         setContentView(R.layout.activity_stream);
         mChatContainer = findViewById(R.id.fragment_chat_container);
@@ -92,41 +87,31 @@ public class StreamChatActivity extends AppCompatActivity implements StreamFragm
                 .findFragmentById(R.id.fragment_player_container);
 
         if (streamFragment == null) {
-            streamFragment = StreamFragment.newInstance();
+            streamFragment = mStreamFragment;
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_player_container, streamFragment)
                     .commit();
         }
-        mStreamFragment = streamFragment;
 
 
         ChatFragment chatFragment = (ChatFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_chat_container);
 
         if (chatFragment == null) {
-            chatFragment = ChatFragment.newInstance();
+            chatFragment = mChatFragment;
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_chat_container, chatFragment)
                     .commit();
         }
 
-        //TODO !THINK HOW TO DECOUPLE THAT
-        Single<Stream> currentStreamUpdate = ProxyRepository.getInstance()
-                .getUserFromStreamer(currentStream)
-                .map(updatedLogin -> {
-                    if (currentStream != null) {
-                        currentStream.setStreamerLogin(updatedLogin.getLogin());
-                    }
-                    return currentStream;
-                });
-        //TODO !THINK HOW TO DECOUPLE THAT
-
+/*
         if (!streamFragment.hasPresenterAttached()) {
             new StreamPresenter(streamFragment, currentStreamUpdate, ProxyRepository.getInstance());
         }
         if (!chatFragment.hasPresenterAttached()) {
             new ChatPresenter(chatFragment, currentStreamUpdate);
         }
+*/
 
         View decorView = getWindow().getDecorView();
         decorView.setOnSystemUiVisibilityChangeListener

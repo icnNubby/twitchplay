@@ -55,7 +55,7 @@ dependencies {
 
     annotationProcessor dependencies.room_annotations
     annotationProcessor dependencies.dagger2_compiler
-    annotationProcessor dependencies.dagger2_annotations
+    annotationProcessor dependencies.dagger2_android_processor
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

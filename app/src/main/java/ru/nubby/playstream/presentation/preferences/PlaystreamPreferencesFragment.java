@@ -11,15 +11,11 @@ public class PlaystreamPreferencesFragment extends PreferenceFragmentCompat
         implements PreferencesContract.View {
 
     @Inject
-    private PreferencesContract.Presenter mPresenter;
+    PreferencesContract.Presenter mPresenter;
 
-    public static PlaystreamPreferencesFragment newInstance() {
+    @Inject
+    public PlaystreamPreferencesFragment() {
 
-        Bundle args = new Bundle();
-
-        PlaystreamPreferencesFragment fragment = new PlaystreamPreferencesFragment();
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
@@ -36,8 +32,8 @@ public class PlaystreamPreferencesFragment extends PreferenceFragmentCompat
 
     @Override
     public void onPause() {
-        super.onPause();
         mPresenter.unsubscribe();
+        super.onPause();
     }
 
     @Override

@@ -7,11 +7,13 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import androidx.annotation.Nullable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.SensitiveStorage;
+import ru.nubby.playstream.domain.Repository;
 import ru.nubby.playstream.domain.ircapi.ChatChannelApi;
 import ru.nubby.playstream.model.Stream;
 
@@ -31,7 +33,7 @@ public class ChatPresenter implements ChatContract.Presenter {
     private Disposable mChatInitializer;
 
     @Inject
-    public ChatPresenter(Single<Stream> stream) {
+    public ChatPresenter(@Nullable  Single<Stream> stream) {
         mStreamSingle = stream;
     }
 

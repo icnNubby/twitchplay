@@ -14,13 +14,10 @@ import android.widget.Toast;
 import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import dagger.android.support.DaggerAppCompatActivity;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.di.ActivityScoped;
-import ru.nubby.playstream.domain.ProxyRepository;
 
-@ActivityScoped
 public class LoginActivity extends DaggerAppCompatActivity implements LoginContract.View {
     private final String TAG = this.getClass().getSimpleName();
 
@@ -28,10 +25,6 @@ public class LoginActivity extends DaggerAppCompatActivity implements LoginContr
     private ProgressBar mWebViewProgress;
     @Inject
     LoginContract.Presenter mLoginPresenter;
-
-    @Inject
-    LoginActivity() {
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,7 +47,7 @@ public class LoginActivity extends DaggerAppCompatActivity implements LoginContr
         mWebView.getSettings().setSupportZoom(true);
 
         mWebView.setWebViewClient(
-                new WebViewClient() {
+                new WebViewClient() { //TODO separate this class
                     @Override
                     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
                         mLoginPresenter.receivedError(failingUrl);
@@ -88,7 +81,6 @@ public class LoginActivity extends DaggerAppCompatActivity implements LoginContr
         mWebViewProgress.setIndeterminate(true);
         mWebViewProgress.setVisibility(View.VISIBLE);
 
-        new LoginPresenter(this, ProxyRepository.getInstance()); //TODO INJECT
     }
 
     @Override
@@ -99,8 +91,8 @@ public class LoginActivity extends DaggerAppCompatActivity implements LoginContr
 
     @Override
     protected void onStop() {
-        super.onStop();
         mLoginPresenter.unsubscribe();
+        super.onStop();
     }
 
     public void loadUrl(String url) {

@@ -16,23 +16,27 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import dagger.android.support.DaggerFragment;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.presentation.stream.StreamChatActivity;
 
-public class StreamListFragment extends Fragment implements StreamListContract.View {
+public class StreamListFragment extends DaggerFragment implements StreamListContract.View {
     private final String TAG = StreamListFragment.class.getSimpleName();
 
     private Picasso mPicasso; // Inject
 
     private RecyclerView mStreamListRecyclerView;
-    private StreamListContract.Presenter mPresenter;
+    @Inject
+    StreamListContract.Presenter mPresenter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressBar mProgressBar;
 
@@ -42,13 +46,9 @@ public class StreamListFragment extends Fragment implements StreamListContract.V
 
     private int mPreviewSize; //1 - big, 2 - small.
 
-    public static StreamListFragment newInstance() {
+    @Inject
+    public StreamListFragment() {
 
-        Bundle args = new Bundle();
-
-        StreamListFragment fragment = new StreamListFragment();
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override

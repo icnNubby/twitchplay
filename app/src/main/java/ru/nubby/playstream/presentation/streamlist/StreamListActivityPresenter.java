@@ -2,7 +2,10 @@ package ru.nubby.playstream.presentation.streamlist;
 
 import android.util.Log;
 
+import javax.inject.Inject;
+
 import androidx.annotation.NonNull;
+import dagger.Lazy;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.domain.Repository;
 import ru.nubby.playstream.model.UserData;
@@ -17,10 +20,11 @@ public class StreamListActivityPresenter implements StreamListActivityContract.P
     private Disposable mDisposableUserFetchTask;
     private Repository mRepository;
 
-    private boolean mFirstLoad;
+    private Lazy<Boolean> mFirstLoad;
 
+    @Inject
     public StreamListActivityPresenter(@NonNull Repository repository,
-                                       boolean firstLoad) {
+                                       Lazy<Boolean> firstLoad) {
         mRepository = repository;
         mFirstLoad = firstLoad;
     }
@@ -30,7 +34,7 @@ public class StreamListActivityPresenter implements StreamListActivityContract.P
         mMainStreamListView = view;
         int defaultState = mRepository.getSharedPreferences().getDefaultStreamListMode();
         mMainStreamListView.setDefaultNavBarState(
-                values()[defaultState], mFirstLoad);
+                values()[defaultState]);
 
         mDisposableUserFetchTask = mRepository
                 .getCurrentLoginInfo()
@@ -40,7 +44,6 @@ public class StreamListActivityPresenter implements StreamListActivityContract.P
                             mMainStreamListView.displayLoggedStatus(new UserData());
                             Log.e(TAG, "Error while fetching user data", error);
                         });
-        mFirstLoad = false;
 
     }
 

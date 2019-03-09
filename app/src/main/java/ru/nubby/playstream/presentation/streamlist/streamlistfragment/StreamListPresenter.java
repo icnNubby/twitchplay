@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import androidx.annotation.Nullable;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.domain.Repository;
 import ru.nubby.playstream.model.Pagination;
@@ -31,23 +32,23 @@ public class StreamListPresenter implements StreamListContract.Presenter {
     private List<Stream> mCurrentStreamList;
     private Map<String, Stream> mCurrentStreamMap;
     private StreamListNavigationState mListState;
-    private boolean forceReload;
+    private boolean mForceReload;
 
     @Inject
-    public StreamListPresenter(StreamListNavigationState state,
-                               boolean forceReload,
+    public StreamListPresenter(@Nullable StreamListNavigationState state,
+                               boolean isFirstLoad,
                                Repository repository) {
         this.mRepository = repository;
         this.mListState = state;
-        this.forceReload = forceReload;
+        this.mForceReload = isFirstLoad;
     }
 
     @Override
     public void subscribe(StreamListContract.View view) {
         mStreamListView = view;
         mStreamListView.setPreviewSize(mRepository.getSharedPreferences().getPreviewSize());
-        if (forceReload && (mDisposableFetchingTask == null || mPagination == null)) {
-            forceReload = false;
+        if (mForceReload && (mDisposableFetchingTask == null || mPagination == null)) {
+            mForceReload = false;
             updateStreams();
         } else {
             mStreamListView.displayStreamList(mCurrentStreamList);

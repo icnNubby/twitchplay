@@ -5,14 +5,17 @@ import android.os.Bundle;
 import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import dagger.android.support.DaggerAppCompatActivity;
 import ru.nubby.playstream.R;
 
-public class PreferencesActivity extends AppCompatActivity{
+public class PreferencesActivity extends DaggerAppCompatActivity {
 
     @Inject
     PreferencesContract.Presenter mPresenter;
+
+    @Inject
+    PlaystreamPreferencesFragment mPreferencesFragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -21,7 +24,7 @@ public class PreferencesActivity extends AppCompatActivity{
         PlaystreamPreferencesFragment fragmentPreferences = (PlaystreamPreferencesFragment)
                 getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (fragmentPreferences == null) {
-            fragmentPreferences = PlaystreamPreferencesFragment.newInstance();
+            fragmentPreferences = mPreferencesFragment;
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_container, fragmentPreferences)
                     .commit();

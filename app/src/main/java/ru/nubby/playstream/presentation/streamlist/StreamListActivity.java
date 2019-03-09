@@ -8,11 +8,12 @@ import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import javax.inject.Inject;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import dagger.android.support.DaggerAppCompatActivity;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.domain.ProxyRepository;
-import ru.nubby.playstream.domain.Repository;
 import ru.nubby.playstream.model.UserData;
 import ru.nubby.playstream.presentation.login.LoginActivity;
 import ru.nubby.playstream.presentation.preferences.PreferencesActivity;
@@ -24,18 +25,27 @@ import static ru.nubby.playstream.presentation.streamlist.StreamListNavigationSt
 import static ru.nubby.playstream.presentation.streamlist.StreamListNavigationState.MODE_TOP;
 
 
-public class StreamListActivity extends AppCompatActivity implements StreamListActivityContract.View {
+public class StreamListActivity extends DaggerAppCompatActivity
+        implements StreamListActivityContract.View {
 
     private final String BUNDLE_NAVBAR_STATE = "navbar_state";
     private final String BUNDLE_TIME_STATE = "paused_at";
 
-    private StreamListContract.Presenter mFragmentPresenter;
-    private StreamListActivityContract.Presenter mActivityPresenter;
+    @Inject
+    StreamListContract.Presenter mFragmentPresenter;
+
+    @Inject
+    StreamListActivityContract.Presenter mActivityPresenter;
+
+    @Inject
+    StreamListFragment mStreamListFragment;
+
     private Toolbar mToolbar;
     private BottomNavigationView mBottomNavigationView;
-    private StreamListNavigationState stateNavbar;
+    private StreamListNavigationState mStateNavbar;
 
-    private long pausedAt;
+    private long mPausedAt;
+    private boolean mFirstLoad = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,27 +56,19 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
         StreamListFragment fragmentStreamList = (StreamListFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_container);
         if (fragmentStreamList == null) {
-            fragmentStreamList = StreamListFragment.newInstance();
+            fragmentStreamList = mStreamListFragment;
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_container, fragmentStreamList)
                     .commit();
         }
+        mStreamListFragment = fragmentStreamList;
 
-        Repository globalRepo =  ProxyRepository.getInstance(); //TODO INJECT
 
         if (savedInstanceState != null) {
-            stateNavbar = (StreamListNavigationState) savedInstanceState.get(BUNDLE_NAVBAR_STATE);
-        }
-        if (!fragmentStreamList.hasPresenterAttached()) {
-            mFragmentPresenter = new StreamListPresenter(fragmentStreamList,
-                    stateNavbar,
-                    true,
-                    globalRepo); //TODO inject
-        } else {
-            mFragmentPresenter = fragmentStreamList.returnAttachedPresenter();
+            mStateNavbar = (StreamListNavigationState) savedInstanceState.get(BUNDLE_NAVBAR_STATE);
         }
 
-        new StreamListActivityPresenter(this, globalRepo, savedInstanceState == null); //TODO inject
+        mFirstLoad = (savedInstanceState == null);
 
         setSupportActionBar(findViewById(R.id.toolbar));
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -75,12 +77,12 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
             switch (menuItem.getItemId()) {
                 case R.id.stream_list_navigation_favourites: {
                     mFragmentPresenter.getFollowedStreams();
-                    stateNavbar = MODE_FAVOURITES;
+                    mStateNavbar = MODE_FAVOURITES;
                     break;
                 }
                 case R.id.stream_list_navigation_top_streams: {
                     mFragmentPresenter.getTopStreams();
-                    stateNavbar = MODE_TOP;
+                    mStateNavbar = MODE_TOP;
                     break;
                 }
             }
@@ -91,14 +93,15 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        pausedAt = savedInstanceState.getLong(BUNDLE_TIME_STATE);
+        mPausedAt = savedInstanceState.getLong(BUNDLE_TIME_STATE);
+        mFirstLoad = false;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mActivityPresenter.subscribe(this);
-        if (pausedAt > 0) decideToUpdate(pausedAt);
+        if (mPausedAt > 0) decideToUpdate(mPausedAt);
 
     }
 
@@ -111,9 +114,9 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable(BUNDLE_NAVBAR_STATE, stateNavbar);
+        outState.putSerializable(BUNDLE_NAVBAR_STATE, mStateNavbar);
         outState.putLong(BUNDLE_TIME_STATE, SystemClock.elapsedRealtime());
-        pausedAt = SystemClock.elapsedRealtime();
+        mPausedAt = SystemClock.elapsedRealtime();
     }
 
     @Override
@@ -138,11 +141,8 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
     }
 
     @Override
-    public void setDefaultNavBarState(StreamListNavigationState state, boolean forceReload) {
-        stateNavbar = state;
-        if (forceReload) {
-            setSelectedNavBarItem();
-        }
+    public void setDefaultNavBarState(StreamListNavigationState state) {
+        mStateNavbar = state;
     }
 
     @Override
@@ -166,9 +166,17 @@ public class StreamListActivity extends AppCompatActivity implements StreamListA
         return mActivityPresenter != null && mFragmentPresenter != null;
     }
 
+    public StreamListNavigationState getNavigationState() {
+        return mStateNavbar;
+    }
+
+    public boolean isFirstLoad(){
+        return mFirstLoad;
+    }
+
     private void setSelectedNavBarItem() {
         int currentNavbarItemRId;
-        switch (stateNavbar) {
+        switch (mStateNavbar) {
             case MODE_FAVOURITES:
                 currentNavbarItemRId = R.id.stream_list_navigation_favourites;
                 break;

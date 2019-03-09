@@ -2,22 +2,30 @@ package ru.nubby.playstream.di;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
+import ru.nubby.playstream.presentation.login.LoginActivity;
+import ru.nubby.playstream.presentation.login.LoginModule;
+import ru.nubby.playstream.presentation.preferences.PreferencesActivity;
+import ru.nubby.playstream.presentation.preferences.PreferencesModule;
+import ru.nubby.playstream.presentation.stream.StreamChatActivity;
+import ru.nubby.playstream.presentation.stream.StreamChatModule;
+import ru.nubby.playstream.presentation.streamlist.StreamListActivity;
+import ru.nubby.playstream.presentation.streamlist.StreamListModule;
 
 @Module
 public abstract class ActivityBindingModule {
     @ActivityScoped
-    @ContributesAndroidInjector(modules = TasksModule.class)
-    abstract TasksActivity tasksActivity();
+    @ContributesAndroidInjector(modules = LoginModule.class)
+    abstract LoginActivity loginActivity();
 
     @ActivityScoped
-    @ContributesAndroidInjector(modules = AddEditTaskModule.class)
-    abstract AddEditTaskActivity addEditTaskActivity();
+    @ContributesAndroidInjector(modules = PreferencesModule.class)
+    abstract PreferencesActivity preferencesActivity();
 
     @ActivityScoped
-    @ContributesAndroidInjector(modules = StatisticsModule.class)
-    abstract StatisticsActivity statisticsActivity();
+    @ContributesAndroidInjector(modules = StreamChatModule.class)
+    abstract StreamChatActivity streamChatActivity();
 
     @ActivityScoped
-    @ContributesAndroidInjector(modules = TaskDetailPresenterModule.class)
-    abstract TaskDetailActivity taskDetailActivity();
+    @ContributesAndroidInjector(modules = StreamListModule.class)
+    abstract StreamListActivity streamListActivity();
 }

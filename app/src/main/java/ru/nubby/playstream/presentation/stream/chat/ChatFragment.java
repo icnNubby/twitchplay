@@ -14,28 +14,28 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import dagger.android.support.DaggerFragment;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.model.ChatMessage;
 
-public class ChatFragment extends Fragment implements ChatContract.View {
+public class ChatFragment extends DaggerFragment implements ChatContract.View {
     private final int MESSAGE_CAPACITY = 100; // TODO get from prefs
 
-    private ChatContract.Presenter mPresenter;
+    @Inject
+    public ChatContract.Presenter mPresenter;
     private RecyclerView mChatRecyclerview;
     private ProgressBar mProgressBar;
 
-    public static ChatFragment newInstance() {
+    @Inject
+    public ChatFragment() {
 
-        Bundle args = new Bundle();
-
-        ChatFragment fragment = new ChatFragment();
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Nullable

@@ -27,13 +27,17 @@ import com.google.android.exoplayer2.util.Util;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import dagger.android.support.DaggerFragment;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.model.Quality;
 
-public class StreamFragment extends Fragment implements StreamContract.View, PopupMenu.OnMenuItemClickListener {
+public class StreamFragment extends DaggerFragment
+        implements StreamContract.View, PopupMenu.OnMenuItemClickListener {
 
 
     public interface StreamActivityCallbacks {
@@ -42,7 +46,9 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
         boolean getFullscreenState();
     }
 
-    private StreamContract.Presenter mPresenter;
+    @Inject
+    public StreamContract.Presenter mPresenter;
+
     private PlayerView mVideoView;
     private ExoPlayer mExoPlayer;
     private ImageButton mFullscreenToggle;
@@ -56,13 +62,9 @@ public class StreamFragment extends Fragment implements StreamContract.View, Pop
 
     private StreamActivityCallbacks mActivityCallbacks;
 
-    public static StreamFragment newInstance() {
+    @Inject
+    public StreamFragment(){
 
-        Bundle args = new Bundle();
-
-        StreamFragment fragment = new StreamFragment();
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override

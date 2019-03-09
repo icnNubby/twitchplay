@@ -5,6 +5,7 @@ import android.content.Context;
 import javax.inject.Singleton;
 
 import androidx.room.Room;
+import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 import ru.nubby.playstream.domain.database.AppDatabase;
@@ -64,6 +65,11 @@ public class RepositoriesModule {
         return new RoomLocalDataSource(followRelationsDao, userDataDao);
     }
 
+    @Provides
+    @Singleton
+    public Repository provideRepository(ProxyRepository repository) {
+        return repository;
+    }
 }
 
 //TODO move it
