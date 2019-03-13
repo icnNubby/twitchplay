@@ -2,6 +2,7 @@ package ru.nubby.playstream.presentation.streamlist.streamlistfragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,12 +32,16 @@ import ru.nubby.playstream.presentation.stream.StreamChatActivity;
 
 public class StreamListFragment extends DaggerFragment implements StreamListContract.View {
     private final String TAG = StreamListFragment.class.getSimpleName();
+    private final String BUNDLE_NAVBAR_STATE = "navbar_state";
+    private final String BUNDLE_TIME_STATE = "paused_at";
 
-    private Picasso mPicasso; // Inject
+    private Picasso mPicasso; // TODO Inject?
 
     private RecyclerView mStreamListRecyclerView;
+
     @Inject
     StreamListContract.Presenter mPresenter;
+
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressBar mProgressBar;
 
@@ -45,6 +50,10 @@ public class StreamListFragment extends DaggerFragment implements StreamListCont
     private float mDensity;
 
     private int mPreviewSize; //1 - big, 2 - small.
+
+    private long mPausedAt;
+    private boolean mFirstLoad = true;
+
 
     @Inject
     public StreamListFragment() {
@@ -79,9 +88,26 @@ public class StreamListFragment extends DaggerFragment implements StreamListCont
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            mPausedAt = savedInstanceState.getLong(BUNDLE_TIME_STATE);
+            mFirstLoad = false;
+        }
+        if (mPausedAt > 0) decideToUpdate(mPausedAt);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         mPresenter.subscribe(this);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(BUNDLE_TIME_STATE, SystemClock.elapsedRealtime());
+        mPausedAt = SystemClock.elapsedRealtime();
     }
 
     @Override
@@ -153,6 +179,13 @@ public class StreamListFragment extends DaggerFragment implements StreamListCont
     public void setPreviewSize(int size) {
         mPreviewSize = size;
     }
+
+    private void decideToUpdate(long savedTime) {
+        if (mPresenter != null) {
+            mPresenter.decideToReload(SystemClock.elapsedRealtime() - savedTime);
+        }
+    }
+
 
     private class StreamListViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {

@@ -10,12 +10,12 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import androidx.annotation.Nullable;
+import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.domain.Repository;
 import ru.nubby.playstream.model.Pagination;
 import ru.nubby.playstream.model.Stream;
-import ru.nubby.playstream.presentation.streamlist.StreamListNavigationState;
+import ru.nubby.playstream.model.StreamListNavigationState;
 
 import static ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListContract.View.ErrorMessage.ERROR_BAD_CONNECTION;
 
@@ -26,54 +26,65 @@ public class StreamListPresenter implements StreamListContract.Presenter {
 
     private StreamListContract.View mStreamListView;
     private Disposable mDisposableFetchingTask;
+    private Disposable mDisposableListState;
     private Pagination mPagination;
     private Repository mRepository;
 
     private List<Stream> mCurrentStreamList;
     private Map<String, Stream> mCurrentStreamMap;
-    private StreamListNavigationState mListState;
-    private boolean mForceReload;
+    private Observable<StreamListNavigationState> mListStateObservable;
+    private StreamListNavigationState mCurrentState;
+    private boolean mForceReload = true;
 
     @Inject
-    public StreamListPresenter(@Nullable StreamListNavigationState state,
-                               boolean isFirstLoad,
-                               Repository repository) {
+    public StreamListPresenter(Repository repository) {
         this.mRepository = repository;
-        this.mListState = state;
-        this.mForceReload = isFirstLoad;
+        this.mListStateObservable = repository.getObservableNavigationState();
     }
 
     @Override
     public void subscribe(StreamListContract.View view) {
         mStreamListView = view;
         mStreamListView.setPreviewSize(mRepository.getSharedPreferences().getPreviewSize());
-        if (mForceReload && (mDisposableFetchingTask == null || mPagination == null)) {
-            mForceReload = false;
-            updateStreams();
-        } else {
-            mStreamListView.displayStreamList(mCurrentStreamList);
-        }
+
+        mCurrentState = mRepository.getCurrentState();
+        mDisposableListState = mListStateObservable
+                .subscribe(streamListNavigationState -> {
+                    mCurrentState = streamListNavigationState;
+                    if (mForceReload && (mDisposableFetchingTask == null || mPagination == null)) {
+                        mForceReload = false;
+                        updateStreams();
+                    } else {
+                        mStreamListView.displayStreamList(mCurrentStreamList);
+                    }
+                });
+
+
     }
 
     @Override
     public void unsubscribe() {
-        if (mDisposableFetchingTask != null) mDisposableFetchingTask.dispose();
+        if (mDisposableFetchingTask != null) {
+            mDisposableFetchingTask.dispose();
+        }
+        if (mDisposableListState != null) {
+            mDisposableListState.dispose();
+        }
         mStreamListView = null;
     }
 
     @Override
     public void updateStreams() {
         if (mDisposableFetchingTask != null) mDisposableFetchingTask.dispose();
-        if (mListState == StreamListNavigationState.MODE_TOP) {
+        if (mCurrentState == StreamListNavigationState.MODE_TOP) {
             getTopStreams();
-        } else {
+        } else if (mCurrentState == StreamListNavigationState.MODE_FAVOURITES) {
             getFollowedStreams();
         }
     }
 
     @Override
     public void getFollowedStreams() {
-        mListState = StreamListNavigationState.MODE_FAVOURITES;
         if (mDisposableFetchingTask != null) mDisposableFetchingTask.dispose();
 
         mDisposableFetchingTask = mRepository
@@ -99,7 +110,6 @@ public class StreamListPresenter implements StreamListContract.Presenter {
 
     @Override
     public void getTopStreams() {
-        mListState = StreamListNavigationState.MODE_TOP;
         mDisposableFetchingTask = mRepository
                 .getTopStreams()
                 .doOnSubscribe(disposable -> {
@@ -123,7 +133,7 @@ public class StreamListPresenter implements StreamListContract.Presenter {
 
     @Override
     public void getMoreStreams() {
-        if (mListState == StreamListNavigationState.MODE_TOP && mPagination != null) {
+        if (mCurrentState == StreamListNavigationState.MODE_TOP && mPagination != null) {
             if (mDisposableFetchingTask != null) {
                 mDisposableFetchingTask.dispose();
             }
@@ -140,18 +150,14 @@ public class StreamListPresenter implements StreamListContract.Presenter {
                             });
         } else {
             Log.e(TAG, "Wrong mode to fetch more streams, pagination cursor = " +
-                    mPagination + ", state = " + mListState);
+                    mPagination + ", state = " + mCurrentState);
         }
     }
 
     @Override
     public void decideToReload(long interval) {
         if (interval >= UPDATE_INTERVAL_MILLIS) {
-            if (mListState == StreamListNavigationState.MODE_TOP) {
-                getTopStreams();
-            } else if (mListState == StreamListNavigationState.MODE_FAVOURITES) {
-                getFollowedStreams();
-            }
+            updateStreams();
         }
     }
 

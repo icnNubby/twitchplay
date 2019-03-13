@@ -5,8 +5,11 @@ import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 import dagger.android.ContributesAndroidInjector;
+import io.reactivex.Observable;
 import ru.nubby.playstream.di.ActivityScoped;
 import ru.nubby.playstream.di.FragmentScoped;
+import ru.nubby.playstream.domain.Repository;
+import ru.nubby.playstream.model.StreamListNavigationState;
 import ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListContract;
 import ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListFragment;
 import ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListPresenter;
@@ -28,17 +31,5 @@ public abstract class StreamListModule {
     abstract StreamListContract.Presenter streamListPresenter(
             StreamListPresenter streamListPresenter);
 
-    @Provides
-    @Nullable
-    @ActivityScoped
-    static StreamListNavigationState provideNavState(StreamListActivity activity) {
-        return activity.getNavigationState();
-    }
-
-    @Provides
-    @ActivityScoped
-    static boolean provideFirstLoad(StreamListActivity activity) {
-        return activity.isFirstLoad();
-    }
 
 }

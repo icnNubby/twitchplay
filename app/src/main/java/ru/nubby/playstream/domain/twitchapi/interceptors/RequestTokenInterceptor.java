@@ -12,6 +12,15 @@ import ru.nubby.playstream.SensitiveStorage;
  * An interceptor that adds custom header to all request
  */
 public final class RequestTokenInterceptor implements Interceptor {
+
+    private final String mHeaderName;
+    private final String mHeaderValue;
+
+    public RequestTokenInterceptor(String headerName, String headerValue) {
+        mHeaderName = headerName;
+        mHeaderValue = headerValue;
+    }
+
     @Override
     @NonNull
     public Response intercept(@NonNull Chain chain) throws IOException {
@@ -19,8 +28,7 @@ public final class RequestTokenInterceptor implements Interceptor {
         Request newRequest;
 
         newRequest = request.newBuilder()
-                .addHeader(SensitiveStorage.getHeaderClientId(),
-                        SensitiveStorage.getClientApiKey())
+                .addHeader(mHeaderName, mHeaderValue)
                 .build();
         return chain.proceed(newRequest);
     }

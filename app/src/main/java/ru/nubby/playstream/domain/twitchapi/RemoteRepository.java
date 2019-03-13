@@ -206,8 +206,8 @@ public class RemoteRepository {
 
     private Observable<FollowRelations> getAllUserFollowRelations(String userId) {
         //Paginated request
-        //first emit is with "start" key
-        //all further emits will be with pagination string aKey
+        //first emit happens with "start" key
+        //all further emits will happen with pagination string aKey
         return Observable
                 .defer(() ->
                 {

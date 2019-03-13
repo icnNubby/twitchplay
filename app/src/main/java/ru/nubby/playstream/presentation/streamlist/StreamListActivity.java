@@ -2,7 +2,6 @@ package ru.nubby.playstream.presentation.streamlist;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -10,29 +9,22 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import javax.inject.Inject;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import dagger.android.support.DaggerAppCompatActivity;
 import ru.nubby.playstream.R;
+import ru.nubby.playstream.model.StreamListNavigationState;
 import ru.nubby.playstream.model.UserData;
 import ru.nubby.playstream.presentation.login.LoginActivity;
 import ru.nubby.playstream.presentation.preferences.PreferencesActivity;
-import ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListContract;
 import ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListFragment;
-import ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListPresenter;
 
-import static ru.nubby.playstream.presentation.streamlist.StreamListNavigationState.MODE_FAVOURITES;
-import static ru.nubby.playstream.presentation.streamlist.StreamListNavigationState.MODE_TOP;
+import static ru.nubby.playstream.model.StreamListNavigationState.MODE_FAVOURITES;
+import static ru.nubby.playstream.model.StreamListNavigationState.MODE_TOP;
 
 
 public class StreamListActivity extends DaggerAppCompatActivity
         implements StreamListActivityContract.View {
 
-    private final String BUNDLE_NAVBAR_STATE = "navbar_state";
-    private final String BUNDLE_TIME_STATE = "paused_at";
-
-    @Inject
-    StreamListContract.Presenter mFragmentPresenter;
 
     @Inject
     StreamListActivityContract.Presenter mActivityPresenter;
@@ -44,8 +36,8 @@ public class StreamListActivity extends DaggerAppCompatActivity
     private BottomNavigationView mBottomNavigationView;
     private StreamListNavigationState mStateNavbar;
 
-    private long mPausedAt;
-    private boolean mFirstLoad = true;
+    private boolean mIsNavigationReallyClicked = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,29 +55,20 @@ public class StreamListActivity extends DaggerAppCompatActivity
         }
         mStreamListFragment = fragmentStreamList;
 
-
-        if (savedInstanceState != null) {
-            mStateNavbar = (StreamListNavigationState) savedInstanceState.get(BUNDLE_NAVBAR_STATE);
-        }
-
-        mFirstLoad = (savedInstanceState == null);
-
         setSupportActionBar(findViewById(R.id.toolbar));
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
         mBottomNavigationView.setOnNavigationItemSelectedListener(menuItem -> {
-
             switch (menuItem.getItemId()) {
                 case R.id.stream_list_navigation_favourites: {
-                    mFragmentPresenter.getFollowedStreams();
                     mStateNavbar = MODE_FAVOURITES;
                     break;
                 }
                 case R.id.stream_list_navigation_top_streams: {
-                    mFragmentPresenter.getTopStreams();
                     mStateNavbar = MODE_TOP;
                     break;
                 }
             }
+            mActivityPresenter.changedNavigationState(mStateNavbar, mIsNavigationReallyClicked);
             return true;
         });
     }
@@ -93,15 +76,13 @@ public class StreamListActivity extends DaggerAppCompatActivity
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        mPausedAt = savedInstanceState.getLong(BUNDLE_TIME_STATE);
-        mFirstLoad = false;
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mActivityPresenter.subscribe(this);
-        if (mPausedAt > 0) decideToUpdate(mPausedAt);
 
     }
 
@@ -111,13 +92,6 @@ public class StreamListActivity extends DaggerAppCompatActivity
         mActivityPresenter.unsubscribe();
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable(BUNDLE_NAVBAR_STATE, mStateNavbar);
-        outState.putLong(BUNDLE_TIME_STATE, SystemClock.elapsedRealtime());
-        mPausedAt = SystemClock.elapsedRealtime();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -141,8 +115,9 @@ public class StreamListActivity extends DaggerAppCompatActivity
     }
 
     @Override
-    public void setDefaultNavBarState(StreamListNavigationState state) {
+    public void setNavBarState(StreamListNavigationState state) {
         mStateNavbar = state;
+        setSelectedNavBarItem();
     }
 
     @Override
@@ -163,15 +138,11 @@ public class StreamListActivity extends DaggerAppCompatActivity
 
     @Override
     public boolean hasPresenterAttached() {
-        return mActivityPresenter != null && mFragmentPresenter != null;
+        return mActivityPresenter != null;
     }
 
     public StreamListNavigationState getNavigationState() {
         return mStateNavbar;
-    }
-
-    public boolean isFirstLoad(){
-        return mFirstLoad;
     }
 
     private void setSelectedNavBarItem() {
@@ -187,17 +158,12 @@ public class StreamListActivity extends DaggerAppCompatActivity
                 currentNavbarItemRId = R.id.stream_list_navigation_favourites;
         }
         mBottomNavigationView.setSelectedItemId(currentNavbarItemRId);
+        mIsNavigationReallyClicked = true;
     }
 
     private void startLoggingActivity() {
         Intent startLogin = new Intent(this, LoginActivity.class);
         startActivity(startLogin);
-    }
-
-    private void decideToUpdate(long savedTime) {
-        if (mFragmentPresenter != null) {
-            mFragmentPresenter.decideToReload(SystemClock.elapsedRealtime() - savedTime);
-        }
     }
 
     private void startPreferencesActivity() {

@@ -11,6 +11,7 @@ import ru.nubby.playstream.model.FollowRelations;
 import ru.nubby.playstream.model.Pagination;
 import ru.nubby.playstream.model.Quality;
 import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.model.StreamListNavigationState;
 import ru.nubby.playstream.model.StreamsRequest;
 import ru.nubby.playstream.model.UserData;
 
@@ -129,5 +130,25 @@ public interface Repository {
      * @return {@link DefaultPreferences} object to read shared preferences
      */
     DefaultPreferences getSharedPreferences();
+
+    /**
+     * Gets navigation state of stream list screen.
+     * It lives here because one presenter should emit it's changes, but other should respond
+     * with view changes. We make this connection by creating Observable source.
+     * @return {@link StreamListNavigationState} enum.
+     */
+    Observable<StreamListNavigationState> getObservableNavigationState();
+
+    /**
+     * Gets navigation state of stream list screen. Will return default value on first retrieve.
+     * @return {@link StreamListNavigationState} enum.
+     */
+    StreamListNavigationState getCurrentState();
+
+    /**
+     * Makes getObservableNavigationState Observable to emit next state value.
+     * @param state state to be emitted.
+     */
+    void setCurrentNavigationState(StreamListNavigationState state);
 
 }

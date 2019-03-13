@@ -13,18 +13,15 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
+import ru.nubby.playstream.SensitiveStorage;
 import ru.nubby.playstream.domain.twitchapi.converter.AnnotatedConverterFactory;
 import ru.nubby.playstream.domain.twitchapi.converter.Json;
 import ru.nubby.playstream.domain.twitchapi.converter.Scalars;
-import ru.nubby.playstream.domain.twitchapi.interceptors.HostSelectionInterceptor;
 import ru.nubby.playstream.domain.twitchapi.interceptors.RequestTokenInterceptor;
 import ru.nubby.playstream.domain.twitchapi.services.RawJsonService;
 import ru.nubby.playstream.domain.twitchapi.services.TwitchApiService;
 import ru.nubby.playstream.domain.twitchapi.services.TwitchHelixService;
 import ru.nubby.playstream.domain.twitchapi.services.TwitchKrakenService;
-
-//TODO prob extract repeating path from retrofit builder to some private method, and build upon it
-//TODO should it be singleton??
 
 /**
  * Some of requests will not work with helix API, some will not work with old api API.
@@ -50,7 +47,8 @@ public class TwitchApiModule {
     @Singleton
     @NonNull
     public RequestTokenInterceptor provideTokenInterceptor() {
-        return new RequestTokenInterceptor();
+        return new RequestTokenInterceptor(SensitiveStorage.getHeaderClientId(),
+                SensitiveStorage.getClientApiKey());
     }
 
     @Provides
@@ -72,7 +70,7 @@ public class TwitchApiModule {
     @Provides
     @Singleton
     @NonNull
-    public AnnotatedConverterFactory provideAnnotatedConverterFactory(){
+    public AnnotatedConverterFactory provideAnnotatedConverterFactory() {
         return new AnnotatedConverterFactory.Builder()
                 .add(Scalars.class, ScalarsConverterFactory.create())
                 .add(Json.class, GsonConverterFactory.create())
@@ -91,8 +89,8 @@ public class TwitchApiModule {
     @Singleton
     @NonNull
     public Retrofit.Builder provideRetrofitBuilder(OkHttpClient okHttpClient,
-                                    RxJava2CallAdapterFactory callAdapterFactory,
-                                    AnnotatedConverterFactory annotatedConverterFactory) {
+                                                   RxJava2CallAdapterFactory callAdapterFactory,
+                                                   AnnotatedConverterFactory annotatedConverterFactory) {
         return new Retrofit.Builder()
                 .client(okHttpClient)
                 .addCallAdapterFactory(callAdapterFactory)

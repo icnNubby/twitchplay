@@ -5,13 +5,10 @@ import android.util.Log;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
-import dagger.Lazy;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.domain.Repository;
+import ru.nubby.playstream.model.StreamListNavigationState;
 import ru.nubby.playstream.model.UserData;
-import ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListContract;
-
-import static ru.nubby.playstream.presentation.streamlist.StreamListNavigationState.values;
 
 public class StreamListActivityPresenter implements StreamListActivityContract.Presenter {
     private final String TAG = StreamListActivityPresenter.class.getSimpleName();
@@ -20,22 +17,15 @@ public class StreamListActivityPresenter implements StreamListActivityContract.P
     private Disposable mDisposableUserFetchTask;
     private Repository mRepository;
 
-    private Lazy<Boolean> mFirstLoad;
-
     @Inject
-    public StreamListActivityPresenter(@NonNull Repository repository,
-                                       Lazy<Boolean> firstLoad) {
+    public StreamListActivityPresenter(@NonNull Repository repository) {
         mRepository = repository;
-        mFirstLoad = firstLoad;
     }
 
     @Override
     public void subscribe(StreamListActivityContract.View view) {
         mMainStreamListView = view;
-        int defaultState = mRepository.getSharedPreferences().getDefaultStreamListMode();
-        mMainStreamListView.setDefaultNavBarState(
-                values()[defaultState]);
-
+        mMainStreamListView.setNavBarState(mRepository.getCurrentState());
         mDisposableUserFetchTask = mRepository
                 .getCurrentLoginInfo()
                 .subscribe(
@@ -50,8 +40,17 @@ public class StreamListActivityPresenter implements StreamListActivityContract.P
 
     @Override
     public void unsubscribe() {
-        if (mDisposableUserFetchTask != null && !mDisposableUserFetchTask.isDisposed())
+        if (mDisposableUserFetchTask != null && !mDisposableUserFetchTask.isDisposed()) {
             mDisposableUserFetchTask.dispose();
+        }
         mMainStreamListView = null;
+    }
+
+    @Override
+    public void changedNavigationState(StreamListNavigationState state,
+                                       boolean isNavigationReallyClicked) {
+        if (isNavigationReallyClicked) {
+            mRepository.setCurrentNavigationState(state);
+        }
     }
 }

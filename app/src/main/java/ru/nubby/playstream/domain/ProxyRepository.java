@@ -16,6 +16,8 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.PublishSubject;
 import ru.nubby.playstream.domain.database.LocalRepository;
 import ru.nubby.playstream.domain.sharedprefs.AuthorizationStorage;
 import ru.nubby.playstream.domain.sharedprefs.DefaultPreferences;
@@ -24,6 +26,7 @@ import ru.nubby.playstream.model.FollowRelations;
 import ru.nubby.playstream.model.Pagination;
 import ru.nubby.playstream.model.Quality;
 import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.model.StreamListNavigationState;
 import ru.nubby.playstream.model.StreamsRequest;
 import ru.nubby.playstream.model.UserData;
 
@@ -48,6 +51,9 @@ public class ProxyRepository implements Repository {
 
     private boolean firstLoad = true; //TODO IDK implement in some other way its too hacky
 
+    private BehaviorSubject<StreamListNavigationState> mNavigationStateObservable;
+    private StreamListNavigationState mNavigationState;
+
     @Inject
     public ProxyRepository(@NonNull RemoteRepository remoteRepository,
                             @NonNull LocalRepository localRepository,
@@ -57,6 +63,11 @@ public class ProxyRepository implements Repository {
         mLocalRepository = localRepository;
         mAuthorizationStorage = authorizationStorage;
         mDefaultPreferences = defaultPreferences;
+
+        mNavigationState =  StreamListNavigationState
+                .values()[defaultPreferences.getDefaultStreamListMode()];
+        mNavigationStateObservable = BehaviorSubject.create();
+        mNavigationStateObservable.onNext(mNavigationState);
     }
 
     @Override
@@ -228,6 +239,22 @@ public class ProxyRepository implements Repository {
     @Override
     public DefaultPreferences getSharedPreferences() {
         return mDefaultPreferences;
+    }
+
+    @Override
+    public Observable<StreamListNavigationState> getObservableNavigationState() {
+        return mNavigationStateObservable;
+    }
+
+    @Override
+    public StreamListNavigationState getCurrentState() {
+        return mNavigationState;
+    }
+
+    @Override
+    public void setCurrentNavigationState(StreamListNavigationState state) {
+        mNavigationState = state;
+        mNavigationStateObservable.onNext(state);
     }
 
     private LoggedStatus getCurrentLoggedStatus() {
