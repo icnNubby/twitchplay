@@ -35,8 +35,9 @@ import androidx.fragment.app.Fragment;
 import dagger.android.support.DaggerFragment;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.model.Quality;
+import ru.nubby.playstream.presentation.BaseFragment;
 
-public class StreamFragment extends DaggerFragment
+public class StreamFragment extends BaseFragment
         implements StreamContract.View, PopupMenu.OnMenuItemClickListener {
 
 

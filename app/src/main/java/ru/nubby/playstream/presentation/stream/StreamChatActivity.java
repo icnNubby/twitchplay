@@ -10,29 +10,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.Toast;
-
-import com.google.gson.Gson;
 
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import dagger.android.support.DaggerAppCompatActivity;
-import io.reactivex.Single;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.domain.ProxyRepository;
-import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.presentation.BaseActivity;
 import ru.nubby.playstream.presentation.stream.chat.ChatFragment;
-import ru.nubby.playstream.presentation.stream.chat.ChatPresenter;
 import ru.nubby.playstream.presentation.stream.streamplayer.StreamFragment;
-import ru.nubby.playstream.presentation.stream.streamplayer.StreamPresenter;
 import ru.nubby.playstream.presentation.uiutils.OnSwipeTouchListener;
 
 /**
  * Should be called with extra JSON : gsonned model.Stream object
  */
-public class StreamChatActivity extends DaggerAppCompatActivity implements StreamFragment.StreamActivityCallbacks {
+public class StreamChatActivity extends BaseActivity implements StreamFragment.StreamActivityCallbacks {
 
     private final static String BUNDLE_FULLSCREEN_ON = "fullscreen_on";
 

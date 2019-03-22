@@ -14,6 +14,7 @@ import dagger.android.support.DaggerAppCompatActivity;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.model.StreamListNavigationState;
 import ru.nubby.playstream.model.UserData;
+import ru.nubby.playstream.presentation.BaseActivity;
 import ru.nubby.playstream.presentation.login.LoginActivity;
 import ru.nubby.playstream.presentation.preferences.PreferencesActivity;
 import ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListFragment;
@@ -22,7 +23,7 @@ import static ru.nubby.playstream.model.StreamListNavigationState.MODE_FAVOURITE
 import static ru.nubby.playstream.model.StreamListNavigationState.MODE_TOP;
 
 
-public class StreamListActivity extends DaggerAppCompatActivity
+public class StreamListActivity extends BaseActivity
         implements StreamListActivityContract.View {
 
 

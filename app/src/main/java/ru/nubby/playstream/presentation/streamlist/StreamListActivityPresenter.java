@@ -6,7 +6,7 @@ import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import io.reactivex.disposables.Disposable;
-import ru.nubby.playstream.domain.Repository;
+import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.StreamListNavigationState;
 import ru.nubby.playstream.model.UserData;
 
@@ -25,7 +25,7 @@ public class StreamListActivityPresenter implements StreamListActivityContract.P
     @Override
     public void subscribe(StreamListActivityContract.View view) {
         mMainStreamListView = view;
-        mMainStreamListView.setNavBarState(mRepository.getCurrentState());
+        mMainStreamListView.setNavBarState(mRepository.getCurrentNavigationState());
         mDisposableUserFetchTask = mRepository
                 .getCurrentLoginInfo()
                 .subscribe(

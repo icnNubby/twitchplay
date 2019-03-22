@@ -13,8 +13,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.SensitiveStorage;
-import ru.nubby.playstream.domain.Repository;
-import ru.nubby.playstream.domain.ircapi.ChatChannelApi;
+import ru.nubby.playstream.data.ircapi.ChatChannelApi;
+import ru.nubby.playstream.di.scopes.FragmentScoped;
 import ru.nubby.playstream.model.Stream;
 
 import static ru.nubby.playstream.presentation.stream.chat.ChatContract.View.InfoMessage.ERROR_DISCONNECTED;

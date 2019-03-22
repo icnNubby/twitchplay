@@ -24,8 +24,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import dagger.android.support.DaggerFragment;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.model.ChatMessage;
+import ru.nubby.playstream.presentation.BaseFragment;
 
-public class ChatFragment extends DaggerFragment implements ChatContract.View {
+public class ChatFragment extends BaseFragment implements ChatContract.View {
     private final int MESSAGE_CAPACITY = 100; // TODO get from prefs
 
     @Inject

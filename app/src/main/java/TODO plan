@@ -35,7 +35,6 @@ More features gradually from nearest to farthest:
     launcher icon and overall beautify
 
 Development stuff:
-    add DI
     add atleast unittests
     add CI
 

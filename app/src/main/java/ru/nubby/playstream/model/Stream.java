@@ -2,6 +2,8 @@ package ru.nubby.playstream.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -9,7 +11,7 @@ import androidx.annotation.Nullable;
  * Stream class. Contains information about user, stream title, viewer count, etc.
  * <a href = "https://dev.twitch.tv/docs/api/reference/#get-streams">Documentation here.</a>
  */
-public class Stream implements Comparable<Stream> {
+public class Stream implements Comparable<Stream>, Serializable {
 
     @SerializedName("title")
     private String title;

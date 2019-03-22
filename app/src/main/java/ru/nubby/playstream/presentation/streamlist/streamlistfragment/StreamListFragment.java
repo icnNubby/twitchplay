@@ -21,16 +21,19 @@ import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import dagger.android.support.DaggerFragment;
 import ru.nubby.playstream.R;
+import ru.nubby.playstream.di.scopes.ActivityScoped;
+import ru.nubby.playstream.di.scopes.FragmentScoped;
 import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.presentation.BaseFragment;
 import ru.nubby.playstream.presentation.stream.StreamChatActivity;
 
-public class StreamListFragment extends DaggerFragment implements StreamListContract.View {
+@ActivityScoped
+public class StreamListFragment extends BaseFragment implements StreamListContract.View {
     private final String TAG = StreamListFragment.class.getSimpleName();
     private final String BUNDLE_NAVBAR_STATE = "navbar_state";
     private final String BUNDLE_TIME_STATE = "paused_at";
@@ -52,7 +55,6 @@ public class StreamListFragment extends DaggerFragment implements StreamListCont
     private int mPreviewSize; //1 - big, 2 - small.
 
     private long mPausedAt;
-    private boolean mFirstLoad = true;
 
 
     @Inject
@@ -63,7 +65,6 @@ public class StreamListFragment extends DaggerFragment implements StreamListCont
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
         mPicasso = Picasso.get();
     }
 
@@ -92,7 +93,6 @@ public class StreamListFragment extends DaggerFragment implements StreamListCont
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {
             mPausedAt = savedInstanceState.getLong(BUNDLE_TIME_STATE);
-            mFirstLoad = false;
         }
         if (mPausedAt > 0) decideToUpdate(mPausedAt);
     }

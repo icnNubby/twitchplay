@@ -14,11 +14,10 @@ import android.widget.Toast;
 import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
-import dagger.android.support.DaggerAppCompatActivity;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.di.ActivityScoped;
+import ru.nubby.playstream.presentation.BaseActivity;
 
-public class LoginActivity extends DaggerAppCompatActivity implements LoginContract.View {
+public class LoginActivity extends BaseActivity implements LoginContract.View {
     private final String TAG = this.getClass().getSimpleName();
 
     private WebView mWebView;

@@ -12,12 +12,14 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
-import ru.nubby.playstream.domain.Repository;
+import ru.nubby.playstream.data.Repository;
+import ru.nubby.playstream.di.scopes.FragmentScoped;
 import ru.nubby.playstream.model.Pagination;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.model.StreamListNavigationState;
 
 import static ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListContract.View.ErrorMessage.ERROR_BAD_CONNECTION;
+
 
 public class StreamListPresenter implements StreamListContract.Presenter {
 
@@ -27,6 +29,7 @@ public class StreamListPresenter implements StreamListContract.Presenter {
     private StreamListContract.View mStreamListView;
     private Disposable mDisposableFetchingTask;
     private Disposable mDisposableListState;
+
     private Pagination mPagination;
     private Repository mRepository;
 
@@ -47,16 +50,11 @@ public class StreamListPresenter implements StreamListContract.Presenter {
         mStreamListView = view;
         mStreamListView.setPreviewSize(mRepository.getSharedPreferences().getPreviewSize());
 
-        mCurrentState = mRepository.getCurrentState();
+        mCurrentState = mRepository.getCurrentNavigationState();
         mDisposableListState = mListStateObservable
                 .subscribe(streamListNavigationState -> {
                     mCurrentState = streamListNavigationState;
-                    if (mForceReload && (mDisposableFetchingTask == null || mPagination == null)) {
-                        mForceReload = false;
-                        updateStreams();
-                    } else {
-                        mStreamListView.displayStreamList(mCurrentStreamList);
-                    }
+                    updateStreams();
                 });
 
 

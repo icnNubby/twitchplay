@@ -5,7 +5,7 @@ import com.squareup.leakcanary.LeakCanary;
 import androidx.preference.PreferenceManager;
 import dagger.android.AndroidInjector;
 import dagger.android.DaggerApplication;
-import ru.nubby.playstream.di.DaggerAppComponent;
+import ru.nubby.playstream.di.components.DaggerAppComponent;
 
 public class PlayStreamApp extends DaggerApplication {
 
@@ -21,6 +21,9 @@ public class PlayStreamApp extends DaggerApplication {
 
     @Override
     protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
-         return DaggerAppComponent.builder().application(this).build();
+         return DaggerAppComponent
+                 .builder()
+                 .application(this)
+                 .build();
     }
 }

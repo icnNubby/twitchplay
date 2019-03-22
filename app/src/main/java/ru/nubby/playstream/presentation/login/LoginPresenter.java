@@ -6,7 +6,7 @@ import javax.inject.Inject;
 
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.SensitiveStorage;
-import ru.nubby.playstream.domain.Repository;
+import ru.nubby.playstream.data.Repository;
 
 public class LoginPresenter implements LoginContract.Presenter {
     private final String TAG = LoginPresenter.class.getSimpleName();
