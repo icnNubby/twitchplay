@@ -6,6 +6,7 @@ import androidx.preference.PreferenceManager;
 import dagger.android.AndroidInjector;
 import dagger.android.DaggerApplication;
 import ru.nubby.playstream.di.components.DaggerAppComponent;
+import ru.nubby.playstream.services.SyncService;
 
 public class PlayStreamApp extends DaggerApplication {
 
@@ -17,6 +18,11 @@ public class PlayStreamApp extends DaggerApplication {
         }
         LeakCanary.install(this);
         PreferenceManager.setDefaultValues(this, R.xml.pref_display, false);
+        setupSyncService();
+    }
+
+    private void setupSyncService() {
+        SyncService.schedule(this);
     }
 
     @Override

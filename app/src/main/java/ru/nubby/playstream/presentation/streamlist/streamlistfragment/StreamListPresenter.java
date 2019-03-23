@@ -13,7 +13,6 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.data.Repository;
-import ru.nubby.playstream.di.scopes.FragmentScoped;
 import ru.nubby.playstream.model.Pagination;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.model.StreamListNavigationState;

@@ -2,7 +2,7 @@ package ru.nubby.playstream.di.modules;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
-import ru.nubby.playstream.di.scopes.ActivityScoped;
+import ru.nubby.playstream.di.scopes.ActivityScope;
 import ru.nubby.playstream.presentation.login.LoginActivity;
 import ru.nubby.playstream.presentation.login.LoginModule;
 import ru.nubby.playstream.presentation.preferences.PreferencesActivity;
@@ -14,19 +14,19 @@ import ru.nubby.playstream.presentation.streamlist.StreamListModule;
 
 @Module
 public abstract class ActivityBindingModule {
-    @ActivityScoped
+    @ActivityScope
     @ContributesAndroidInjector(modules = LoginModule.class)
     abstract LoginActivity loginActivity();
 
-    @ActivityScoped
+    @ActivityScope
     @ContributesAndroidInjector(modules = PreferencesModule.class)
     abstract PreferencesActivity preferencesActivity();
 
-    @ActivityScoped
+    @ActivityScope
     @ContributesAndroidInjector(modules = StreamChatModule.class)
     abstract StreamChatActivity streamChatActivity();
 
-    @ActivityScoped
+    @ActivityScope
     @ContributesAndroidInjector(modules = StreamListModule.class)
     abstract StreamListActivity streamListActivity();
 }

@@ -24,15 +24,13 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import dagger.android.support.DaggerFragment;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.di.scopes.ActivityScoped;
-import ru.nubby.playstream.di.scopes.FragmentScoped;
+import ru.nubby.playstream.di.scopes.ActivityScope;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.presentation.BaseFragment;
 import ru.nubby.playstream.presentation.stream.StreamChatActivity;
 
-@ActivityScoped
+@ActivityScope
 public class StreamListFragment extends BaseFragment implements StreamListContract.View {
     private final String TAG = StreamListFragment.class.getSimpleName();
     private final String BUNDLE_NAVBAR_STATE = "navbar_state";

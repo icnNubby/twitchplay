@@ -17,12 +17,13 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import ru.nubby.playstream.model.ChatMessage;
 
+//todo think more
 public class ChatChannelApi {
     private final String TAG = getClass().getSimpleName();
 
     // Default Twitch Chat connect IP/domain and port
-    private final String TWITCH_CHAT_SERVER = "irc.twitch.tv";
-    private final int TWITCH_CHAT_PORT = 6667;
+    private static final String TWITCH_CHAT_SERVER = "irc.twitch.tv";
+    private static final int TWITCH_CHAT_PORT = 6667;
 
     private static final Pattern STD_VAR_PATTERN =
             Pattern.compile("color=(#?\\w*);display-name=(\\w+).*;mod=(0|1);room-id=\\d+;.*subscriber=(0|1);.*turbo=(0|1);.* PRIVMSG #\\S* :(.*)");

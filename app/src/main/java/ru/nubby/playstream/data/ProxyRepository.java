@@ -49,8 +49,9 @@ public class ProxyRepository implements Repository {
     private final AuthorizationStorage mAuthorizationStorage;
     private final DefaultPreferences mDefaultPreferences;
 
-    private boolean firstLoad = true; //TODO IDK implement in some other way its too hacky
+    private boolean mFollowsFirstLoad = true; //TODO IDK implement in some other way its too hacky
 
+    //TODO maybe there is better way? =(
     private BehaviorSubject<StreamListNavigationState> mNavigationStateObservable;
     private StreamListNavigationState mNavigationState;
 
@@ -88,19 +89,18 @@ public class ProxyRepository implements Repository {
 
     @Override
     public Single<List<FollowRelations>> getUserFollows(String userId) {
-        if (firstLoad) {
-            firstLoad = false;
+        if (mFollowsFirstLoad) {
             return mRemoteRepository
                     .getUserFollows(userId)
                     .subscribeOn(Schedulers.io())
+                    .doOnSuccess(followRelationsList -> mFollowsFirstLoad = false)
                     .flatMap(followRelationsList ->
                             mLocalRepository
                                     .deleteAllFollowRelationsEntries()
                                     .andThen(mLocalRepository
                                             .insertFollowRelationsList(followRelationsList.toArray(
                                                     new FollowRelations[0])))
-                                    .andThen(Single.create(emitter ->
-                                            emitter.onSuccess(followRelationsList))));
+                                    .andThen(Single.just(followRelationsList)));
 
         } else {
             return mLocalRepository
@@ -202,7 +202,8 @@ public class ProxyRepository implements Repository {
                                                 new FollowRelations(userData.getId(),
                                                         userData.getLogin(),
                                                         targetStream.getUserId(),
-                                                        targetStream.getStreamerLogin(), ""))
+                                                        targetStream.getStreamerLogin(),
+                                                        ""))
                                         .subscribeOn(Schedulers.io())));
     }
 

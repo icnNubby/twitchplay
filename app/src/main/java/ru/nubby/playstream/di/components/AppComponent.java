@@ -13,6 +13,7 @@ import ru.nubby.playstream.di.modules.ActivityBindingModule;
 import ru.nubby.playstream.di.modules.AppModule;
 import ru.nubby.playstream.data.RepositoriesModule;
 import ru.nubby.playstream.data.twitchapi.TwitchApiModule;
+import ru.nubby.playstream.di.modules.ServiceBindingModule;
 
 @Singleton
 @Component(modules = {
@@ -20,6 +21,7 @@ import ru.nubby.playstream.data.twitchapi.TwitchApiModule;
         RepositoriesModule.class,
         TwitchApiModule.class,
         ActivityBindingModule.class,
+        ServiceBindingModule.class,
         AndroidSupportInjectionModule.class})
 
 public interface AppComponent extends AndroidInjector<PlayStreamApp> {

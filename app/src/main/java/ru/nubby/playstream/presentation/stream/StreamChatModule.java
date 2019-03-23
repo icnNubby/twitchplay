@@ -11,8 +11,8 @@ import dagger.Provides;
 import dagger.android.ContributesAndroidInjector;
 import io.reactivex.Single;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.di.scopes.ActivityScoped;
-import ru.nubby.playstream.di.scopes.FragmentScoped;
+import ru.nubby.playstream.di.scopes.ActivityScope;
+import ru.nubby.playstream.di.scopes.FragmentScope;
 import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.presentation.stream.chat.ChatContract;
@@ -25,24 +25,24 @@ import ru.nubby.playstream.presentation.stream.streamplayer.StreamPresenter;
 @Module
 public abstract class StreamChatModule {
 
-    @FragmentScoped
+    @FragmentScope
     @ContributesAndroidInjector
     abstract ChatFragment chatFragment();
 
-    @FragmentScoped
+    @FragmentScope
     @ContributesAndroidInjector
     abstract StreamFragment streamFragment();
 
-    @ActivityScoped
+    @ActivityScope
     @Binds
     abstract StreamContract.Presenter streamPresenter(StreamPresenter presenter);
 
-    @ActivityScoped
+    @ActivityScope
     @Binds
     abstract ChatContract.Presenter chatPresenter(ChatPresenter presenter);
 
     @Provides
-    @ActivityScoped
+    @ActivityScope
     static Single<Stream> provideStreamUpdater(StreamChatActivity activity, Repository repository) {
         String jsonStream = null;
         Bundle extras = activity.getIntent().getExtras();

@@ -13,7 +13,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.data.Repository;
-import ru.nubby.playstream.di.scopes.FragmentScoped;
 import ru.nubby.playstream.model.Quality;
 import ru.nubby.playstream.model.Stream;
 

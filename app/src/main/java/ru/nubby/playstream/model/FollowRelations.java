@@ -1,13 +1,11 @@
 package ru.nubby.playstream.model;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.PrimaryKey;
 
 @Entity(tableName = "follow_relations", primaryKeys = {"from_id", "to_id"})
 public class FollowRelations {
