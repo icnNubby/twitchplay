@@ -12,6 +12,7 @@ import javax.inject.Singleton;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Completable;
+import io.reactivex.CompletableObserver;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -20,6 +21,7 @@ import io.reactivex.subjects.BehaviorSubject;
 import ru.nubby.playstream.data.database.LocalRepository;
 import ru.nubby.playstream.data.sharedprefs.AuthorizationStorage;
 import ru.nubby.playstream.data.sharedprefs.DefaultPreferences;
+import ru.nubby.playstream.data.sharedprefs.PersistentStorage;
 import ru.nubby.playstream.data.twitchapi.RemoteRepository;
 import ru.nubby.playstream.model.FollowRelations;
 import ru.nubby.playstream.model.Pagination;
@@ -48,8 +50,9 @@ public class ProxyRepository implements Repository {
     private final LocalRepository mLocalRepository;
     private final AuthorizationStorage mAuthorizationStorage;
     private final DefaultPreferences mDefaultPreferences;
+    private final PersistentStorage mPersistentStorage;
 
-    private boolean mFollowsFirstLoad = true; //TODO IDK implement in some other way its too hacky
+    private boolean mFollowsFullUpdate = true; //TODO IDK implement in some other way its too hacky
 
     //TODO maybe there is better way? =(
     private BehaviorSubject<StreamListNavigationState> mNavigationStateObservable;
@@ -59,11 +62,13 @@ public class ProxyRepository implements Repository {
     public ProxyRepository(@NonNull RemoteRepository remoteRepository,
                            @NonNull LocalRepository localRepository,
                            @NonNull AuthorizationStorage authorizationStorage,
-                           @NonNull DefaultPreferences defaultPreferences) {
+                           @NonNull DefaultPreferences defaultPreferences,
+                           @NonNull PersistentStorage persistentStorage) {
         mRemoteRepository = remoteRepository;
         mLocalRepository = localRepository;
         mAuthorizationStorage = authorizationStorage;
         mDefaultPreferences = defaultPreferences;
+        mPersistentStorage = persistentStorage;
 
         mNavigationState = StreamListNavigationState
                 .values()[defaultPreferences.getDefaultStreamListMode()];
@@ -89,11 +94,11 @@ public class ProxyRepository implements Repository {
 
     @Override
     public Single<List<FollowRelations>> getUserFollows(String userId) {
-        if (mFollowsFirstLoad) {
+        if (mFollowsFullUpdate) {
             return mRemoteRepository
                     .getUserFollows(userId)
                     .subscribeOn(Schedulers.io())
-                    .doOnSuccess(followRelationsList -> mFollowsFirstLoad = false)
+                    .doOnSuccess(followRelationsList -> mFollowsFullUpdate = false)
                     .flatMap(followRelationsList ->
                             mLocalRepository
                                     .deleteAllFollowRelationsEntries()
@@ -110,23 +115,13 @@ public class ProxyRepository implements Repository {
     }
 
     @Override
-    public Single<Boolean> synchronizeFollows(String userId) {
-        return getUserFollows(userId)
-                .subscribeOn(Schedulers.io())
-                .flatMap(list -> {
-                    mLocalRepository.insertFollowRelationsList(list.toArray(new FollowRelations[0]));
-                    return mLocalRepository.getFollowRelationsEntriesById(userId);
-                })
-                .map(followRelationsList -> true);
-    }
-
-    @Override
     public Single<List<Stream>> getLiveStreamsFollowedByUser() {
         return getCurrentLoginInfo()
                 .subscribeOn(Schedulers.io())
                 .flatMap(userData -> mRemoteRepository
                         .getLiveStreamsFromRelationList(getUserFollows(userData.getId())))
                 .flatMap(streams -> this.fetchAdditionalInfo(streams, false))
+                .doOnSuccess(this::persistLiveStreamList)
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -258,6 +253,30 @@ public class ProxyRepository implements Repository {
         mNavigationStateObservable.onNext(state);
     }
 
+    @Override
+    public Completable synchronizeFollows(String userId) {
+        mFollowsFullUpdate = true;
+        return getUserFollows(userId)
+                .flatMapCompletable(followRelationsList -> CompletableObserver::onComplete);
+    }
+
+    @Override
+    public Completable synchronizeUserData() {
+        return  mLocalRepository
+                .getAllUserDataEntries()
+                .toSingle()
+                .flatMap(mRemoteRepository::getUpdatedUserDataList)
+                .flatMapCompletable(updatedUserDataList -> mLocalRepository
+                        .insertUserDataList(updatedUserDataList.toArray(new UserData[0])));
+    }
+
+    @Override
+    public List<Stream> getLastStreamList() {
+        return mPersistentStorage.getStreamList();
+    }
+
+    //Private methods
+
     private LoggedStatus getCurrentLoggedStatus() {
         String token = mAuthorizationStorage.getUserAccessToken();
         if (token != null && !token.equals("")) {
@@ -354,5 +373,10 @@ public class ProxyRepository implements Repository {
                 .toList()
                 .flatMap(userDataList -> Single.just(streamListCopy));
 
+    }
+
+    //todo maybe persist data in db, if we will have big lists, it will be better
+    private void persistLiveStreamList(List<Stream> streamList) {
+        mPersistentStorage.setStreamList(streamList);
     }
 }

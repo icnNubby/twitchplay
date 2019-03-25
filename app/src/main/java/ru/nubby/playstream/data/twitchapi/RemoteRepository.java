@@ -110,17 +110,19 @@ public class RemoteRepository {
                 .fromIterable(streamIdList)
                 .subscribeOn(Schedulers.computation())
                 .map(Stream::getUserId)
-                .buffer(100)
-                .subscribeOn(Schedulers.io())
-                .flatMap(idList -> mTwitchHelixService
-                        .getUserDataListByIdsList(idList)
-                        .map(UserDataList::getData)
-                        .subscribeOn(Schedulers.io())
-                        .toObservable())
-                .subscribeOn(Schedulers.computation())
-                .flatMap(Observable::fromIterable)
-                .toList();
+                .toList()
+                .flatMap(this::getUserDataListByStringIds);
     }
+
+    public Single<List<UserData>> getUpdatedUserDataList(List<UserData> userDataList) {
+        return Observable
+                .fromIterable(userDataList)
+                .subscribeOn(Schedulers.computation())
+                .map(UserData::getId)
+                .toList()
+                .flatMap(this::getUserDataListByStringIds);
+    }
+
 
     public Single<UserData> getUserDataFromToken(String token) {
         return mTwitchHelixService
@@ -246,4 +248,19 @@ public class RemoteRepository {
                 .flatMap(Observable::fromIterable);
     }
 
+    private Single<List<UserData>> getUserDataListByStringIds(List<String> idList) {
+        return Observable
+                .fromIterable(idList)
+                .subscribeOn(Schedulers.computation())
+                .buffer(100)
+                .subscribeOn(Schedulers.io())
+                .flatMap(idListBuffered -> mTwitchHelixService
+                        .getUserDataListByIdsList(idListBuffered)
+                        .map(UserDataList::getData)
+                        .subscribeOn(Schedulers.io())
+                        .toObservable())
+                .subscribeOn(Schedulers.computation())
+                .flatMap(Observable::fromIterable)
+                .toList();
+    }
 }

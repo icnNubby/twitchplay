@@ -5,6 +5,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:name=".PlayStreamApp"
         android:allowBackup="true"
@@ -36,7 +38,8 @@
             android:parentActivityName=".presentation.streamlist.StreamListActivity">
         </activity>
 
-        <service android:name=".services.SyncService"
+        <service android:name=".services.SyncUserDataService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <service android:name=".services.NotificationService" />
     </application>
 </manifest>

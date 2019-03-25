@@ -45,8 +45,6 @@ public class StreamChatActivity extends BaseActivity implements StreamFragment.S
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
         setContentView(R.layout.activity_stream);
         mChatContainer = findViewById(R.id.fragment_chat_container);
         mPlayerContainer = findViewById(R.id.fragment_player_container);
@@ -95,15 +93,6 @@ public class StreamChatActivity extends BaseActivity implements StreamFragment.S
                     .add(R.id.fragment_chat_container, chatFragment)
                     .commit();
         }
-
-/*
-        if (!streamFragment.hasPresenterAttached()) {
-            new StreamPresenter(streamFragment, currentStreamUpdate, ProxyRepository.getInstance());
-        }
-        if (!chatFragment.hasPresenterAttached()) {
-            new ChatPresenter(chatFragment, currentStreamUpdate);
-        }
-*/
 
         View decorView = getWindow().getDecorView();
         decorView.setOnSystemUiVisibilityChangeListener

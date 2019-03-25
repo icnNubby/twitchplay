@@ -1,5 +1,7 @@
 package ru.nubby.playstream.data.database;
 
+import java.util.List;
+
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -18,6 +20,8 @@ public interface UserDataDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Completable insertUserData(UserData userDataEntry);
 
+    @Query("SELECT * FROM user_data")
+    Maybe<List<UserData>> getAll();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Completable insertUserDataList(UserData... userDataEntry);

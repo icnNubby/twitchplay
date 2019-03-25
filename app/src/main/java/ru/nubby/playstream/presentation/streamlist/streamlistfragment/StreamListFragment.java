@@ -43,6 +43,9 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
     @Inject
     StreamListContract.Presenter mPresenter;
 
+    @Inject
+    Gson mGson;
+
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressBar mProgressBar;
 
@@ -226,7 +229,7 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
         @Override
         public void onClick(View v) {
             Intent startStream = new Intent(getContext(), StreamChatActivity.class);
-            startStream.putExtra("stream_json", new Gson().toJson(mStream)); // SLOW, YES
+            startStream.putExtra("stream_json", mGson.toJson(mStream)); // SLOW, YES
             startActivity(startStream);
         }
     }

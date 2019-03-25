@@ -50,7 +50,8 @@ public class StreamPresenter implements StreamContract.Presenter {
         mStreamView = view;
         mStreamAdditionalInfoTask = mStreamRequest
                 .doOnSubscribe(streamReturned -> mStreamView.displayLoading(true))
-                .subscribe(streamReturned -> {
+                .subscribe(
+                        streamReturned -> {
                             mCurrentStream = streamReturned;
                             playStream(streamReturned);
                             mStreamView.displayLoading(false);

@@ -1,29 +1,32 @@
 package ru.nubby.playstream.utils;
 
+import javax.inject.Inject;
+
 import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class RxSchedulersProvider {
-    private final Scheduler mIOScheduler;
-    private final Scheduler mUIScheduler;
+    private final Scheduler mIoScheduler;
+    private final Scheduler mUiScheduler;
     private final Scheduler mComputationScheduler;
 
-    public RxSchedulersProvider(Scheduler ioScheduler,
-                                Scheduler uiScheduler,
-                                Scheduler computationScheduler) {
-        mIOScheduler = ioScheduler;
-        mUIScheduler = uiScheduler;
-        mComputationScheduler = computationScheduler;
+    @Inject
+    public RxSchedulersProvider() {
+        mIoScheduler = Schedulers.io();
+        mUiScheduler = AndroidSchedulers.mainThread();
+        mComputationScheduler = Schedulers.computation();
     }
 
     public Scheduler getComputationScheduler() {
         return mComputationScheduler;
     }
 
-    public Scheduler getIOScheduler() {
-        return mIOScheduler;
+    public Scheduler getIoScheduler() {
+        return mIoScheduler;
     }
 
-    public Scheduler getUIScheduler() {
-        return mUIScheduler;
+    public Scheduler getUiScheduler() {
+        return mUiScheduler;
     }
 }

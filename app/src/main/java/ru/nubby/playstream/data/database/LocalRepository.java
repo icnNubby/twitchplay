@@ -24,6 +24,8 @@ public interface LocalRepository {
 
     Maybe<UserData> findUserDataById(String id);
 
+    Maybe<List<UserData>> getAllUserDataEntries();
+
     Completable insertUserData(UserData userDataEntry);
 
     Completable insertUserDataList(UserData... userDataEntryList);

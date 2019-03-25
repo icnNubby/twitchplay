@@ -36,5 +36,7 @@
     <string name="stream_list_item_size_key"
         translatable="false">preview_size</string>
 
+    <string name="live_streamer_notification_id">112121</string>>
+
 
 </resources>

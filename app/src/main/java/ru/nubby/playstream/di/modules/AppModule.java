@@ -3,6 +3,8 @@ package ru.nubby.playstream.di.modules;
 import android.app.Application;
 import android.content.Context;
 
+import javax.inject.Named;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -13,4 +15,5 @@ public class AppModule {
     public Context provideContext(Application application) {
         return application;
     }
+
 }

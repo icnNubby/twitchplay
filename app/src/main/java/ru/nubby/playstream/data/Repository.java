@@ -36,12 +36,6 @@ public interface Repository {
      */
     Single<List<FollowRelations>> getUserFollows(String userId);
 
-    /**
-     * Synchronizes user follows list from remote to local repository
-     * @param userId current (logged) user id
-     * @return always true if fetch went well, error in rx style if something happened.
-     */
-    Single<Boolean> synchronizeFollows(String userId);
 
     /**
      * Gets active stream list from remote or local(cached) repository
@@ -151,4 +145,23 @@ public interface Repository {
      */
     void setCurrentNavigationState(StreamListNavigationState state);
 
+    /**
+     * Synchronizes user follows list from remote to local repository.
+     * @param userId current (logged) user id
+     * @return Might return error in rx style if something happened.
+     */
+    Completable synchronizeFollows(String userId);
+
+    /**
+     * Updates all userData entries in local database from remote.
+     * @return Might return error in rx style if something happened.
+     */
+    Completable synchronizeUserData();
+
+    /**
+     * Gets last retrieved stream list.
+     * This stream list is saved in {@link ru.nubby.playstream.data.sharedprefs.PersistentStorage}
+     * each time {@link #getLiveStreamsFollowedByUser()} method is called
+     */
+    List<Stream> getLastStreamList();
 }

@@ -2,6 +2,8 @@ package ru.nubby.playstream.data;
 
 import android.content.Context;
 
+import com.google.gson.Gson;
+
 import javax.inject.Singleton;
 
 import androidx.room.Room;
@@ -68,6 +70,12 @@ public class RepositoriesModule {
     @Singleton
     public Repository provideRepository(ProxyRepository repository) {
         return repository;
+    }
+
+    @Provides
+    @Singleton
+    public Gson provideDefaultGson() {
+        return new Gson();
     }
 }
 

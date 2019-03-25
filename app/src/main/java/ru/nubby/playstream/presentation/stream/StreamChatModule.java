@@ -43,7 +43,9 @@ public abstract class StreamChatModule {
 
     @Provides
     @ActivityScope
-    static Single<Stream> provideStreamUpdater(StreamChatActivity activity, Repository repository) {
+    static Single<Stream> provideStreamUpdater(StreamChatActivity activity,
+                                               Repository repository,
+                                               Gson gson) {
         String jsonStream = null;
         Bundle extras = activity.getIntent().getExtras();
         if (extras != null) {
@@ -53,7 +55,7 @@ public abstract class StreamChatModule {
             Toast.makeText(activity, activity.getText(R.string.error_no_stream_info_provided), Toast.LENGTH_SHORT).show();
             activity.finish(); //we cant start stream from nothing
         }
-        Stream currentStream = new Gson().fromJson(jsonStream, Stream.class);
+        Stream currentStream = gson.fromJson(jsonStream, Stream.class);
         if (currentStream == null) {
             activity.finish();
         }

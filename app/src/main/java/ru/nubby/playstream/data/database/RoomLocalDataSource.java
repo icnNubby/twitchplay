@@ -56,6 +56,11 @@ public class RoomLocalDataSource implements LocalRepository {
     }
 
     @Override
+    public Maybe<List<UserData>> getAllUserDataEntries() {
+        return mUserDataDao.getAll();
+    }
+
+    @Override
     public Completable insertUserData(UserData userDataEntry) {
         return mUserDataDao.insertUserData(userDataEntry);
     }
