@@ -27,6 +27,7 @@
             android:name=".presentation.stream.StreamChatActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:launchMode="singleTop"
+            android:parentActivityName=".presentation.streamlist.StreamListActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
             android:name=".presentation.login.LoginActivity"

@@ -2,12 +2,17 @@ package ru.nubby.playstream.presentation.preferences;
 
 import javax.inject.Inject;
 
+import ru.nubby.playstream.data.Repository;
+
 public class PreferencesPresenter implements PreferencesContract.Presenter {
 
     private PreferencesContract.View mPreferencesView;
 
+    private Repository mRepository;
+
     @Inject
-    PreferencesPresenter() {
+    PreferencesPresenter(Repository repository) {
+        this.mRepository = repository;
     }
 
     @Override

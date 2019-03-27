@@ -6,14 +6,10 @@ import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import dagger.android.support.DaggerAppCompatActivity;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.presentation.BaseActivity;
 
 public class PreferencesActivity extends BaseActivity {
-
-    @Inject
-    PreferencesContract.Presenter mPresenter;
 
     @Inject
     PlaystreamPreferencesFragment mPreferencesFragment;

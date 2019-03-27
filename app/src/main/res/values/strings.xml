@@ -18,34 +18,58 @@
     <string name="not_logged_in">You are not logged in</string>
 
     <!-- Preferences-->
-    <string name="default_quality_summary">Default stream playback quality</string>
-    <string name="default_quality_title">Default quality</string>
-    <string name="default_quality_default_value">720x30</string>
-    <string name="default_quality_key"
-        translatable="false">default_quality</string>
 
-    <string name="default_stream_list_mode_summary">Default main screen mode</string>
-    <string name="default_stream_list_mode_title">Default mode</string>
-    <string name="default_stream_list_mode_default_value">0</string>
-    <string name="default_stream_list_mode_key"
-        translatable="false">default_stream_list_mode</string>
+    <string name="defaults_category_title">Defaults</string>
+    <string name="defaults_category_key"
+        translatable="false">defaults_category</string>
 
-    <string name="stream_list_item_size_summary">Size of stream preview on main screen</string>
-    <string name="stream_list_item_size_title">Preview size</string>
-    <string name="stream_list_item_size_default_value">1</string>
-    <string name="stream_list_item_size_key"
-        translatable="false">preview_size</string>
+        <string name="default_quality_summary">Stream playback quality</string>
+        <string name="default_quality_title">Quality</string>
+        <string name="default_quality_default_value">720x30</string>
+        <string name="default_quality_key"
+            translatable="false">default_quality</string>
+
+        <string name="default_stream_list_mode_summary">Main screen mode</string>
+        <string name="default_stream_list_mode_title">Navigation mode</string>
+        <string name="default_stream_list_mode_default_value">0</string>
+        <string name="default_stream_list_mode_key"
+            translatable="false">default_stream_list_mode</string>
+
+        <string name="stream_list_item_size_summary">Size of stream preview on main screen</string>
+        <string name="stream_list_item_size_title">Preview size</string>
+        <string name="stream_list_item_size_default_value">1</string>
+        <string name="stream_list_item_size_key"
+            translatable="false">preview_size</string>
+
+    <string name="notifications_category_title">Notifications</string>
+    <string name="notifications_category_key"
+        translatable="false">notifications_category</string>
+
+        <string name="notifications_are_on_title">Enable</string>
+        <string name="notifications_are_on_summary">Enable notifications about channels becoming live.</string>
+        <string name="notifications_are_on_key"
+            translatable="false">notifications_are_on</string>
+
+        <string name="silent_hours_title">Silent hours</string>
+        <string name="silent_hours_summary">Enable silent hours, when notifications will be disabled.</string>
+        <string name="silent_hours_key"
+            translatable="false">silent_hours_are_on</string>
+
+        <string name="silent_time_start_title">Start</string>
+        <string name="silent_time_start_summary">Starting time for silent hours</string>
+        <string name="silent_time_start_default_value">00:00</string>
+        <string name="silent_time_start_key"
+            translatable="false">silent_time_start</string>
+
+        <string name="silent_time_finish_title">Finish</string>
+        <string name="silent_time_finish_summary">Ending time for silent hours</string>
+        <string name="silent_time_finish_default_value">00:00</string>
+        <string name="silent_time_finish_key"
+            translatable="false">silent_time_finish</string>
 
     <!-- Notifications-->
-    <string name="notification_list_separator">", "</string>
-    <string name="notification_single_live">%s is now live</string>
-    <string name="notification_multiple_live">%1$s and %2$s are now live</string>
-    <string name="notification_is_playing_game">%1$s is playing %2$s</string>
-    <string name="notification_is_playing_game_short">is playing %1$s</string>
-    <string name="notification_stream_viewers">%d Viewers</string>
-    <string name="notification_number_streams_live">%d streams just went live</string>
-    <string name="notification_additional_multiple_live">%d additional streams are live</string>
-    <string name="notification_additional_single_live">%d additional stream is live</string>
+    <string name="notification_stream_viewers">%s viewers</string>
+    <string name="notification_streams_live">%d streams are live</string>
 
     <string name="notification_new_streams_title">%d new stream online</string>
 

@@ -7,14 +7,22 @@ import android.os.Build;
 
 import com.squareup.leakcanary.LeakCanary;
 
+import javax.inject.Inject;
+
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
+import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.preference.PreferenceManager;
 import dagger.android.AndroidInjector;
 import dagger.android.DaggerApplication;
 import ru.nubby.playstream.di.components.DaggerAppComponent;
-import ru.nubby.playstream.services.NotificationService;
-import ru.nubby.playstream.services.SyncUserDataService;
+import ru.nubby.playstream.services.ServicesScheduler;
 
-public class PlayStreamApp extends DaggerApplication {
+public class PlayStreamApp extends DaggerApplication implements LifecycleObserver {
+
+    @Inject
+    ServicesScheduler mServicesScheduler;
 
     @Override
     public void onCreate() {
@@ -24,9 +32,8 @@ public class PlayStreamApp extends DaggerApplication {
         }
         LeakCanary.install(this);
         PreferenceManager.setDefaultValues(this, R.xml.pref_display, false);
-        setupSyncService();
         initNotificationChannels();
-        setupNotificationService();
+        ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
     }
 
     private void initNotificationChannels() {
@@ -42,13 +49,17 @@ public class PlayStreamApp extends DaggerApplication {
         );
     }
 
-    private void setupSyncService() {
-        SyncUserDataService.schedule(this);
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    public void onAppBackgrounded() {
+        mServicesScheduler.scheduleUserDataSync();
+        mServicesScheduler.scheduleNotifications();
     }
 
-    private void setupNotificationService() {
-        NotificationService.schedule(this);
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    public void onAppForegrounded() {
+        mServicesScheduler.cancelNotificaions();
     }
+
 
     @Override
     protected AndroidInjector<? extends DaggerApplication> applicationInjector() {

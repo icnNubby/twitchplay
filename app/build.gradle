@@ -31,6 +31,8 @@ dependencies {
     implementation dependencies.preference
     implementation dependencies.cardview
     implementation dependencies.design
+    implementation dependencies.lifecycle
+
     implementation dependencies.okhttp
     implementation dependencies.okhttp_interceptor
     implementation dependencies.constraint
@@ -56,6 +58,7 @@ dependencies {
     annotationProcessor dependencies.room_annotations
     annotationProcessor dependencies.dagger2_compiler
     annotationProcessor dependencies.dagger2_android_processor
+    annotationProcessor dependencies.lifecycle_processor
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

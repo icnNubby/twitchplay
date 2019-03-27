@@ -1,37 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory
+        android:key="@string/defaults_category_key"
+        android:title="@string/defaults_category_title">
+        <ListPreference
+            android:defaultValue="@string/default_quality_default_value"
+            android:dialogTitle="@string/default_quality_title"
+            android:entries="@array/quality_list"
+            android:entryValues="@array/quality_list"
+            android:key="@string/default_quality_key"
+            android:persistent="true"
+            android:summary="@string/default_quality_summary"
+            android:title="@string/default_quality_title"
+            app:iconSpaceReserved="false" />
+        <ListPreference
+            android:defaultValue="@string/default_stream_list_mode_default_value"
+            android:dialogTitle="@string/default_stream_list_mode_title"
+            android:entries="@array/stream_list_modes"
+            android:entryValues="@array/stream_list_modes_values"
+            android:key="@string/default_stream_list_mode_key"
+            android:persistent="true"
+            android:summary="@string/default_stream_list_mode_summary"
+            android:title="@string/default_stream_list_mode_title"
+            app:iconSpaceReserved="false" />
 
-    <ListPreference
-        android:defaultValue="@string/default_quality_default_value"
-        android:dialogTitle="@string/default_quality_title"
-        android:entries="@array/quality_list"
-        android:entryValues="@array/quality_list"
-        android:key="@string/default_quality_key"
-        android:persistent="true"
-        android:summary="@string/default_quality_summary"
-        android:title="@string/default_quality_title"
-        app:iconSpaceReserved="false"/>
-    <ListPreference
-        android:defaultValue="@string/default_stream_list_mode_default_value"
-        android:dialogTitle="@string/default_stream_list_mode_title"
-        android:entries="@array/stream_list_modes"
-        android:entryValues="@array/stream_list_modes_values"
-        android:key="@string/default_stream_list_mode_key"
-        android:persistent="true"
-        android:summary="@string/default_stream_list_mode_summary"
-        android:title="@string/default_stream_list_mode_title"
-        app:iconSpaceReserved="false"/>
+        <ListPreference
+            android:defaultValue="@string/stream_list_item_size_default_value"
+            android:dialogTitle="@string/stream_list_item_size_title"
+            android:entries="@array/stream_list_item_size"
+            android:entryValues="@array/stream_list_item_size_values"
+            android:key="@string/stream_list_item_size_key"
+            android:persistent="true"
+            android:summary="@string/stream_list_item_size_summary"
+            android:title="@string/stream_list_item_size_title"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
 
-    <ListPreference
-        android:dialogTitle="@string/stream_list_item_size_title"
-        android:defaultValue="@string/stream_list_item_size_default_value"
-        android:entries="@array/stream_list_item_size"
-        android:entryValues="@array/stream_list_item_size_values"
-        android:key="@string/stream_list_item_size_key"
-        android:persistent="true"
-        android:summary="@string/stream_list_item_size_summary"
-        android:title="@string/stream_list_item_size_title"
-        app:iconSpaceReserved="false"/>
+    <PreferenceCategory
+        android:title="@string/notifications_category_title"
+        android:key="@string/defaults_category_key">
+        <CheckBoxPreference
+            android:defaultValue="@bool/default_notifications_are_on"
+            android:key="@string/notifications_are_on_key"
+            android:title="@string/notifications_are_on_title"
+            android:summary="@string/notifications_are_on_summary"
+            android:persistent="true"
+            app:iconSpaceReserved="false">
+        </CheckBoxPreference>
+
+        <CheckBoxPreference
+            android:defaultValue="@bool/default_silent_hours_are_on"
+            android:key="@string/silent_hours_key"
+            android:title="@string/silent_hours_title"
+            android:summary="@string/silent_hours_summary"
+            android:persistent="true"
+            android:dependency="@string/notifications_are_on_key"
+            app:iconSpaceReserved="false">
+        </CheckBoxPreference>
+
+        <ru.nubby.playstream.presentation.preferences.utils.TimePreference
+            android:key="@string/silent_time_start_key"
+            android:title="@string/silent_time_start_title"
+            android:summary="@string/silent_time_start_summary"
+            android:dependency="@string/silent_hours_key"
+            android:defaultValue="@string/silent_time_start_default_value"
+            android:persistent="true"
+            app:iconSpaceReserved="false">
+        </ru.nubby.playstream.presentation.preferences.utils.TimePreference>
+
+        <ru.nubby.playstream.presentation.preferences.utils.TimePreference
+            android:key="@string/silent_time_finish_key"
+            android:title="@string/silent_time_finish_title"
+            android:dependency="@string/silent_hours_key"
+            android:summary="@string/silent_time_finish_summary"
+            android:defaultValue="@string/silent_time_finish_default_value"
+            android:persistent="true"
+            app:iconSpaceReserved="false">
+        </ru.nubby.playstream.presentation.preferences.utils.TimePreference>
+
+    </PreferenceCategory>
 
 </PreferenceScreen>

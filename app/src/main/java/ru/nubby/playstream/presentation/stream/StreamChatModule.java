@@ -21,6 +21,7 @@ import ru.nubby.playstream.presentation.stream.chat.ChatPresenter;
 import ru.nubby.playstream.presentation.stream.streamplayer.StreamContract;
 import ru.nubby.playstream.presentation.stream.streamplayer.StreamFragment;
 import ru.nubby.playstream.presentation.stream.streamplayer.StreamPresenter;
+import ru.nubby.playstream.utils.Constants;
 
 @Module
 public abstract class StreamChatModule {
@@ -49,7 +50,7 @@ public abstract class StreamChatModule {
         String jsonStream = null;
         Bundle extras = activity.getIntent().getExtras();
         if (extras != null) {
-            jsonStream = extras.getString("stream_json");
+            jsonStream = extras.getString(Constants.sStreamIntentKey);
         }
         if (jsonStream == null) {
             Toast.makeText(activity, activity.getText(R.string.error_no_stream_info_provided), Toast.LENGTH_SHORT).show();

@@ -60,4 +60,28 @@ public class DefaultPreferences {
         return 0;
     }
 }
+
+    public boolean getNotificationsAreOn() {
+        return mSharedPreferences.getBoolean(
+                mContext.getString(R.string.notifications_are_on_key),
+                mContext.getResources().getBoolean(R.bool.default_notifications_are_on));
+    }
+
+    public boolean getSilentHoursAreOn() {
+        return mSharedPreferences.getBoolean(
+                mContext.getString(R.string.silent_hours_key),
+                mContext.getResources().getBoolean(R.bool.default_silent_hours_are_on));
+    }
+
+    public String getSilentHoursStartTime() {
+        return mSharedPreferences.getString(
+                mContext.getString(R.string.silent_time_start_key),
+                mContext.getString(R.string.silent_time_start_default_value));
+    }
+
+    public String getSilentHoursFinishTime() {
+        return mSharedPreferences.getString(
+                mContext.getString(R.string.silent_time_finish_key),
+                mContext.getString(R.string.silent_time_finish_default_value));
+    }
 }

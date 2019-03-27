@@ -1,6 +1,5 @@
 package ru.nubby.playstream.presentation.streamlist.streamlistfragment;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -30,6 +29,7 @@ import ru.nubby.playstream.di.scopes.ActivityScope;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.presentation.BaseFragment;
 import ru.nubby.playstream.presentation.stream.StreamChatActivity;
+import ru.nubby.playstream.utils.Constants;
 
 @ActivityScope
 public class StreamListFragment extends BaseFragment implements StreamListContract.View {
@@ -101,8 +101,8 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    public void onResume() {
+        super.onResume();
         mPresenter.subscribe(this);
     }
 
@@ -114,8 +114,8 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onPause() {
+        super.onPause();
         mPresenter.unsubscribe();
     }
 
@@ -231,7 +231,7 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
         @Override
         public void onClick(View v) {
             Intent startStream = new Intent(getContext(), StreamChatActivity.class);
-            startStream.putExtra("stream_json", mGson.toJson(mStream)); // SLOW, YES
+            startStream.putExtra(Constants.sStreamIntentKey, mGson.toJson(mStream)); // SLOW, YES
             startActivity(startStream);
         }
     }
