@@ -1,23 +1,23 @@
 <resources>
     <string name="app_name">Playstream</string>
 
-    <!-- Errors and info messages, translatable         -->
+    <!-- Errors and info messages, translatable-->
     <string name="login_failed">Login procedure failed, please retry.</string>
     <string name="error_no_stream_info_provided">No stream info provided.</string>
     <string name="system_user">System</string>
 
-    <!-- Menus, translatable                            -->
+    <!-- Menus, translatable-->
     <string name="login">Login</string>
     <string name="settings">Settings</string>
 
     <string name="favourites">Follows</string>
     <string name="top_streams">Top streams</string>
 
-    <!-- Title, translatable                            -->
+    <!-- Title, translatable-->
     <string name="logged_in">Logged as: </string>
     <string name="not_logged_in">You are not logged in</string>
 
-    <!-- Preferences                                    -->
+    <!-- Preferences-->
     <string name="default_quality_summary">Default stream playback quality</string>
     <string name="default_quality_title">Default quality</string>
     <string name="default_quality_default_value">720x30</string>
@@ -36,7 +36,22 @@
     <string name="stream_list_item_size_key"
         translatable="false">preview_size</string>
 
-    <string name="live_streamer_notification_id">112121</string>>
+    <!-- Notifications-->
+    <string name="notification_list_separator">", "</string>
+    <string name="notification_single_live">%s is now live</string>
+    <string name="notification_multiple_live">%1$s and %2$s are now live</string>
+    <string name="notification_is_playing_game">%1$s is playing %2$s</string>
+    <string name="notification_is_playing_game_short">is playing %1$s</string>
+    <string name="notification_stream_viewers">%d Viewers</string>
+    <string name="notification_number_streams_live">%d streams just went live</string>
+    <string name="notification_additional_multiple_live">%d additional streams are live</string>
+    <string name="notification_additional_single_live">%d additional stream is live</string>
+
+    <string name="notification_new_streams_title">%d new stream online</string>
+
+    <!-- Utilities-->
+    <string name="live_streamer_notification_id"
+        translatable="false">112121</string>>
 
 
 </resources>

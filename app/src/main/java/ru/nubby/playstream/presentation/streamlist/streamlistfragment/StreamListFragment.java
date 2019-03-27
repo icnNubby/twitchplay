@@ -1,5 +1,6 @@
 package ru.nubby.playstream.presentation.streamlist.streamlistfragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -90,17 +91,18 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null) {
             mPausedAt = savedInstanceState.getLong(BUNDLE_TIME_STATE);
         }
-        if (mPausedAt > 0) decideToUpdate(mPausedAt);
+       // if (mPausedAt > 0) decideToUpdate(mPausedAt);
+        //todo fix
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onAttach(Context context) {
+        super.onAttach(context);
         mPresenter.subscribe(this);
     }
 
@@ -112,8 +114,8 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDetach() {
+        super.onDetach();
         mPresenter.unsubscribe();
     }
 

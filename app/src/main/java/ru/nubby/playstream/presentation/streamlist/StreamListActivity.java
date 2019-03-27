@@ -84,7 +84,6 @@ public class StreamListActivity extends BaseActivity
     protected void onResume() {
         super.onResume();
         mActivityPresenter.subscribe(this);
-
     }
 
     @Override

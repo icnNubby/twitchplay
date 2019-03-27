@@ -161,7 +161,7 @@ public interface Repository {
     /**
      * Gets last retrieved stream list.
      * This stream list is saved in {@link ru.nubby.playstream.data.sharedprefs.PersistentStorage}
-     * each time {@link #getLiveStreamsFollowedByUser()} method is called
+     * each time when {@link #getLiveStreamsFollowedByUser()} method is called.
      */
     List<Stream> getLastStreamList();
 }

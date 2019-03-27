@@ -46,6 +46,7 @@ public class StreamListPresenter implements StreamListContract.Presenter {
 
     @Override
     public void subscribe(StreamListContract.View view) {
+        Log.d(TAG, "subscribe: " + this.toString());
         mStreamListView = view;
         mStreamListView.setPreviewSize(mRepository.getSharedPreferences().getPreviewSize());
 
@@ -53,20 +54,21 @@ public class StreamListPresenter implements StreamListContract.Presenter {
         mDisposableListState = mListStateObservable
                 .subscribe(streamListNavigationState -> {
                     mCurrentState = streamListNavigationState;
+                    Log.d(TAG, "subscribe: GOT EMIT: " + streamListNavigationState + " Presenter: " + this.toString());
                     updateStreams();
                 });
-
-
     }
 
     @Override
     public void unsubscribe() {
+        Log.d(TAG, "unsubscribe: " + this.toString());
         if (mDisposableFetchingTask != null) {
             mDisposableFetchingTask.dispose();
         }
         if (mDisposableListState != null) {
             mDisposableListState.dispose();
         }
+        Log.d(TAG, "unsubscribe: all disposed, view cleared " + this.toString());
         mStreamListView = null;
     }
 
@@ -87,10 +89,13 @@ public class StreamListPresenter implements StreamListContract.Presenter {
         mDisposableFetchingTask = mRepository
                 .getLiveStreamsFollowedByUser()
                 .doOnSubscribe(disposable -> {
-                    mStreamListView.clearStreamList();
-                    mCurrentStreamList = new ArrayList<>();
-                    mCurrentStreamMap = new HashMap<>();
-                    mStreamListView.setupProgressBar(true);
+                    Log.d(TAG, "getFollowedStreams do on sub: " + this.toString());
+                    if (!disposable.isDisposed()) {
+                        mStreamListView.clearStreamList();
+                        mCurrentStreamList = new ArrayList<>();
+                        mCurrentStreamMap = new HashMap<>();
+                        mStreamListView.setupProgressBar(true);
+                    }
                 })
                 .subscribe(streams -> {
                             checkAndAddStreams(streams);
@@ -110,10 +115,13 @@ public class StreamListPresenter implements StreamListContract.Presenter {
         mDisposableFetchingTask = mRepository
                 .getTopStreams()
                 .doOnSubscribe(disposable -> {
-                    mStreamListView.clearStreamList();
-                    mCurrentStreamList = new ArrayList<>();
-                    mCurrentStreamMap = new HashMap<>();
-                    mStreamListView.setupProgressBar(true);
+                    Log.d(TAG, "getTopStreams: do on sub " + this.toString());
+                    if (!disposable.isDisposed()) {
+                        mStreamListView.clearStreamList();
+                        mCurrentStreamList = new ArrayList<>();
+                        mCurrentStreamMap = new HashMap<>();
+                        mStreamListView.setupProgressBar(true);
+                    }
                 })
                 .subscribe(streams -> {
                             mStreamListView.setupProgressBar(false);

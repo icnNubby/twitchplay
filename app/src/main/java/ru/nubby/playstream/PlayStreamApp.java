@@ -11,6 +11,7 @@ import androidx.preference.PreferenceManager;
 import dagger.android.AndroidInjector;
 import dagger.android.DaggerApplication;
 import ru.nubby.playstream.di.components.DaggerAppComponent;
+import ru.nubby.playstream.services.NotificationService;
 import ru.nubby.playstream.services.SyncUserDataService;
 
 public class PlayStreamApp extends DaggerApplication {
@@ -25,6 +26,7 @@ public class PlayStreamApp extends DaggerApplication {
         PreferenceManager.setDefaultValues(this, R.xml.pref_display, false);
         setupSyncService();
         initNotificationChannels();
+        setupNotificationService();
     }
 
     private void initNotificationChannels() {
@@ -42,6 +44,10 @@ public class PlayStreamApp extends DaggerApplication {
 
     private void setupSyncService() {
         SyncUserDataService.schedule(this);
+    }
+
+    private void setupNotificationService() {
+        NotificationService.schedule(this);
     }
 
     @Override

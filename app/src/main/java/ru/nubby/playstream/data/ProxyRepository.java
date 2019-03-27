@@ -1,6 +1,9 @@
 package ru.nubby.playstream.data;
 
+import android.graphics.Bitmap;
+
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,6 +55,8 @@ public class ProxyRepository implements Repository {
     private final DefaultPreferences mDefaultPreferences;
     private final PersistentStorage mPersistentStorage;
 
+    private final Picasso mPicasso;
+
     private boolean mFollowsFullUpdate = true; //TODO IDK implement in some other way its too hacky
 
     //TODO maybe there is better way? =(
@@ -74,6 +79,7 @@ public class ProxyRepository implements Repository {
                 .values()[defaultPreferences.getDefaultStreamListMode()];
         mNavigationStateObservable = BehaviorSubject.create();
         mNavigationStateObservable.onNext(mNavigationState);
+        mPicasso = Picasso.get();
     }
 
     @Override
@@ -318,11 +324,14 @@ public class ProxyRepository implements Repository {
             streamsIndexes.put(streamListCopy.get(i).getUserId(), i);
         }
 
-        // 1. tries to fetch UserData from db by Id, updates streamListCopy with that data
-        // 2. for all streams id's that are not in db, performs net request, updates streamListCopy
-        // 3. writes fetched UserData from step 2 to db.
-        // if forceUpdateDb == true - skips step 1.
-        // result - updated streamListCopy
+        /*
+             1. tries to fetch UserData from db by Id, updates streamListCopy with that data
+             2. for all streams id's that are not in db, performs net request, updates
+                streamListCopy
+             3. writes fetched UserData from step 2 to db.
+             if forceUpdateDb == true - skips step 1.
+             result - updated streamListCopy
+         */
 
         Observable<UserData> localSource;
         if (!forceUpdateDb) {

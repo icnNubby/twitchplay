@@ -174,28 +174,19 @@ public class StreamChatActivity extends BaseActivity implements StreamFragment.S
     private void setAndroidUiMode() {
         View decorView = getWindow().getDecorView();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // Hide navigation bar
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN // Hide Status bar
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE);
-            } else {
-                decorView.setSystemUiVisibility(
-                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // Hide navigation bar
-                                | View.SYSTEM_UI_FLAG_FULLSCREEN // Hide Status bar
-                );
-            }
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // Hide navigation bar
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN // Hide Status bar
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE);
         } else {
             decorView.setSystemUiVisibility(0); // Remove all flags.
         }
     }
 
     private void hideSystemUI() {
-
         View decorView = getWindow().getDecorView();
         decorView.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_IMMERSIVE
+                        View.SYSTEM_UI_FLAG_IMMERSIVE
                         | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
