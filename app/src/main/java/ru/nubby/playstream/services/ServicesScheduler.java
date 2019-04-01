@@ -43,11 +43,11 @@ public class ServicesScheduler {
         if (isJobScheduled == JobScheduler.RESULT_FAILURE) {
             Log.e(TAG, "Notification job has not been scheduled");
         } else {
-            Log.d(TAG, "Schedule: notification job scheduled");
+            Log.d(TAG, "Notification job is scheduled");
         }
     }
 
-    public void cancelNotificaions() {
+    public void cancelNotifications() {
         JobScheduler scheduler = (JobScheduler) mContext.getSystemService(JOB_SCHEDULER_SERVICE);
         scheduler.cancel(NOTIFICATION_JOB_ID);
     }
@@ -63,6 +63,8 @@ public class ServicesScheduler {
         int isJobScheduled = scheduler.schedule(jobInfo);
         if (isJobScheduled == JobScheduler.RESULT_FAILURE) {
             Log.e(TAG, "Sync job has not been scheduled");
+        } else {
+            Log.d(TAG, "Sync job is scheduled");
         }
     }
 

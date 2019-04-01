@@ -123,7 +123,6 @@ public class RemoteRepository {
                 .flatMap(this::getUserDataListByStringIds);
     }
 
-
     public Single<UserData> getUserDataFromToken(String token) {
         return mTwitchHelixService
                 .getUserDataListByToken("Bearer " + token)

@@ -1,7 +1,5 @@
 package ru.nubby.playstream.data;
 
-import android.graphics.Bitmap;
-
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
@@ -313,7 +311,7 @@ public class ProxyRepository implements Repository {
 
     private Single<List<Stream>> fetchAdditionalInfo(final List<Stream> streamList,
                                                      boolean forceUpdateDb) {
-        //makes deep copy of streamList, modifies each element with fetched userdata
+        //makes deep copy of streamList
         Gson gson = new Gson();
         final List<Stream> streamListCopy = new ArrayList<>();
         for (Stream item : streamList) {
@@ -330,7 +328,7 @@ public class ProxyRepository implements Repository {
                 streamListCopy
              3. writes fetched UserData from step 2 to db.
              if forceUpdateDb == true - skips step 1.
-             result - updated streamListCopy
+             result - updated COPY of streamList
          */
 
         Observable<UserData> localSource;

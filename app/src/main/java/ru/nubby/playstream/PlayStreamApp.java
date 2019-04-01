@@ -57,7 +57,7 @@ public class PlayStreamApp extends DaggerApplication implements LifecycleObserve
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     public void onAppForegrounded() {
-        mServicesScheduler.cancelNotificaions();
+        mServicesScheduler.cancelNotifications();
     }
 
 

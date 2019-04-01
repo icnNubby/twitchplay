@@ -9,6 +9,8 @@ import android.app.job.JobService;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.media.RingtoneManager;
 import android.util.Log;
 import android.util.Pair;
 
@@ -77,12 +79,13 @@ public class NotificationService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
 
-        if (!checkConditions()) {
+        if (!conditionsSatisfied()) {
             jobFinished(params, false);
             return true;
         }
 
         final List<Stream> lastStreams = getLastLiveStreams();
+
         mRetrieveLiveStreams = getLiveStreams()
                 .filter(streamList -> !streamList.isEmpty())
                 .subscribeOn(mSchedulersProvider.getIoScheduler())
@@ -103,7 +106,7 @@ public class NotificationService extends JobService {
         return true;
     }
 
-    private boolean checkConditions() {
+    private boolean conditionsSatisfied() {
 
         if (!mDefaultPreferences.getNotificationsAreOn()) {
             return false;
@@ -219,6 +222,10 @@ public class NotificationService extends JobService {
                     getString(R.string.live_streamer_notification_id))
                     .setAutoCancel(true)
                     .setContentIntent(intent)
+                    .setDefaults(0)
+                    .setLights(Color.BLUE, 5000, 5000)
+                    .setVibrate(new long[] {0,100,0,0})
+                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                     .setContentTitle(freshStream.getStreamerName())
                     .setContentText(freshStream.getTitle())
                     .setSubText(mContext.getString(R.string.notification_stream_viewers,
@@ -231,6 +238,10 @@ public class NotificationService extends JobService {
         Notification summaryNotification = new NotificationCompat.Builder(mContext,
                 getString(R.string.live_streamer_notification_id))
                 .setAutoCancel(true)
+                .setDefaults(0)
+                .setLights(Color.BLUE, 5000, 5000)
+                .setVibrate(new long[] {0,100,0,0})
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setContentIntent(constructMainIntent())
                 .setContentTitle(mContext.getString(R.string.notification_streams_live,
                         newNotifications.size()))
@@ -275,7 +286,7 @@ public class NotificationService extends JobService {
 
         int requestCode = stream.getUserId().hashCode();
         Intent intent = new Intent(mContext, StreamChatActivity.class);
-        intent.putExtra(Constants.sStreamIntentKey, mGson.toJson(stream)); //todo strings
+        intent.putExtra(Constants.sStreamIntentKey, mGson.toJson(stream));
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
         stackBuilder.addParentStack(StreamChatActivity.class);

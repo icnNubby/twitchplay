@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory
         android:key="@string/defaults_category_key"
-        android:title="@string/defaults_category_title">
+        android:title="@string/defaults_category_title"
+        app:iconSpaceReserved="false" >
         <ListPreference
             android:defaultValue="@string/default_quality_default_value"
             android:dialogTitle="@string/default_quality_title"
@@ -39,7 +40,8 @@
 
     <PreferenceCategory
         android:title="@string/notifications_category_title"
-        android:key="@string/defaults_category_key">
+        android:key="@string/defaults_category_key"
+        app:iconSpaceReserved="false">
         <CheckBoxPreference
             android:defaultValue="@bool/default_notifications_are_on"
             android:key="@string/notifications_are_on_key"

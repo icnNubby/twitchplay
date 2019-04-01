@@ -20,6 +20,7 @@ ext {
     work_manager_version = '1.0.0-beta01'
     design_version = '1.0.0-rc01'
     lifecycle_version = '2.0.0'
+    preference_version = '1.1.0-alpha04'
 
     //utils
     rxjava_version = '2.2.6'
@@ -42,7 +43,7 @@ ext {
     app_dependencies = [
             //android
             appcompat: "androidx.appcompat:appcompat:$support_version",
-            preference: "androidx.preference:preference:$support_version",
+            preference: "androidx.preference:preference:$preference_version",
             cardview: "androidx.cardview:cardview:$support_version",
             design: "com.google.android.material:material:$design_version",
             constraint: "androidx.constraintlayout:constraintlayout:$constraint_version",
