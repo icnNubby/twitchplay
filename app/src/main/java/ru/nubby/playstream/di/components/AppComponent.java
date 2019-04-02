@@ -14,12 +14,14 @@ import ru.nubby.playstream.di.modules.AppModule;
 import ru.nubby.playstream.data.RepositoriesModule;
 import ru.nubby.playstream.data.twitchapi.TwitchApiModule;
 import ru.nubby.playstream.di.modules.ServiceBindingModule;
+import ru.nubby.playstream.di.modules.ViewModelModule;
 
 @Singleton
 @Component(modules = {
         AppModule.class,
         RepositoriesModule.class,
         TwitchApiModule.class,
+        ViewModelModule.class,
         ActivityBindingModule.class,
         ServiceBindingModule.class,
         AndroidSupportInjectionModule.class})

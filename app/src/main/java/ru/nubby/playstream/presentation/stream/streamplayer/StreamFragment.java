@@ -69,7 +69,7 @@ public class StreamFragment extends BaseFragment
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         mActivityCallbacks = (StreamActivityCallbacks) context;
     }
@@ -110,7 +110,6 @@ public class StreamFragment extends BaseFragment
 
         mProgressBar = fragmentView.findViewById(R.id.stream_buffer_playerview_progressbar);
 
-        setRetainInstance(true);
         return fragmentView;
     }
 
@@ -160,7 +159,7 @@ public class StreamFragment extends BaseFragment
 
     @Override
     public void displayStream(String url) {
-        if (url == null || "".equals(url)) {
+        if (url == null || url.isEmpty()) {
             //TODO no stream error processing
             return;
         }

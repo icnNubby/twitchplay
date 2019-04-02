@@ -21,6 +21,7 @@ import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -28,21 +29,26 @@ import ru.nubby.playstream.R;
 import ru.nubby.playstream.di.scopes.ActivityScope;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.presentation.BaseFragment;
+import ru.nubby.playstream.presentation.PresenterFactory;
 import ru.nubby.playstream.presentation.stream.StreamChatActivity;
 import ru.nubby.playstream.utils.Constants;
 
 @ActivityScope
 public class StreamListFragment extends BaseFragment implements StreamListContract.View {
     private final String TAG = StreamListFragment.class.getSimpleName();
-    private final String BUNDLE_NAVBAR_STATE = "navbar_state";
+
     private final String BUNDLE_TIME_STATE = "paused_at";
+    private final String BUNDLE_CARD_LAST_WIDTH = "last_width";
+    private final String BUNDLE_CARD_LAST_HEIGHT = "last_height";
 
     private Picasso mPicasso; // TODO Inject?
 
     private RecyclerView mStreamListRecyclerView;
 
     @Inject
-    StreamListContract.Presenter mPresenter;
+    PresenterFactory mPresenterFactory;
+
+    StreamListPresenter mPresenter;
 
     @Inject
     Gson mGson;
@@ -50,8 +56,8 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressBar mProgressBar;
 
-    private float mStreamCardWidth;
-    private float mStreamCardHeight;
+    private float mStreamCardWidth = 300;
+    private float mStreamCardHeight = mStreamCardWidth * 9 / 16;
     private float mDensity;
 
     private int mPreviewSize; //1 - big, 2 - small.
@@ -67,12 +73,14 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mPresenter = ViewModelProviders.of(this, mPresenterFactory).get(StreamListPresenter.class);
         mPicasso = Picasso.get();
     }
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.fragment_stream_list, container, false);
         mStreamListRecyclerView = fragmentView.findViewById(R.id.stream_list_recycler_view);
@@ -95,21 +103,27 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null) {
             mPausedAt = savedInstanceState.getLong(BUNDLE_TIME_STATE);
+            mStreamCardHeight = savedInstanceState.getFloat(BUNDLE_CARD_LAST_HEIGHT);
+            mStreamCardWidth = savedInstanceState.getFloat(BUNDLE_CARD_LAST_WIDTH);
         }
-       // if (mPausedAt > 0) decideToUpdate(mPausedAt);
-        //todo fix
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.subscribe(this);
+        long timeFromRecreation = 0;
+        if (mPausedAt > 0) {
+            timeFromRecreation = SystemClock.elapsedRealtime() - mPausedAt;
+        }
+        mPresenter.subscribe(this, this.getLifecycle(), timeFromRecreation);
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putLong(BUNDLE_TIME_STATE, SystemClock.elapsedRealtime());
+        outState.putFloat(BUNDLE_CARD_LAST_WIDTH, mStreamCardWidth);
+        outState.putFloat(BUNDLE_CARD_LAST_HEIGHT, mStreamCardWidth);
         mPausedAt = SystemClock.elapsedRealtime();
     }
 
@@ -183,12 +197,6 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
         mPreviewSize = size;
     }
 
-    private void decideToUpdate(long savedTime) {
-        if (mPresenter != null) {
-            mPresenter.decideToReload(SystemClock.elapsedRealtime() - savedTime);
-        }
-    }
-
 
     private class StreamListViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
@@ -211,10 +219,11 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
             mPicasso // todo inject
                     .load(formattedUrl)
                     .placeholder(R.drawable.video_placeholder)
-                    .resize((int) (mStreamCardWidth * mDensity), (int) (mStreamCardHeight * mDensity))
+                    .fit()
                     .into(mStreamPreview);
             if (stream.getUserData() != null) {
                 mPicasso.load(stream.getUserData().getProfileImageUrl())
+                        .fit()
                         .into(mAvatar);
             }
         }

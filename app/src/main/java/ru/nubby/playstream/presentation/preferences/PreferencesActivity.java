@@ -26,6 +26,7 @@ public class PreferencesActivity extends BaseActivity {
                     .add(R.id.fragment_container, fragmentPreferences)
                     .commit();
         }
+        mPreferencesFragment = fragmentPreferences;
         Toolbar appBar = findViewById(R.id.toolbar);
         setSupportActionBar(appBar);
         if (getSupportActionBar() != null) {

@@ -1,7 +1,6 @@
 package ru.nubby.playstream.data;
 
 import com.google.gson.Gson;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,8 +52,6 @@ public class ProxyRepository implements Repository {
     private final DefaultPreferences mDefaultPreferences;
     private final PersistentStorage mPersistentStorage;
 
-    private final Picasso mPicasso;
-
     private boolean mFollowsFullUpdate = true; //TODO IDK implement in some other way its too hacky
 
     //TODO maybe there is better way? =(
@@ -77,7 +74,6 @@ public class ProxyRepository implements Repository {
                 .values()[defaultPreferences.getDefaultStreamListMode()];
         mNavigationStateObservable = BehaviorSubject.create();
         mNavigationStateObservable.onNext(mNavigationState);
-        mPicasso = Picasso.get();
     }
 
     @Override
@@ -125,7 +121,7 @@ public class ProxyRepository implements Repository {
                 .flatMap(userData -> mRemoteRepository
                         .getLiveStreamsFromRelationList(getUserFollows(userData.getId())))
                 .flatMap(streams -> this.fetchAdditionalInfo(streams, false))
-                .doOnSuccess(this::persistLiveStreamList)
+                .doOnSuccess(this::saveLiveStreamList)
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -383,7 +379,7 @@ public class ProxyRepository implements Repository {
     }
 
     //todo maybe persist data in db, if we will have big lists, it will be better
-    private void persistLiveStreamList(List<Stream> streamList) {
+    private void saveLiveStreamList(List<Stream> streamList) {
         mPersistentStorage.setStreamList(streamList);
     }
 }

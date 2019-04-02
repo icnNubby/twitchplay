@@ -9,6 +9,12 @@ import okhttp3.ResponseBody;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
 
+/**
+ * Factory, providing different retrofit converters for annotated retrofit service's methods.
+ * By default uses {@link Json} converter.
+ * {@link Scalars} for raw text responses.
+ * Use {@link Builder} to link annotations and existing retrofit converters.
+ */
 public class AnnotatedConverterFactory extends Converter.Factory {
 
     private final Map<Class<?>, Converter.Factory> mFactoryMap;

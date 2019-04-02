@@ -13,6 +13,7 @@ import ru.nubby.playstream.R;
 import ru.nubby.playstream.presentation.preferences.utils.TimePreference;
 import ru.nubby.playstream.presentation.preferences.utils.TimePreferenceDialogFragmentCompat;
 import ru.nubby.playstream.services.NotificationService;
+import ru.nubby.playstream.services.ServicesScheduler;
 
 public class PlaystreamPreferencesFragment extends PreferenceFragmentCompat
         implements PreferencesContract.View, SharedPreferences.OnSharedPreferenceChangeListener {
@@ -22,6 +23,9 @@ public class PlaystreamPreferencesFragment extends PreferenceFragmentCompat
 
     @Inject
     Context mContext;
+
+    @Inject
+    ServicesScheduler mServicesScheduler;
 
     @Inject
     public PlaystreamPreferencesFragment() {
@@ -59,31 +63,24 @@ public class PlaystreamPreferencesFragment extends PreferenceFragmentCompat
     @Override
     public void onDisplayPreferenceDialog(Preference preference) {
         DialogFragment dialogFragment = null;
-        if (preference instanceof TimePreference)
-        {
+        if (preference instanceof TimePreference) {
             dialogFragment = new TimePreferenceDialogFragmentCompat();
             Bundle bundle = new Bundle(1);
             bundle.putString("key", preference.getKey());
             dialogFragment.setArguments(bundle);
         }
 
-        if (dialogFragment != null)
-        {
+        if (dialogFragment != null) {
             dialogFragment.setTargetFragment(this, 0);
             dialogFragment.show(this.getFragmentManager(),
                     "androidx.preference.PreferenceFragment.DIALOG");
-        }
-        else
-        {
+        } else {
             super.onDisplayPreferenceDialog(preference);
         }
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(getString(R.string.notifications_are_on_key))) {
-
-            //NotificationService.schedule(mContext);
-        }
+        //todo ?
     }
 }

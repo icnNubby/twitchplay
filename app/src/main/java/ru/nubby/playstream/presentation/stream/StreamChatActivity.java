@@ -2,7 +2,6 @@ package ru.nubby.playstream.presentation.stream;
 
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
@@ -14,7 +13,6 @@ import android.widget.LinearLayout;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
-import dagger.android.support.DaggerAppCompatActivity;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.presentation.BaseActivity;
 import ru.nubby.playstream.presentation.stream.chat.ChatFragment;
@@ -39,7 +37,7 @@ public class StreamChatActivity extends BaseActivity implements StreamFragment.S
     @Inject
     ChatFragment mChatFragment;
 
-    private boolean fullscreenOn;
+    private boolean mFullscreenOn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +65,7 @@ public class StreamChatActivity extends BaseActivity implements StreamFragment.S
 
             @Override
             public void onDoubleTapListener() {
-                toggleFullscreen(!fullscreenOn);
+                toggleFullscreen(!mFullscreenOn);
             }
         };
         mStreamLinearLayout.setOnTouchListener(mOnSwipeTouchListener);
@@ -82,7 +80,7 @@ public class StreamChatActivity extends BaseActivity implements StreamFragment.S
                     .add(R.id.fragment_player_container, streamFragment)
                     .commit();
         }
-
+        mStreamFragment = streamFragment;
 
         ChatFragment chatFragment = (ChatFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_chat_container);
@@ -93,6 +91,7 @@ public class StreamChatActivity extends BaseActivity implements StreamFragment.S
                     .add(R.id.fragment_chat_container, chatFragment)
                     .commit();
         }
+        mChatFragment = chatFragment;
 
         View decorView = getWindow().getDecorView();
         decorView.setOnSystemUiVisibilityChangeListener
@@ -109,7 +108,7 @@ public class StreamChatActivity extends BaseActivity implements StreamFragment.S
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         setWindowMode(newConfig.orientation);
     }
@@ -125,14 +124,14 @@ public class StreamChatActivity extends BaseActivity implements StreamFragment.S
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null) {
-            fullscreenOn = savedInstanceState.getBoolean(BUNDLE_FULLSCREEN_ON);
-            toggleFullscreen(fullscreenOn);
+            mFullscreenOn = savedInstanceState.getBoolean(BUNDLE_FULLSCREEN_ON);
+            toggleFullscreen(mFullscreenOn);
         }
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putBoolean(BUNDLE_FULLSCREEN_ON, fullscreenOn);
+        outState.putBoolean(BUNDLE_FULLSCREEN_ON, mFullscreenOn);
         super.onSaveInstanceState(outState);
     }
 
@@ -147,19 +146,19 @@ public class StreamChatActivity extends BaseActivity implements StreamFragment.S
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
             showChat();
         }
-        this.fullscreenOn = fullscreenOn;
+        this.mFullscreenOn = fullscreenOn;
         mStreamFragment.toggleFullscreen(fullscreenOn);
     }
 
     @Override
     public boolean getFullscreenState() {
-        return fullscreenOn;
+        return mFullscreenOn;
     }
 
     @Override
     public void onBackPressed() {
-        if (fullscreenOn) {
-            toggleFullscreen(!fullscreenOn);
+        if (mFullscreenOn) {
+            toggleFullscreen(!mFullscreenOn);
         } else {
             super.onBackPressed();
         }
@@ -204,13 +203,13 @@ public class StreamChatActivity extends BaseActivity implements StreamFragment.S
 
     private void hideChat() {
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE &&
-                !fullscreenOn)
+                !mFullscreenOn)
             mChatContainer.setVisibility(View.GONE); //TODO ANIM
     }
 
     private void showChat() {
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE &&
-                !fullscreenOn)
+                !mFullscreenOn)
             mChatContainer.setVisibility(View.VISIBLE); //TODO ANIM
     }
 

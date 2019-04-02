@@ -23,14 +23,12 @@ public class PersistentStorage {
     private static final String PREF_STREAM_LIST = "stream_list";
 
     private SharedPreferences mSharedPreferences;
-    private Context mContext;
     private Gson mGson;
 
     @Inject
     public PersistentStorage(Context context, Gson gson) {
         mSharedPreferences = context.getSharedPreferences(PREFERENCES_FILENAME,
                 Context.MODE_PRIVATE);
-        mContext = context;
         mGson = gson;
     }
 

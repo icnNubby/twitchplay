@@ -10,17 +10,21 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.ViewModel;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.Pagination;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.model.StreamListNavigationState;
+import ru.nubby.playstream.presentation.BasePresenterImpl;
 
 import static ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListContract.View.ErrorMessage.ERROR_BAD_CONNECTION;
 
 
-public class StreamListPresenter implements StreamListContract.Presenter {
+public class StreamListPresenter extends BasePresenterImpl<StreamListContract.View>
+    implements StreamListContract.Presenter{
 
     private static final String TAG = StreamListPresenter.class.getSimpleName();
     private final long UPDATE_INTERVAL_MILLIS = 1000 * 60 * 5; // 5 minutes
@@ -36,7 +40,7 @@ public class StreamListPresenter implements StreamListContract.Presenter {
     private Map<String, Stream> mCurrentStreamMap;
     private Observable<StreamListNavigationState> mListStateObservable;
     private StreamListNavigationState mCurrentState;
-    private boolean mForceReload = true;
+    private boolean mForceReload = false;
 
     @Inject
     public StreamListPresenter(Repository repository) {
@@ -44,18 +48,24 @@ public class StreamListPresenter implements StreamListContract.Presenter {
         this.mListStateObservable = repository.getObservableNavigationState();
     }
 
-    @Override
-    public void subscribe(StreamListContract.View view) {
-        Log.d(TAG, "subscribe: " + this.toString());
+    public void subscribe(StreamListContract.View view, Lifecycle lifecycle, long interval) {
+        super.subscribe(view, lifecycle);
         mStreamListView = view;
         mStreamListView.setPreviewSize(mRepository.getSharedPreferences().getPreviewSize());
+
+        mForceReload = (interval >= UPDATE_INTERVAL_MILLIS ||
+                interval == 0);
 
         mCurrentState = mRepository.getCurrentNavigationState();
         mDisposableListState = mListStateObservable
                 .subscribe(streamListNavigationState -> {
                     mCurrentState = streamListNavigationState;
-                    Log.d(TAG, "subscribe: GOT EMIT: " + streamListNavigationState + " Presenter: " + this.toString());
-                    updateStreams();
+                    if (mForceReload) {
+                        updateStreams();
+                    } else {
+                        mForceReload = true;
+                        mStreamListView.displayStreamList(mCurrentStreamList);
+                    }
                 });
     }
 
@@ -74,7 +84,9 @@ public class StreamListPresenter implements StreamListContract.Presenter {
 
     @Override
     public void updateStreams() {
-        if (mDisposableFetchingTask != null) mDisposableFetchingTask.dispose();
+        if (mDisposableFetchingTask != null) {
+            mDisposableFetchingTask.dispose();
+        }
         if (mCurrentState == StreamListNavigationState.MODE_TOP) {
             getTopStreams();
         } else if (mCurrentState == StreamListNavigationState.MODE_FAVOURITES) {
@@ -145,8 +157,8 @@ public class StreamListPresenter implements StreamListContract.Presenter {
             mDisposableFetchingTask = mRepository
                     .getTopStreams(mPagination)
                     .subscribe(streams -> {
-                                List<Stream> added = checkAndAddStreams(streams.getData());
-                                mStreamListView.addStreamList(added);
+                                List<Stream> moreStreams = checkAndAddStreams(streams.getData());
+                                mStreamListView.addStreamList(moreStreams);
                                 mPagination = streams.getPagination();
                             },
                             e -> {
@@ -156,13 +168,6 @@ public class StreamListPresenter implements StreamListContract.Presenter {
         } else {
             Log.e(TAG, "Wrong mode to fetch more streams, pagination cursor = " +
                     mPagination + ", state = " + mCurrentState);
-        }
-    }
-
-    @Override
-    public void decideToReload(long interval) {
-        if (interval >= UPDATE_INTERVAL_MILLIS) {
-            updateStreams();
         }
     }
 

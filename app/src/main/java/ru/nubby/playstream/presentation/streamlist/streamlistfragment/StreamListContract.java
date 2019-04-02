@@ -25,7 +25,7 @@ public interface StreamListContract {
         void updateStreams();
         void getFollowedStreams();
         void getTopStreams();
-        void decideToReload(long interval);
+        //void decideToReload(long interval);
     }
 
 }

@@ -25,10 +25,12 @@ public class ServicesScheduler {
     private static final int USERDATA_SYNC_JOB_ID = 2;
 
     private Context mContext;
+    private JobScheduler mScheduler;
 
     @Inject
     public ServicesScheduler(@NonNull Context context) {
         mContext = context;
+        mScheduler = (JobScheduler) mContext.getSystemService(JOB_SCHEDULER_SERVICE);
     }
 
     public void scheduleNotifications() {
@@ -38,8 +40,7 @@ public class ServicesScheduler {
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPersisted(true)
                 .build();
-        JobScheduler scheduler = (JobScheduler) mContext.getSystemService(JOB_SCHEDULER_SERVICE);
-        int isJobScheduled = scheduler.schedule(jobInfo);
+        int isJobScheduled = mScheduler.schedule(jobInfo);
         if (isJobScheduled == JobScheduler.RESULT_FAILURE) {
             Log.e(TAG, "Notification job has not been scheduled");
         } else {
@@ -48,8 +49,7 @@ public class ServicesScheduler {
     }
 
     public void cancelNotifications() {
-        JobScheduler scheduler = (JobScheduler) mContext.getSystemService(JOB_SCHEDULER_SERVICE);
-        scheduler.cancel(NOTIFICATION_JOB_ID);
+        mScheduler.cancel(NOTIFICATION_JOB_ID);
     }
 
     public void scheduleUserDataSync() {
@@ -59,8 +59,7 @@ public class ServicesScheduler {
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPersisted(true)
                 .build();
-        JobScheduler scheduler = (JobScheduler) mContext.getSystemService(JOB_SCHEDULER_SERVICE);
-        int isJobScheduled = scheduler.schedule(jobInfo);
+        int isJobScheduled = mScheduler.schedule(jobInfo);
         if (isJobScheduled == JobScheduler.RESULT_FAILURE) {
             Log.e(TAG, "Sync job has not been scheduled");
         } else {
@@ -69,7 +68,6 @@ public class ServicesScheduler {
     }
 
     public void cancelUserDataSync() {
-        JobScheduler scheduler = (JobScheduler) mContext.getSystemService(JOB_SCHEDULER_SERVICE);
-        scheduler.cancel(USERDATA_SYNC_JOB_ID);
+        mScheduler.cancel(USERDATA_SYNC_JOB_ID);
     }
 }

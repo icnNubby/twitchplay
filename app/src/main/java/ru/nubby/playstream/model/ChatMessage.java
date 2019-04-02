@@ -14,7 +14,7 @@ public final class ChatMessage {
     @NonNull
     private String color;
 
-    public ChatMessage(@NonNull String user,@NonNull String message,@NonNull String color) {
+    public ChatMessage(@NonNull String user, @NonNull String message, @NonNull String color) {
         this.message = message;
         this.user = user;
         this.color = color;
