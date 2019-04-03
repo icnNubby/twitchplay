@@ -18,25 +18,36 @@ import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import dagger.android.support.DaggerFragment;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.model.ChatMessage;
-import ru.nubby.playstream.presentation.BaseFragment;
+import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.presentation.base.BaseFragment;
+import ru.nubby.playstream.presentation.base.PresenterFactory;
 
 public class ChatFragment extends BaseFragment implements ChatContract.View {
     private final int MESSAGE_CAPACITY = 100; // TODO get from prefs
 
     @Inject
-    public ChatContract.Presenter mPresenter;
+    public PresenterFactory mPresenterFactory;
+
+    private ChatContract.Presenter mPresenter;
     private RecyclerView mChatRecyclerview;
     private ProgressBar mProgressBar;
+
+    private Stream mCurrentStream;
 
     @Inject
     public ChatFragment() {
 
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mPresenter = ViewModelProviders.of(this, mPresenterFactory).get(ChatPresenter.class);
     }
 
     @Nullable
@@ -54,7 +65,7 @@ public class ChatFragment extends BaseFragment implements ChatContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.subscribe(this);
+        mPresenter.subscribe(this, this.getLifecycle(), mCurrentStream);
     }
 
     @Override
@@ -99,6 +110,10 @@ public class ChatFragment extends BaseFragment implements ChatContract.View {
         } else {
             mProgressBar.setVisibility(View.GONE);
         }
+    }
+
+    public void setCurrentStream(Stream currentStream) {
+        mCurrentStream = currentStream;
     }
 
     private class ChatMessagesViewHolder extends RecyclerView.ViewHolder {

@@ -31,11 +31,12 @@ import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import dagger.android.support.DaggerFragment;
+import androidx.lifecycle.ViewModelProviders;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.model.Quality;
-import ru.nubby.playstream.presentation.BaseFragment;
+import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.presentation.base.BaseFragment;
+import ru.nubby.playstream.presentation.base.PresenterFactory;
 
 public class StreamFragment extends BaseFragment
         implements StreamContract.View, PopupMenu.OnMenuItemClickListener {
@@ -48,7 +49,9 @@ public class StreamFragment extends BaseFragment
     }
 
     @Inject
-    public StreamContract.Presenter mPresenter;
+    public PresenterFactory mPresenterFactory;
+
+    private StreamContract.Presenter mPresenter;
 
     private PlayerView mVideoView;
     private ExoPlayer mExoPlayer;
@@ -63,6 +66,8 @@ public class StreamFragment extends BaseFragment
 
     private StreamActivityCallbacks mActivityCallbacks;
 
+    private Stream mCurrentStream;
+
     @Inject
     public StreamFragment(){
 
@@ -72,6 +77,13 @@ public class StreamFragment extends BaseFragment
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         mActivityCallbacks = (StreamActivityCallbacks) context;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mPresenter = ViewModelProviders.of(this, mPresenterFactory)
+                .get(StreamPresenter.class);
     }
 
     @Nullable
@@ -116,7 +128,7 @@ public class StreamFragment extends BaseFragment
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.subscribe(this);
+        mPresenter.subscribe(this, this.getLifecycle(), mCurrentStream);
         mVideoView.onResume();
         mExoPlayer.setPlayWhenReady(true);
     }
@@ -258,6 +270,12 @@ public class StreamFragment extends BaseFragment
     public void enableFollow(boolean enabled) {
         mFollowUnfollowButton.setEnabled(enabled);
     }
+
+    public void setCurrentStream(Stream stream) {
+        mCurrentStream = stream;
+    }
+
+
 
     private void redrawFullscreenButton(boolean currentModeFullscreenOn) {
         if (currentModeFullscreenOn) {

@@ -28,8 +28,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.di.scopes.ActivityScope;
 import ru.nubby.playstream.model.Stream;
-import ru.nubby.playstream.presentation.BaseFragment;
-import ru.nubby.playstream.presentation.PresenterFactory;
+import ru.nubby.playstream.presentation.base.BaseFragment;
+import ru.nubby.playstream.presentation.base.PresenterFactory;
 import ru.nubby.playstream.presentation.stream.StreamChatActivity;
 import ru.nubby.playstream.utils.Constants;
 
@@ -48,13 +48,13 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
     @Inject
     PresenterFactory mPresenterFactory;
 
-    StreamListPresenter mPresenter;
-
     @Inject
     Gson mGson;
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressBar mProgressBar;
+
+    private StreamListContract.Presenter mPresenter;
 
     private float mStreamCardWidth = 300;
     private float mStreamCardHeight = mStreamCardWidth * 9 / 16;

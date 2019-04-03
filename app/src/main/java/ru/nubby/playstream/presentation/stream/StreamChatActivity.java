@@ -9,15 +9,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.presentation.BaseActivity;
+import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.presentation.base.BaseActivity;
 import ru.nubby.playstream.presentation.stream.chat.ChatFragment;
 import ru.nubby.playstream.presentation.stream.streamplayer.StreamFragment;
 import ru.nubby.playstream.presentation.uiutils.OnSwipeTouchListener;
+import ru.nubby.playstream.utils.Constants;
 
 /**
  * Should be called with extra JSON : gsonned model.Stream object
@@ -36,6 +41,9 @@ public class StreamChatActivity extends BaseActivity implements StreamFragment.S
 
     @Inject
     ChatFragment mChatFragment;
+
+    @Inject
+    Gson mGson;
 
     private boolean mFullscreenOn;
 
@@ -105,6 +113,11 @@ public class StreamChatActivity extends BaseActivity implements StreamFragment.S
                 });
 
         setWindowMode(getResources().getConfiguration().orientation);
+
+        Stream stream = readStreamFromExtras();
+
+        mStreamFragment.setCurrentStream(stream);
+        mChatFragment.setCurrentStream(stream);
     }
 
     @Override
@@ -247,4 +260,20 @@ public class StreamChatActivity extends BaseActivity implements StreamFragment.S
         }
     }
 
+    private Stream readStreamFromExtras() {
+        String jsonStream = null;
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            jsonStream = extras.getString(Constants.sStreamIntentKey);
+        }
+        if (jsonStream == null) {
+            Toast.makeText(this, getText(R.string.error_no_stream_info_provided), Toast.LENGTH_SHORT).show();
+            finish(); //we cant start stream from nothing
+        }
+        Stream currentStream = mGson.fromJson(jsonStream, Stream.class);
+        if (currentStream == null) {
+            finish();
+        }
+        return currentStream;
+    }
 }

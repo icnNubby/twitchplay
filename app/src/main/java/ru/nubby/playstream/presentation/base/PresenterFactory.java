@@ -1,4 +1,4 @@
-package ru.nubby.playstream.presentation;
+package ru.nubby.playstream.presentation.base;
 
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;

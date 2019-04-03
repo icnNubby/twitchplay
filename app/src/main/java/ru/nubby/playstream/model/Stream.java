@@ -18,7 +18,7 @@ public class Stream implements Comparable<Stream>, Serializable {
 
     @NonNull
     @SerializedName("user_id")
-    private String userId;
+    private String userId = "";
 
     @SerializedName("user_name")
     private String streamerName;
@@ -43,6 +43,26 @@ public class Stream implements Comparable<Stream>, Serializable {
     private String thumbnailUrl;
 
     private UserData userData;
+
+    public Stream(){
+
+    }
+
+    public Stream(@NonNull Stream stream) {
+        this.userId = stream.getUserId();
+        this.streamerName = stream.getStreamerName();
+        this.streamerLogin = stream.getStreamerLogin();
+        this.title = stream.getTitle();
+        this.type = stream.getType();
+        this.viewerCount = stream.getViewerCount();
+        this.thumbnailUrl = stream.getThumbnailUrl();
+        if (stream.getUserData() != null) {
+            this.userData = new UserData(stream.getUserData());
+        } else {
+            this.userData = null;
+        }
+
+    }
 
     public String getTitle() {
         return title;

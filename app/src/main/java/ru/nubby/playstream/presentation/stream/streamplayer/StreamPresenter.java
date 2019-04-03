@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import javax.inject.Inject;
 
+import androidx.lifecycle.Lifecycle;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -15,17 +16,18 @@ import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.Quality;
 import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.presentation.base.BasePresenterImpl;
 
 import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.ERROR_CHANNEL_FOLLOW_UNFOLLOW;
 import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.ERROR_FETCHING_ADDITIONAL_INFO;
 import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.INFO_CHANNEL_FOLLOWED;
 import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.INFO_CHANNEL_UNFOLLOWED;
 
-public class StreamPresenter implements StreamContract.Presenter {
+public class StreamPresenter extends BasePresenterImpl<StreamContract.View>
+        implements StreamContract.Presenter {
     private final String TAG = "StreamPresenter";
 
     private StreamContract.View mStreamView;
-    private Single<Stream> mStreamRequest;
     private Disposable mStreamResolutionsInfoTask;
     private Disposable mStreamAdditionalInfoTask;
     private Disposable mStreamInfoUpdater;
@@ -39,16 +41,22 @@ public class StreamPresenter implements StreamContract.Presenter {
     private Repository mRepository;
 
     @Inject
-    public StreamPresenter(Single<Stream> stream,
-                           Repository repository) {
-        mStreamRequest = stream;
+    public StreamPresenter(Repository repository) {
         mRepository = repository;
     }
 
     @Override
-    public void subscribe(StreamContract.View view) {
+    public void subscribe(StreamContract.View view, Lifecycle lifecycle, Stream stream) {
+        super.subscribe(view, lifecycle);
+        Stream streamCopy = new Stream(stream);
+        Single<Stream> initialStreamRequest = mRepository
+                .getUserFromStreamer(stream)
+                .map(updatedLogin -> {
+                    streamCopy.setStreamerLogin(updatedLogin.getLogin());
+                    return streamCopy;
+                });
         mStreamView = view;
-        mStreamAdditionalInfoTask = mStreamRequest
+        mStreamAdditionalInfoTask = initialStreamRequest
                 .doOnSubscribe(streamReturned -> mStreamView.displayLoading(true))
                 .subscribe(
                         streamReturned -> {

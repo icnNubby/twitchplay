@@ -7,7 +7,7 @@ import javax.inject.Inject;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.presentation.BaseActivity;
+import ru.nubby.playstream.presentation.base.BaseActivity;
 
 public class PreferencesActivity extends BaseActivity {
 

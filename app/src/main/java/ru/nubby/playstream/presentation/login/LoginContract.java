@@ -1,7 +1,7 @@
 package ru.nubby.playstream.presentation.login;
 
-import ru.nubby.playstream.presentation.BasePresenter;
-import ru.nubby.playstream.presentation.BaseView;
+import ru.nubby.playstream.presentation.base.BasePresenter;
+import ru.nubby.playstream.presentation.base.BaseView;
 
 public interface LoginContract {
     interface View extends BaseView {

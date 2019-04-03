@@ -12,8 +12,4 @@ public abstract class PreferencesModule {
     @ContributesAndroidInjector
     abstract PlaystreamPreferencesFragment preferencesFragment();
 
-    @ActivityScope
-    @Binds
-    abstract PreferencesContract.Presenter bindPresenter(PreferencesPresenter presenter);
-
 }

@@ -2,8 +2,10 @@ package ru.nubby.playstream.presentation.stream.streamplayer;
 
 import java.util.List;
 
-import ru.nubby.playstream.presentation.BasePresenter;
-import ru.nubby.playstream.presentation.BaseView;
+import androidx.lifecycle.Lifecycle;
+import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.presentation.base.BasePresenter;
+import ru.nubby.playstream.presentation.base.BaseView;
 import ru.nubby.playstream.model.Quality;
 
 public interface StreamContract {
@@ -24,6 +26,7 @@ public interface StreamContract {
     }
 
     interface Presenter extends BasePresenter<View> {
+        void subscribe(View view, Lifecycle lifecycle, Stream stream);
         void playChosenQuality(Quality quality);
         void followOrUnfollowChannel();
     }

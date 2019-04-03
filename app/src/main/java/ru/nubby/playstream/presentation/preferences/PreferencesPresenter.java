@@ -2,26 +2,27 @@ package ru.nubby.playstream.presentation.preferences;
 
 import javax.inject.Inject;
 
+import androidx.lifecycle.Lifecycle;
 import ru.nubby.playstream.data.Repository;
+import ru.nubby.playstream.presentation.base.BasePresenterImpl;
 
-public class PreferencesPresenter implements PreferencesContract.Presenter {
+public class PreferencesPresenter extends BasePresenterImpl<PreferencesContract.View>
+        implements PreferencesContract.Presenter {
 
-    private PreferencesContract.View mPreferencesView;
 
     private Repository mRepository;
 
     @Inject
-    PreferencesPresenter(Repository repository) {
+    public PreferencesPresenter(Repository repository) {
         this.mRepository = repository;
     }
 
     @Override
-    public void subscribe(PreferencesContract.View view) {
-        mPreferencesView = view;
+    public void subscribe(PreferencesContract.View view, Lifecycle lifecycle) {
+        super.subscribe(view, lifecycle);
     }
 
     @Override
     public void unsubscribe() {
-        mPreferencesView = null;
     }
 }

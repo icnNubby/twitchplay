@@ -39,6 +39,23 @@ public class UserData implements Serializable {
     @SerializedName("email")
     private String email;
 
+    public UserData(){
+
+    }
+
+    public UserData(UserData userData){
+        this.id = userData.getId();
+        this.login = userData.getLogin();
+        this.displayName = userData.getDisplayName();
+        this.type = userData.getType();
+        this.broadcasterType = userData.getBroadcasterType();
+        this.description = userData.getDescription();
+        this.profileImageUrl = userData.getProfileImageUrl();
+        this.offlineImageUrl = userData.getOfflineImageUrl();
+        this.viewCount = userData.getViewCount();
+        this.email = userData.getEmail();
+    }
+
     @NonNull
     public String getId() {
         return id;

@@ -4,11 +4,14 @@ import android.util.Log;
 
 import javax.inject.Inject;
 
+import androidx.lifecycle.Lifecycle;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.SensitiveStorage;
 import ru.nubby.playstream.data.Repository;
+import ru.nubby.playstream.presentation.base.BasePresenterImpl;
 
-public class LoginPresenter implements LoginContract.Presenter {
+public class LoginPresenter extends BasePresenterImpl<LoginContract.View>
+        implements LoginContract.Presenter {
     private final String TAG = LoginPresenter.class.getSimpleName();
 
     private final String LOGIN_URL = "https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id="
@@ -21,12 +24,13 @@ public class LoginPresenter implements LoginContract.Presenter {
     private Repository mRepository;
 
     @Inject
-    LoginPresenter(Repository repository) {
+    public LoginPresenter(Repository repository) {
         mRepository = repository;
     }
 
     @Override
-    public void subscribe(LoginContract.View view) {
+    public void subscribe(LoginContract.View view, Lifecycle lifecycle) {
+        super.subscribe(view, lifecycle);
         mLoginView = view;
         mLoginView.loadUrl(LOGIN_URL);
     }

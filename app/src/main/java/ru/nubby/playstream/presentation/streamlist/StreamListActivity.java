@@ -10,11 +10,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import javax.inject.Inject;
 
 import androidx.appcompat.widget.Toolbar;
-import dagger.android.support.DaggerAppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.model.StreamListNavigationState;
 import ru.nubby.playstream.model.UserData;
-import ru.nubby.playstream.presentation.BaseActivity;
+import ru.nubby.playstream.presentation.base.BaseActivity;
+import ru.nubby.playstream.presentation.base.PresenterFactory;
 import ru.nubby.playstream.presentation.login.LoginActivity;
 import ru.nubby.playstream.presentation.preferences.PreferencesActivity;
 import ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListFragment;
@@ -28,7 +29,7 @@ public class StreamListActivity extends BaseActivity
 
 
     @Inject
-    StreamListActivityContract.Presenter mActivityPresenter;
+    PresenterFactory mPresenterFactory;
 
     @Inject
     StreamListFragment mStreamListFragment;
@@ -36,6 +37,8 @@ public class StreamListActivity extends BaseActivity
     private Toolbar mToolbar;
     private BottomNavigationView mBottomNavigationView;
     private StreamListNavigationState mStateNavbar;
+
+    private StreamListActivityContract.Presenter mActivityPresenter;
 
     private boolean mIsNavigationReallyClicked = false;
 
@@ -72,6 +75,9 @@ public class StreamListActivity extends BaseActivity
             mActivityPresenter.changedNavigationState(mStateNavbar, mIsNavigationReallyClicked);
             return true;
         });
+
+        mActivityPresenter = ViewModelProviders.of(this, mPresenterFactory)
+                .get(StreamListActivityPresenter.class);
     }
 
     @Override
@@ -83,7 +89,7 @@ public class StreamListActivity extends BaseActivity
     @Override
     protected void onResume() {
         super.onResume();
-        mActivityPresenter.subscribe(this);
+        mActivityPresenter.subscribe(this, this.getLifecycle());
     }
 
     @Override

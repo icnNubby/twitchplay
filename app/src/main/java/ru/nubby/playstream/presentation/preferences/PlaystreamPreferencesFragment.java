@@ -7,9 +7,11 @@ import android.os.Bundle;
 import javax.inject.Inject;
 
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import ru.nubby.playstream.R;
+import ru.nubby.playstream.presentation.base.PresenterFactory;
 import ru.nubby.playstream.presentation.preferences.utils.TimePreference;
 import ru.nubby.playstream.presentation.preferences.utils.TimePreferenceDialogFragmentCompat;
 import ru.nubby.playstream.services.NotificationService;
@@ -19,7 +21,9 @@ public class PlaystreamPreferencesFragment extends PreferenceFragmentCompat
         implements PreferencesContract.View, SharedPreferences.OnSharedPreferenceChangeListener {
 
     @Inject
-    PreferencesContract.Presenter mPresenter;
+    PresenterFactory mPresenterFactory;
+
+    private PreferencesContract.Presenter mPresenter;
 
     @Inject
     Context mContext;
@@ -36,12 +40,14 @@ public class PlaystreamPreferencesFragment extends PreferenceFragmentCompat
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.pref_display);
+        mPresenter = ViewModelProviders.of(this, mPresenterFactory)
+                .get(PreferencesPresenter.class);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.subscribe(this);
+        mPresenter.subscribe(this, this.getLifecycle());
     }
 
     @Override

@@ -1,4 +1,4 @@
-package ru.nubby.playstream.presentation;
+package ru.nubby.playstream.presentation.base;
 
 import android.os.Bundle;
 
@@ -14,7 +14,7 @@ import dagger.android.support.HasSupportFragmentInjector;
 
 public abstract class BaseActivity extends AppCompatActivity implements HasSupportFragmentInjector {
     @Inject
-    DispatchingAndroidInjector<Fragment> fragmentInjector;
+    public DispatchingAndroidInjector<Fragment> fragmentInjector;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

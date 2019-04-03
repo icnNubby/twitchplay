@@ -5,25 +5,29 @@ import android.util.Log;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.Lifecycle;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.StreamListNavigationState;
 import ru.nubby.playstream.model.UserData;
+import ru.nubby.playstream.presentation.base.BasePresenterImpl;
 
-public class StreamListActivityPresenter implements StreamListActivityContract.Presenter {
+public class StreamListActivityPresenter extends BasePresenterImpl<StreamListActivityContract.View>
+        implements StreamListActivityContract.Presenter {
     private final String TAG = StreamListActivityPresenter.class.getSimpleName();
 
     private StreamListActivityContract.View mMainStreamListView;
     private Disposable mDisposableUserFetchTask;
     private Repository mRepository;
 
-    @Inject
+
     public StreamListActivityPresenter(@NonNull Repository repository) {
         mRepository = repository;
     }
 
     @Override
-    public void subscribe(StreamListActivityContract.View view) {
+    public void subscribe(StreamListActivityContract.View view, Lifecycle lifecycle) {
+        super.subscribe(view, lifecycle);
         mMainStreamListView = view;
         mMainStreamListView.setNavBarState(mRepository.getCurrentNavigationState());
         mDisposableUserFetchTask = mRepository

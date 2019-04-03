@@ -1,4 +1,4 @@
-package ru.nubby.playstream.presentation;
+package ru.nubby.playstream.presentation.base;
 
 public interface BaseView {
 

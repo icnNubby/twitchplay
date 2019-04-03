@@ -14,8 +14,10 @@ import android.widget.Toast;
 import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProviders;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.presentation.BaseActivity;
+import ru.nubby.playstream.presentation.base.BaseActivity;
+import ru.nubby.playstream.presentation.base.PresenterFactory;
 
 public class LoginActivity extends BaseActivity implements LoginContract.View {
     private final String TAG = this.getClass().getSimpleName();
@@ -23,12 +25,17 @@ public class LoginActivity extends BaseActivity implements LoginContract.View {
     private WebView mWebView;
     private ProgressBar mWebViewProgress;
     @Inject
-    LoginContract.Presenter mLoginPresenter;
+    public PresenterFactory mPresenterFactory;
+
+    private LoginContract.Presenter mLoginPresenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        mLoginPresenter = ViewModelProviders.of(this, mPresenterFactory)
+                .get(LoginPresenter.class);
 
         mWebView = findViewById(R.id.login_web_view);
         mWebViewProgress = findViewById(R.id.login_progress_bar);
@@ -85,7 +92,7 @@ public class LoginActivity extends BaseActivity implements LoginContract.View {
     @Override
     protected void onResume() {
         super.onResume();
-        mLoginPresenter.subscribe(this);
+        mLoginPresenter.subscribe(this, this.getLifecycle());
     }
 
     @Override

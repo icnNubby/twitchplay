@@ -8,38 +8,50 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
+import androidx.lifecycle.Lifecycle;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.SensitiveStorage;
+import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.data.ircapi.ChatChannelApi;
 import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.presentation.base.BasePresenterImpl;
 
 import static ru.nubby.playstream.presentation.stream.chat.ChatContract.View.InfoMessage.ERROR_DISCONNECTED;
 import static ru.nubby.playstream.presentation.stream.chat.ChatContract.View.InfoMessage.ERROR_FIRST_CONNECT;
 import static ru.nubby.playstream.presentation.stream.chat.ChatContract.View.InfoMessage.ERROR_RECONNECT;
 import static ru.nubby.playstream.presentation.stream.chat.ChatContract.View.InfoMessage.INFO_CONNECTED;
 
-public class ChatPresenter implements ChatContract.Presenter {
+public class ChatPresenter extends BasePresenterImpl<ChatContract.View>
+        implements ChatContract.Presenter {
     private static final String TAG = ChatPresenter.class.getSimpleName();
 
     private ChatContract.View mChatView;
     private Disposable mChatListener;
     private Disposable mDisposableStreamAdditionalInfo;
-    private Single<Stream> mStreamSingle;
+    private Repository mRepository;
     private ChatChannelApi mChatApi = null;
     private Disposable mChatInitializer;
 
     @Inject
-    public ChatPresenter(@Nullable  Single<Stream> stream) {
-        mStreamSingle = stream;
+    public ChatPresenter(Repository repository) {
+        mRepository = repository;
     }
 
     @Override
-    public void subscribe(ChatContract.View view) {
+    public void subscribe(ChatContract.View view, Lifecycle lifecycle, Stream stream) {
+        super.subscribe(view, lifecycle);
+        Stream streamCopy = new Stream(stream);
+        Single<Stream> initialStreamRequest = mRepository
+                .getUserFromStreamer(stream)
+                .map(updatedLogin -> {
+                    streamCopy.setStreamerLogin(updatedLogin.getLogin());
+                    return streamCopy;
+                });
         mChatView = view;
-        mDisposableStreamAdditionalInfo = mStreamSingle
+        mDisposableStreamAdditionalInfo = initialStreamRequest
                 .doOnSubscribe(streamReturned -> mChatView.displayLoading(true))
                 .subscribe(
                         streamReturned -> {

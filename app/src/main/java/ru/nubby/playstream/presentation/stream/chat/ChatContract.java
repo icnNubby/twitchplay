@@ -1,8 +1,10 @@
 package ru.nubby.playstream.presentation.stream.chat;
 
+import androidx.lifecycle.Lifecycle;
 import ru.nubby.playstream.model.ChatMessage;
-import ru.nubby.playstream.presentation.BasePresenter;
-import ru.nubby.playstream.presentation.BaseView;
+import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.presentation.base.BasePresenter;
+import ru.nubby.playstream.presentation.base.BaseView;
 
 public interface ChatContract {
     interface View extends BaseView  {
@@ -15,5 +17,6 @@ public interface ChatContract {
     }
 
     interface Presenter extends BasePresenter<View> {
+        void subscribe(View view, Lifecycle lifecycle, Stream stream);
     }
 }

@@ -11,20 +11,19 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.ViewModel;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.Pagination;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.model.StreamListNavigationState;
-import ru.nubby.playstream.presentation.BasePresenterImpl;
+import ru.nubby.playstream.presentation.base.BasePresenterImpl;
 
 import static ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListContract.View.ErrorMessage.ERROR_BAD_CONNECTION;
 
 
 public class StreamListPresenter extends BasePresenterImpl<StreamListContract.View>
-    implements StreamListContract.Presenter{
+    implements StreamListContract.Presenter {
 
     private static final String TAG = StreamListPresenter.class.getSimpleName();
     private final long UPDATE_INTERVAL_MILLIS = 1000 * 60 * 5; // 5 minutes
@@ -42,12 +41,12 @@ public class StreamListPresenter extends BasePresenterImpl<StreamListContract.Vi
     private StreamListNavigationState mCurrentState;
     private boolean mForceReload = false;
 
-    @Inject
     public StreamListPresenter(Repository repository) {
         this.mRepository = repository;
         this.mListStateObservable = repository.getObservableNavigationState();
     }
 
+    @Override
     public void subscribe(StreamListContract.View view, Lifecycle lifecycle, long interval) {
         super.subscribe(view, lifecycle);
         mStreamListView = view;
@@ -60,6 +59,9 @@ public class StreamListPresenter extends BasePresenterImpl<StreamListContract.Vi
         mDisposableListState = mListStateObservable
                 .subscribe(streamListNavigationState -> {
                     mCurrentState = streamListNavigationState;
+                    if (mCurrentStreamList == null || mCurrentStreamList.isEmpty()) {
+                        mForceReload = true;
+                    }
                     if (mForceReload) {
                         updateStreams();
                     } else {

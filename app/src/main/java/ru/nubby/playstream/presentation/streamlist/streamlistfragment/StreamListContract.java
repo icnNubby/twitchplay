@@ -2,8 +2,9 @@ package ru.nubby.playstream.presentation.streamlist.streamlistfragment;
 
 import java.util.List;
 
-import ru.nubby.playstream.presentation.BasePresenter;
-import ru.nubby.playstream.presentation.BaseView;
+import androidx.lifecycle.Lifecycle;
+import ru.nubby.playstream.presentation.base.BasePresenter;
+import ru.nubby.playstream.presentation.base.BaseView;
 import ru.nubby.playstream.model.Stream;
 
 public interface StreamListContract {
@@ -21,11 +22,11 @@ public interface StreamListContract {
     }
 
     interface Presenter extends BasePresenter<View> {
+        void subscribe(StreamListContract.View view, Lifecycle lifecycle, long interval);
         void getMoreStreams();
         void updateStreams();
         void getFollowedStreams();
         void getTopStreams();
-        //void decideToReload(long interval);
     }
 
 }
