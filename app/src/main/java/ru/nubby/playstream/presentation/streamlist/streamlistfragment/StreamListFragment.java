@@ -3,6 +3,7 @@ package ru.nubby.playstream.presentation.streamlist.streamlistfragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -131,6 +132,7 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
     public void onPause() {
         super.onPause();
         mPresenter.unsubscribe();
+        Log.d(TAG, "onPause: ");
     }
 
     @Override

@@ -116,6 +116,7 @@ public class StreamChatActivity extends BaseActivity implements StreamFragment.S
 
         Stream stream = readStreamFromExtras();
 
+        //TODO think more
         mStreamFragment.setCurrentStream(stream);
         mChatFragment.setCurrentStream(stream);
     }

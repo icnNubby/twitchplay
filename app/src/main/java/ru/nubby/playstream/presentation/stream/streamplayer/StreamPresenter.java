@@ -16,18 +16,17 @@ import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.Quality;
 import ru.nubby.playstream.model.Stream;
-import ru.nubby.playstream.presentation.base.BasePresenterImpl;
+import ru.nubby.playstream.presentation.base.BaseRxPresenter;
 
 import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.ERROR_CHANNEL_FOLLOW_UNFOLLOW;
 import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.ERROR_FETCHING_ADDITIONAL_INFO;
 import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.INFO_CHANNEL_FOLLOWED;
 import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.INFO_CHANNEL_UNFOLLOWED;
 
-public class StreamPresenter extends BasePresenterImpl<StreamContract.View>
+public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
         implements StreamContract.Presenter {
     private final String TAG = "StreamPresenter";
 
-    private StreamContract.View mStreamView;
     private Disposable mStreamResolutionsInfoTask;
     private Disposable mStreamAdditionalInfoTask;
     private Disposable mStreamInfoUpdater;
@@ -48,6 +47,7 @@ public class StreamPresenter extends BasePresenterImpl<StreamContract.View>
     @Override
     public void subscribe(StreamContract.View view, Lifecycle lifecycle, Stream stream) {
         super.subscribe(view, lifecycle);
+
         Stream streamCopy = new Stream(stream);
         Single<Stream> initialStreamRequest = mRepository
                 .getUserFromStreamer(stream)
@@ -55,68 +55,53 @@ public class StreamPresenter extends BasePresenterImpl<StreamContract.View>
                     streamCopy.setStreamerLogin(updatedLogin.getLogin());
                     return streamCopy;
                 });
-        mStreamView = view;
+
         mStreamAdditionalInfoTask = initialStreamRequest
-                .doOnSubscribe(streamReturned -> mStreamView.displayLoading(true))
+                .doOnSubscribe(streamReturned -> mView.displayLoading(true))
                 .subscribe(
                         streamReturned -> {
                             mCurrentStream = streamReturned;
                             playStream(streamReturned);
-                            mStreamView.displayLoading(false);
-                            mStreamView.displayTitle(streamReturned.getTitle());
-                            mStreamView.displayViewerCount(streamReturned.getViewerCount());
+                            mView.displayLoading(false);
+                            mView.displayTitle(streamReturned.getTitle());
+                            mView.displayViewerCount(streamReturned.getViewerCount());
                             mFollowDisplayTask = mRepository
                                     .isStreamFollowed(streamReturned)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe(
-                                            success -> {
-                                                mStreamView.displayFollowStatus(success);
-                                                mStreamView.enableFollow(true);
+                                            followStatus -> {
+                                                mView.displayFollowStatus(followStatus);
+                                                mView.enableFollow(true);
                                             },
                                             error -> {
                                                 Log.e(TAG, "Follow error " + error, error);
-                                                mStreamView.enableFollow(false);
-                                                mStreamView.displayInfoMessage(
+                                                mView.enableFollow(false);
+                                                mView.displayInfoMessage(
                                                         ERROR_CHANNEL_FOLLOW_UNFOLLOW,
                                                         mCurrentStream.getStreamerName());
                                             }
                                     );
+                            mCompositeDisposable.add(mFollowDisplayTask);
                         },
                         error -> {
                             mCurrentStream = null;
-                            mStreamView.displayLoading(false);
-                            mStreamView.enableFollow(false);
+                            mView.displayLoading(false);
+                            mView.enableFollow(false);
                             Log.e(TAG, "Error while fetching additional data ", error);
                         });
+        mCompositeDisposable.add(mStreamAdditionalInfoTask);
     }
 
     @Override
     public void unsubscribe() {
-        if (mStreamResolutionsInfoTask != null && !mStreamResolutionsInfoTask.isDisposed()) {
-            mStreamResolutionsInfoTask.dispose();
-        }
-        if (mStreamAdditionalInfoTask != null && !mStreamAdditionalInfoTask.isDisposed()) {
-            mStreamAdditionalInfoTask.dispose();
-        }
-        if (mStreamInfoUpdater != null && !mStreamInfoUpdater.isDisposed()) {
-            mStreamInfoUpdater.dispose();
-        }
-        if (mFollowUnfollowTask != null && !mFollowUnfollowTask.isDisposed()) {
-            mFollowUnfollowTask.dispose();
-        }
-        if (mFollowDisplayTask != null && !mFollowDisplayTask.isDisposed()) {
-            mFollowDisplayTask.dispose();
-        }
-
         mCurrentStream = null;
-        mStreamView = null;
     }
 
     @Override
     public void playChosenQuality(Quality quality) {
         String url = mQualityUrls.get(quality);
-        mStreamView.displayStream(url);
+        mView.displayStream(url);
     }
 
     @Override
@@ -134,25 +119,26 @@ public class StreamPresenter extends BasePresenterImpl<StreamContract.View>
                     })
                     .andThen(mRepository.isStreamFollowed(mCurrentStream))
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(result -> {
-                                mStreamView.displayFollowStatus(result);
-                                mStreamView.enableFollow(true);
-                                if (result) {
-                                    mStreamView.displayInfoMessage(INFO_CHANNEL_FOLLOWED,
+                    .subscribe(followStatus -> {
+                                mView.displayFollowStatus(followStatus);
+                                mView.enableFollow(true);
+                                if (followStatus) {
+                                    mView.displayInfoMessage(INFO_CHANNEL_FOLLOWED,
                                             mCurrentStream.getStreamerName());
                                 } else {
-                                    mStreamView.displayInfoMessage(INFO_CHANNEL_UNFOLLOWED,
+                                    mView.displayInfoMessage(INFO_CHANNEL_UNFOLLOWED,
                                             mCurrentStream.getStreamerName());
                                 }
                             },
                             error -> {
                                 Log.e(TAG, "Follow error " + error, error);
-                                mStreamView.enableFollow(false);
-                                mStreamView.displayInfoMessage(ERROR_CHANNEL_FOLLOW_UNFOLLOW,
+                                mView.enableFollow(false);
+                                mView.displayInfoMessage(ERROR_CHANNEL_FOLLOW_UNFOLLOW,
                                         mCurrentStream.getStreamerName());
                             });
+            mCompositeDisposable.add(mFollowUnfollowTask);
         } else {
-            mStreamView.enableFollow(false);
+            mView.enableFollow(false);
         }
     }
 
@@ -165,7 +151,8 @@ public class StreamPresenter extends BasePresenterImpl<StreamContract.View>
         if (mStreamInfoUpdater != null && !mStreamInfoUpdater.isDisposed()) {
             mStreamInfoUpdater.dispose();
         }
-        mStreamView.displayLoading(true);
+
+        mView.displayLoading(true);
         mStreamResolutionsInfoTask = mRepository
                 .getQualityUrls(stream)
                 .subscribe(fetchedQualityTable -> {
@@ -173,7 +160,7 @@ public class StreamPresenter extends BasePresenterImpl<StreamContract.View>
                             //set available qualities to menu, sorted
                             mQualities = new ArrayList<>(mQualityUrls.keySet());
                             Collections.sort(mQualities);
-                            mStreamView.setQualitiesMenu(mQualities);
+                            mView.setQualitiesMenu(mQualities);
 
                             //get url for default or if not exists for closest better quality.
                             Quality defaultQuality = mRepository
@@ -186,30 +173,32 @@ public class StreamPresenter extends BasePresenterImpl<StreamContract.View>
                                 url = mQualityUrls.get(nextQuality);
                             }
                             if (!mQualities.isEmpty() || url == null) {
-                                mStreamView.displayStream(url);
+                                mView.displayStream(url);
                             } else {
-                                mStreamView.displayInfoMessage(ERROR_FETCHING_ADDITIONAL_INFO,
+                                mView.displayInfoMessage(ERROR_FETCHING_ADDITIONAL_INFO,
                                         mCurrentStream.getStreamerName());
                             }
-                            mStreamView.displayLoading(false);
+                            mView.displayLoading(false);
                         },
                         error -> {
-                            mStreamView.displayInfoMessage(ERROR_FETCHING_ADDITIONAL_INFO,
+                            mView.displayInfoMessage(ERROR_FETCHING_ADDITIONAL_INFO,
                                     mCurrentStream.getStreamerName());
-                            mStreamView.displayLoading(false);
+                            mView.displayLoading(false);
                             Log.e(TAG, "Error while fetching quality urls " + error, error);
                         });
+        mCompositeDisposable.add(mStreamResolutionsInfoTask);
 
         mStreamInfoUpdater = mRepository
                 .getUpdatableStreamInfo(stream)
                 .subscribe(streamUpdated -> {
-                            mStreamView.displayTitle(streamUpdated.getTitle());
-                            mStreamView.displayViewerCount(streamUpdated.getViewerCount());
+                            mView.displayTitle(streamUpdated.getTitle());
+                            mView.displayViewerCount(streamUpdated.getViewerCount());
                         },
-                        error -> Log.e(TAG, "Error while updating stream mRepository "
+                        error -> Log.e(TAG, "Error while updating stream info. "
                                 + error.getMessage(), error));
 
-        //todo error processing in view
+        mCompositeDisposable.add(mStreamInfoUpdater);
+
     }
 
 }

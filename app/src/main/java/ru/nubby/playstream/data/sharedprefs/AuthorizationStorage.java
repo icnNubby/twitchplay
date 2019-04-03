@@ -21,7 +21,7 @@ public class AuthorizationStorage {
     private Gson mGson;
 
     @Inject
-    public AuthorizationStorage(Context context, Gson gson) {
+    AuthorizationStorage(Context context, Gson gson) {
         mSharedPreferences = context.getSharedPreferences(PREFERENCES_FILENAME,
                 Context.MODE_PRIVATE);
         mGson = gson;
@@ -31,22 +31,22 @@ public class AuthorizationStorage {
         return mSharedPreferences.getString(PREF_USER_ACCESS_TOKEN, "");
     }
 
-    public boolean setUserAccessToken(String token) {
-        return mSharedPreferences
+    public void setUserAccessToken(String token) {
+        mSharedPreferences
                 .edit()
                 .putString(PREF_USER_ACCESS_TOKEN, token)
-                .commit();
+                .apply();
     }
 
     public UserData getUserData() {
         return mGson.fromJson(mSharedPreferences.getString(PREF_USER_DATA, ""), UserData.class);
     }
 
-    public boolean setUserData(UserData data) {
-        return mSharedPreferences
+    public void setUserData(UserData data) {
+        mSharedPreferences
                 .edit()
                 .putString(PREF_USER_DATA, mGson.toJson(data, UserData.class))
-                .commit();
+                .apply();
     }
 
 }

@@ -2,17 +2,15 @@ package ru.nubby.playstream.presentation.streamlist;
 
 import android.util.Log;
 
-import javax.inject.Inject;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.StreamListNavigationState;
 import ru.nubby.playstream.model.UserData;
-import ru.nubby.playstream.presentation.base.BasePresenterImpl;
+import ru.nubby.playstream.presentation.base.BaseRxPresenter;
 
-public class StreamListActivityPresenter extends BasePresenterImpl<StreamListActivityContract.View>
+public class StreamListActivityPresenter extends BaseRxPresenter<StreamListActivityContract.View>
         implements StreamListActivityContract.Presenter {
     private final String TAG = StreamListActivityPresenter.class.getSimpleName();
 

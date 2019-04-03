@@ -4,9 +4,9 @@ import javax.inject.Inject;
 
 import androidx.lifecycle.Lifecycle;
 import ru.nubby.playstream.data.Repository;
-import ru.nubby.playstream.presentation.base.BasePresenterImpl;
+import ru.nubby.playstream.presentation.base.BaseRxPresenter;
 
-public class PreferencesPresenter extends BasePresenterImpl<PreferencesContract.View>
+public class PreferencesPresenter extends BaseRxPresenter<PreferencesContract.View>
         implements PreferencesContract.Presenter {
 
 

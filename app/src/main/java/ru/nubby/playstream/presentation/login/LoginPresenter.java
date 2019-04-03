@@ -8,18 +8,15 @@ import androidx.lifecycle.Lifecycle;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.SensitiveStorage;
 import ru.nubby.playstream.data.Repository;
-import ru.nubby.playstream.presentation.base.BasePresenterImpl;
+import ru.nubby.playstream.presentation.base.BaseRxPresenter;
 
-public class LoginPresenter extends BasePresenterImpl<LoginContract.View>
+public class LoginPresenter extends BaseRxPresenter<LoginContract.View>
         implements LoginContract.Presenter {
     private final String TAG = LoginPresenter.class.getSimpleName();
 
     private final String LOGIN_URL = "https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id="
                     + SensitiveStorage.getClientApiKey()
                     + "&redirect_uri=http%3A%2F%2Flocalhost&scope=user_read+user_follows_edit+user_subscriptions";
-
-    private LoginContract.View mLoginView;
-    private Disposable mDisposableUserFetchTask;
 
     private Repository mRepository;
 
@@ -31,16 +28,11 @@ public class LoginPresenter extends BasePresenterImpl<LoginContract.View>
     @Override
     public void subscribe(LoginContract.View view, Lifecycle lifecycle) {
         super.subscribe(view, lifecycle);
-        mLoginView = view;
-        mLoginView.loadUrl(LOGIN_URL);
+        mView.loadUrl(LOGIN_URL);
     }
 
     @Override
     public void unsubscribe() {
-        if (mDisposableUserFetchTask != null && mDisposableUserFetchTask.isDisposed()) {
-            mDisposableUserFetchTask.dispose();
-        }
-        mLoginView = null;
     }
 
     @Override
@@ -52,10 +44,12 @@ public class LoginPresenter extends BasePresenterImpl<LoginContract.View>
     public boolean interceptedAnswer(String url) {
         if (url.contains("#access_token=")) {
             String mAccessToken = getAccessTokenFromURL(url);
-            mDisposableUserFetchTask = mRepository
+            Disposable disposableUserFetchTask = mRepository
                     .loginAttempt(mAccessToken)
-                    .subscribe(userData -> mLoginView.handleUserInfoFetched(true),
+                    .subscribe(
+                            userData -> mView.handleUserInfoFetched(true),
                             error -> Log.e(TAG, "Error while fetching user data", error));
+            mCompositeDisposable.add(disposableUserFetchTask);
             return true;
         }
         return false;

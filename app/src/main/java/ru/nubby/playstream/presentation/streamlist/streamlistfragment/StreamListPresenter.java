@@ -8,8 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import androidx.lifecycle.Lifecycle;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
@@ -17,20 +15,18 @@ import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.model.Pagination;
 import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.model.StreamListNavigationState;
-import ru.nubby.playstream.presentation.base.BasePresenterImpl;
+import ru.nubby.playstream.presentation.base.BaseRxPresenter;
 
 import static ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListContract.View.ErrorMessage.ERROR_BAD_CONNECTION;
 
 
-public class StreamListPresenter extends BasePresenterImpl<StreamListContract.View>
-    implements StreamListContract.Presenter {
+public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View>
+        implements StreamListContract.Presenter {
 
     private static final String TAG = StreamListPresenter.class.getSimpleName();
     private final long UPDATE_INTERVAL_MILLIS = 1000 * 60 * 5; // 5 minutes
 
-    private StreamListContract.View mStreamListView;
     private Disposable mDisposableFetchingTask;
-    private Disposable mDisposableListState;
 
     private Pagination mPagination;
     private Repository mRepository;
@@ -49,44 +45,36 @@ public class StreamListPresenter extends BasePresenterImpl<StreamListContract.Vi
     @Override
     public void subscribe(StreamListContract.View view, Lifecycle lifecycle, long interval) {
         super.subscribe(view, lifecycle);
-        mStreamListView = view;
-        mStreamListView.setPreviewSize(mRepository.getSharedPreferences().getPreviewSize());
+        mView.setPreviewSize(mRepository.getSharedPreferences().getPreviewSize());
 
         mForceReload = (interval >= UPDATE_INTERVAL_MILLIS ||
-                interval == 0);
+                interval == 0 ||
+                mCurrentStreamList == null ||
+                mCurrentStreamList.isEmpty());
 
         mCurrentState = mRepository.getCurrentNavigationState();
-        mDisposableListState = mListStateObservable
+        Disposable disposableListState = mListStateObservable
                 .subscribe(streamListNavigationState -> {
                     mCurrentState = streamListNavigationState;
-                    if (mCurrentStreamList == null || mCurrentStreamList.isEmpty()) {
-                        mForceReload = true;
-                    }
                     if (mForceReload) {
                         updateStreams();
                     } else {
                         mForceReload = true;
-                        mStreamListView.displayStreamList(mCurrentStreamList);
+                        mView.displayStreamList(mCurrentStreamList);
                     }
                 });
+        mCompositeDisposable.add(disposableListState);
     }
 
     @Override
     public void unsubscribe() {
-        Log.d(TAG, "unsubscribe: " + this.toString());
-        if (mDisposableFetchingTask != null) {
-            mDisposableFetchingTask.dispose();
-        }
-        if (mDisposableListState != null) {
-            mDisposableListState.dispose();
-        }
-        Log.d(TAG, "unsubscribe: all disposed, view cleared " + this.toString());
-        mStreamListView = null;
+        Log.d(TAG, "unsubscribe: ");
     }
 
     @Override
     public void updateStreams() {
         if (mDisposableFetchingTask != null) {
+            mCompositeDisposable.remove(mDisposableFetchingTask);
             mDisposableFetchingTask.dispose();
         }
         if (mCurrentState == StreamListNavigationState.MODE_TOP) {
@@ -98,30 +86,34 @@ public class StreamListPresenter extends BasePresenterImpl<StreamListContract.Vi
 
     @Override
     public void getFollowedStreams() {
-        if (mDisposableFetchingTask != null) mDisposableFetchingTask.dispose();
+        if (mDisposableFetchingTask != null) {
+            mCompositeDisposable.remove(mDisposableFetchingTask);
+            mDisposableFetchingTask.dispose();
+        }
 
         mDisposableFetchingTask = mRepository
                 .getLiveStreamsFollowedByUser()
                 .doOnSubscribe(disposable -> {
                     Log.d(TAG, "getFollowedStreams do on sub: " + this.toString());
                     if (!disposable.isDisposed()) {
-                        mStreamListView.clearStreamList();
+                        mView.clearStreamList();
                         mCurrentStreamList = new ArrayList<>();
                         mCurrentStreamMap = new HashMap<>();
-                        mStreamListView.setupProgressBar(true);
+                        mView.setupProgressBar(true);
                     }
                 })
                 .subscribe(streams -> {
                             checkAndAddStreams(streams);
-                            mStreamListView.displayStreamList(mCurrentStreamList);
-                            mStreamListView.setupProgressBar(false);
+                            mView.displayStreamList(mCurrentStreamList);
+                            mView.setupProgressBar(false);
                             mPagination = null;
                         },
                         error -> {
-                            mStreamListView.setupProgressBar(false);
-                            mStreamListView.displayError(ERROR_BAD_CONNECTION);
+                            mView.setupProgressBar(false);
+                            mView.displayError(ERROR_BAD_CONNECTION);
                             Log.e(TAG, "Error while fetching user follows ", error);
                         });
+        mCompositeDisposable.add(mDisposableFetchingTask);
     }
 
     @Override
@@ -131,42 +123,45 @@ public class StreamListPresenter extends BasePresenterImpl<StreamListContract.Vi
                 .doOnSubscribe(disposable -> {
                     Log.d(TAG, "getTopStreams: do on sub " + this.toString());
                     if (!disposable.isDisposed()) {
-                        mStreamListView.clearStreamList();
+                        mView.clearStreamList();
                         mCurrentStreamList = new ArrayList<>();
                         mCurrentStreamMap = new HashMap<>();
-                        mStreamListView.setupProgressBar(true);
+                        mView.setupProgressBar(true);
                     }
                 })
                 .subscribe(streams -> {
-                            mStreamListView.setupProgressBar(false);
+                            mView.setupProgressBar(false);
                             checkAndAddStreams(streams.getData());
-                            mStreamListView.displayStreamList(mCurrentStreamList);
+                            mView.displayStreamList(mCurrentStreamList);
                             mPagination = streams.getPagination();
                         },
                         e -> {
-                            mStreamListView.setupProgressBar(false);
-                            mStreamListView.displayError(ERROR_BAD_CONNECTION);
+                            mView.setupProgressBar(false);
+                            mView.displayError(ERROR_BAD_CONNECTION);
                             Log.e(TAG, "Error while fetching streams", e);
                         });
+        mCompositeDisposable.add(mDisposableFetchingTask);
     }
 
     @Override
     public void getMoreStreams() {
         if (mCurrentState == StreamListNavigationState.MODE_TOP && mPagination != null) {
             if (mDisposableFetchingTask != null) {
+                mCompositeDisposable.remove(mDisposableFetchingTask);
                 mDisposableFetchingTask.dispose();
             }
             mDisposableFetchingTask = mRepository
                     .getTopStreams(mPagination)
                     .subscribe(streams -> {
                                 List<Stream> moreStreams = checkAndAddStreams(streams.getData());
-                                mStreamListView.addStreamList(moreStreams);
+                                mView.addStreamList(moreStreams);
                                 mPagination = streams.getPagination();
                             },
                             e -> {
-                                mStreamListView.displayError(ERROR_BAD_CONNECTION);
+                                mView.displayError(ERROR_BAD_CONNECTION);
                                 Log.e(TAG, "Error while fetching more streams", e);
                             });
+            mCompositeDisposable.add(mDisposableFetchingTask);
         } else {
             Log.e(TAG, "Wrong mode to fetch more streams, pagination cursor = " +
                     mPagination + ", state = " + mCurrentState);

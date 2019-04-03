@@ -17,7 +17,7 @@ public class DefaultPreferences {
     private Context mContext;
 
     @Inject
-    public DefaultPreferences(Context context) {
+    DefaultPreferences(Context context) {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         mContext = context;
     }

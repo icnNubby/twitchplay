@@ -53,7 +53,7 @@ public class LoginActivity extends BaseActivity implements LoginContract.View {
         mWebView.getSettings().setSupportZoom(true);
 
         mWebView.setWebViewClient(
-                new WebViewClient() { //TODO separate this class
+                new WebViewClient() { //TODO separate this class?
                     @Override
                     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
                         mLoginPresenter.receivedError(failingUrl);
@@ -114,8 +114,7 @@ public class LoginActivity extends BaseActivity implements LoginContract.View {
     public void handleUserInfoFetched(boolean success) {
         if (success) {
             finish();
-        }
-        else {
+        } else {
             mWebViewProgress.setVisibility(View.GONE);
             mWebView.setVisibility(View.VISIBLE);
             Toast.makeText(this, getText(R.string.login_failed), Toast.LENGTH_LONG).show();

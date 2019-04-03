@@ -7,64 +7,48 @@ import android.util.AttributeSet;
 
 import androidx.preference.DialogPreference;
 
-public class TimePreference extends DialogPreference
-{
+public class TimePreference extends DialogPreference {
     public int hour = 0;
     public int minute = 0;
 
-    public static int parseHour(String value)
-    {
-        try
-        {
+    public static int parseHour(String value){
+        try {
             String[] time = value.split(":");
             return (Integer.parseInt(time[0]));
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             return 0;
         }
     }
 
-    public static int parseMinute(String value)
-    {
-        try
-        {
+    public static int parseMinute(String value) {
+        try {
             String[] time = value.split(":");
             return (Integer.parseInt(time[1]));
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             return 0;
         }
     }
 
-    public static String timeToString(int h, int m)
-    {
+    public static String timeToString(int h, int m) {
         return String.format("%02d", h) + ":" + String.format("%02d", m);
     }
 
-    public TimePreference(Context context, AttributeSet attrs)
-    {
+    public TimePreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
     @Override
-    protected Object onGetDefaultValue(TypedArray a, int index)
-    {
+    protected Object onGetDefaultValue(TypedArray a, int index) {
         return a.getString(index);
     }
 
     @Override
-    protected void onSetInitialValue(boolean restoreValue, Object defaultValue)
-    {
+    protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
         String value;
-        if (restoreValue)
-        {
+        if (restoreValue) {
             if (defaultValue == null) value = getPersistedString("00:00");
             else value = getPersistedString(defaultValue.toString());
-        }
-        else
-        {
+        } else {
             value = defaultValue.toString();
         }
 
@@ -72,8 +56,7 @@ public class TimePreference extends DialogPreference
         minute = parseMinute(value);
     }
 
-    public void persistStringValue(String value)
-    {
+    public void persistStringValue(String value) {
         persistString(value);
     }
 }

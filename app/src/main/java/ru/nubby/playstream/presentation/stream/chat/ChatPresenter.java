@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import androidx.annotation.Nullable;
 import androidx.lifecycle.Lifecycle;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -17,23 +16,24 @@ import ru.nubby.playstream.SensitiveStorage;
 import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.data.ircapi.ChatChannelApi;
 import ru.nubby.playstream.model.Stream;
-import ru.nubby.playstream.presentation.base.BasePresenterImpl;
+import ru.nubby.playstream.presentation.base.BaseRxPresenter;
 
 import static ru.nubby.playstream.presentation.stream.chat.ChatContract.View.InfoMessage.ERROR_DISCONNECTED;
 import static ru.nubby.playstream.presentation.stream.chat.ChatContract.View.InfoMessage.ERROR_FIRST_CONNECT;
 import static ru.nubby.playstream.presentation.stream.chat.ChatContract.View.InfoMessage.ERROR_RECONNECT;
 import static ru.nubby.playstream.presentation.stream.chat.ChatContract.View.InfoMessage.INFO_CONNECTED;
 
-public class ChatPresenter extends BasePresenterImpl<ChatContract.View>
+public class ChatPresenter extends BaseRxPresenter<ChatContract.View>
         implements ChatContract.Presenter {
     private static final String TAG = ChatPresenter.class.getSimpleName();
 
-    private ChatContract.View mChatView;
+    private static final long RETRY_DELAY_SECONDS = 10;
+
     private Disposable mChatListener;
-    private Disposable mDisposableStreamAdditionalInfo;
+    private Disposable mChatInitializer;
+
     private Repository mRepository;
     private ChatChannelApi mChatApi = null;
-    private Disposable mChatInitializer;
 
     @Inject
     public ChatPresenter(Repository repository) {
@@ -50,9 +50,8 @@ public class ChatPresenter extends BasePresenterImpl<ChatContract.View>
                     streamCopy.setStreamerLogin(updatedLogin.getLogin());
                     return streamCopy;
                 });
-        mChatView = view;
-        mDisposableStreamAdditionalInfo = initialStreamRequest
-                .doOnSubscribe(streamReturned -> mChatView.displayLoading(true))
+        Disposable disposableStreamAdditionalInfo = initialStreamRequest
+                .doOnSubscribe(streamReturned -> mView.displayLoading(true))
                 .subscribe(
                         streamReturned -> {
                             mChatApi = new ChatChannelApi( //TODO ?DI?
@@ -62,42 +61,33 @@ public class ChatPresenter extends BasePresenterImpl<ChatContract.View>
                             mChatInitializer = mChatApi
                                     .init()
                                     .retryWhen(throwableFlowable -> throwableFlowable
-                                            .delay(10, TimeUnit.SECONDS)
+                                            .delay(RETRY_DELAY_SECONDS, TimeUnit.SECONDS)
                                             .observeOn(AndroidSchedulers.mainThread())
                                             .doOnEach(throwableNotification ->
-                                                    mChatView.displayInfoMessage(ERROR_RECONNECT)))
+                                                    mView.displayInfoMessage(ERROR_RECONNECT)))
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe(
                                             success -> {
-                                                mChatView.displayInfoMessage(INFO_CONNECTED);
+                                                mView.displayInfoMessage(INFO_CONNECTED);
                                                 listenToChat();
                                             },
                                             error -> {
-                                                mChatView.displayInfoMessage(ERROR_FIRST_CONNECT);
+                                                mView.displayInfoMessage(ERROR_FIRST_CONNECT);
                                             });
-                            mChatView.displayLoading(false);
+                            mCompositeDisposable.add(mChatInitializer);
+                            mView.displayLoading(false);
                         },
                         error -> {
                             Log.e(TAG, "Error while fetching additional data", error);
-                            mChatView.displayInfoMessage(ERROR_FIRST_CONNECT);
-                            mChatView.displayLoading(false);
+                            mView.displayInfoMessage(ERROR_FIRST_CONNECT);
+                            mView.displayLoading(false);
                         });
+        mCompositeDisposable.add(disposableStreamAdditionalInfo);
     }
 
     @Override
     public void unsubscribe() {
-        //TODO composite disposal
-        if (mChatListener != null && !mChatListener.isDisposed()) {
-            mChatListener.dispose();
-        }
-        if (mChatInitializer != null && !mChatInitializer.isDisposed()) {
-            mChatInitializer.dispose();
-        }
-        if (mDisposableStreamAdditionalInfo != null && !mDisposableStreamAdditionalInfo.isDisposed()) {
-            mDisposableStreamAdditionalInfo.dispose();
-        }
-        mChatView = null;
     }
 
     private void listenToChat() {
@@ -106,10 +96,10 @@ public class ChatPresenter extends BasePresenterImpl<ChatContract.View>
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        result -> mChatView.addChatMessage(result),
+                        result -> mView.addChatMessage(result),
                         error -> {
                             Log.e(TAG, "Error while listening to chat", error);
-                            mChatView.displayInfoMessage(ERROR_DISCONNECTED);
+                            mView.displayInfoMessage(ERROR_DISCONNECTED);
                             mChatListener.dispose();
                             mChatInitializer = mChatApi.init()
                                     .subscribeOn(Schedulers.io())
@@ -117,14 +107,15 @@ public class ChatPresenter extends BasePresenterImpl<ChatContract.View>
                                             .delay(10, TimeUnit.SECONDS)
                                             .observeOn(AndroidSchedulers.mainThread())
                                             .doOnEach(throwableNotification ->
-                                                    mChatView.displayInfoMessage(ERROR_RECONNECT)))
+                                                    mView.displayInfoMessage(ERROR_RECONNECT)))
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe(
                                             success -> {
-                                                mChatView.displayInfoMessage(INFO_CONNECTED);
+                                                mView.displayInfoMessage(INFO_CONNECTED);
                                                 listenToChat();
                                             });
                         });
+        mCompositeDisposable.add(mChatListener);
     }
 
 }

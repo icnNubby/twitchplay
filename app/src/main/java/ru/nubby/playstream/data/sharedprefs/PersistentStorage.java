@@ -26,17 +26,17 @@ public class PersistentStorage {
     private Gson mGson;
 
     @Inject
-    public PersistentStorage(Context context, Gson gson) {
+    PersistentStorage(Context context, Gson gson) {
         mSharedPreferences = context.getSharedPreferences(PREFERENCES_FILENAME,
                 Context.MODE_PRIVATE);
         mGson = gson;
     }
 
-    public boolean setStreamList(List<Stream> streamList) {
-        return mSharedPreferences
+    public void setStreamList(List<Stream> streamList) {
+        mSharedPreferences
                 .edit()
                 .putString(PREF_STREAM_LIST, mGson.toJson(streamList))
-                .commit();
+                .apply();
     }
 
     public List<Stream> getStreamList() {

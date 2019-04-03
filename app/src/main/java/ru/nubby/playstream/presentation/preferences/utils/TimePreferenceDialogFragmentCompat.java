@@ -8,20 +8,18 @@ import androidx.preference.DialogPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceDialogFragmentCompat;
 
-public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragmentCompat implements DialogPreference.TargetFragment
-{
+public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragmentCompat
+        implements DialogPreference.TargetFragment {
     TimePicker timePicker = null;
 
     @Override
-    protected View onCreateDialogView(Context context)
-    {
+    protected View onCreateDialogView(Context context) {
         timePicker = new TimePicker(context);
         return (timePicker);
     }
 
     @Override
-    protected void onBindDialogView(View v)
-    {
+    protected void onBindDialogView(View v) {
         super.onBindDialogView(v);
         timePicker.setIs24HourView(true);
         TimePreference pref = (TimePreference) getPreference();
@@ -30,10 +28,8 @@ public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragment
     }
 
     @Override
-    public void onDialogClosed(boolean positiveResult)
-    {
-        if (positiveResult)
-        {
+    public void onDialogClosed(boolean positiveResult) {
+        if (positiveResult) {
             TimePreference pref = (TimePreference) getPreference();
             pref.hour = timePicker.getCurrentHour();
             pref.minute = timePicker.getCurrentMinute();
@@ -44,8 +40,7 @@ public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragment
     }
 
     @Override
-    public Preference findPreference(CharSequence charSequence)
-    {
+    public Preference findPreference(CharSequence charSequence) {
         return getPreference();
     }
 }
