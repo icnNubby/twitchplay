@@ -1,4 +1,4 @@
-package ru.nubby.playstream.model;
+package ru.nubby.playstream.domain.entity;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -8,7 +8,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 
 @Entity(tableName = "follow_relations", primaryKeys = {"from_id", "to_id"})
-public class FollowRelations {
+public final class FollowRelations {
     @ColumnInfo(name = "from_id")
     @SerializedName("from_id")
     @NonNull

@@ -5,8 +5,8 @@ import java.util.List;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
-import ru.nubby.playstream.model.FollowRelations;
-import ru.nubby.playstream.model.UserData;
+import ru.nubby.playstream.domain.entity.FollowRelations;
+import ru.nubby.playstream.domain.entity.UserData;
 
 public interface LocalRepository {
 

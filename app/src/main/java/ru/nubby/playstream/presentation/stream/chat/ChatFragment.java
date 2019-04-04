@@ -22,8 +22,8 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.model.ChatMessage;
-import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.domain.entity.ChatMessage;
+import ru.nubby.playstream.domain.entity.Stream;
 import ru.nubby.playstream.presentation.base.BaseFragment;
 import ru.nubby.playstream.presentation.base.PresenterFactory;
 

@@ -15,27 +15,12 @@ import ru.nubby.playstream.data.database.LocalRepository;
 import ru.nubby.playstream.data.database.RoomLocalDataSource;
 import ru.nubby.playstream.data.database.UserDataDao;
 import ru.nubby.playstream.data.twitchapi.RemoteRepository;
-import ru.nubby.playstream.data.twitchapi.services.RawJsonService;
-import ru.nubby.playstream.data.twitchapi.services.TwitchApiService;
-import ru.nubby.playstream.data.twitchapi.services.TwitchHelixService;
-import ru.nubby.playstream.data.twitchapi.services.TwitchKrakenService;
+import ru.nubby.playstream.data.twitchapi.TwitchRepository;
 
 @Module
-public class RepositoriesModule {
+public class DataModule {
 
     private static final String DATABASE_NAME = "playstream";
-
-    @Provides
-    @Singleton
-    public RemoteRepository provideRemoteRepository(RawJsonService rawJsonService,
-                                                    TwitchApiService twitchApiService,
-                                                    TwitchKrakenService twitchKrakenService,
-                                                    TwitchHelixService twitchHelixService) {
-        return new RemoteRepository(rawJsonService,
-                twitchApiService,
-                twitchKrakenService,
-                twitchHelixService);
-    }
 
     @Provides
     @Singleton
@@ -61,9 +46,14 @@ public class RepositoriesModule {
 
     @Provides
     @Singleton
-    public LocalRepository provideLocalRepository(FollowRelationsDao followRelationsDao,
-                                                  UserDataDao userDataDao) {
-        return new RoomLocalDataSource(followRelationsDao, userDataDao);
+    public LocalRepository provideLocalRepository(RoomLocalDataSource roomLocalDataSource) {
+        return roomLocalDataSource;
+    }
+
+    @Provides
+    @Singleton
+    public RemoteRepository provideRemoteRepository(TwitchRepository twitchRepository) {
+        return twitchRepository;
     }
 
     @Provides
@@ -78,5 +68,3 @@ public class RepositoriesModule {
         return new Gson();
     }
 }
-
-//TODO move it?

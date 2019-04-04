@@ -13,15 +13,12 @@ import dagger.MapKey;
 import dagger.Module;
 import dagger.Provides;
 import dagger.multibindings.IntoMap;
-import io.reactivex.Single;
 import ru.nubby.playstream.data.Repository;
-import ru.nubby.playstream.model.Stream;
 import ru.nubby.playstream.presentation.base.PresenterFactory;
 import ru.nubby.playstream.presentation.login.LoginPresenter;
 import ru.nubby.playstream.presentation.preferences.PreferencesPresenter;
 import ru.nubby.playstream.presentation.stream.chat.ChatPresenter;
 import ru.nubby.playstream.presentation.stream.streamplayer.StreamPresenter;
-import ru.nubby.playstream.presentation.streamlist.StreamListActivity;
 import ru.nubby.playstream.presentation.streamlist.StreamListActivityPresenter;
 import ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListPresenter;
 

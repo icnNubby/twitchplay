@@ -1,7 +1,7 @@
 package ru.nubby.playstream.presentation.streamlist;
 
-import ru.nubby.playstream.model.StreamListNavigationState;
-import ru.nubby.playstream.model.UserData;
+import ru.nubby.playstream.domain.entity.StreamListNavigationState;
+import ru.nubby.playstream.domain.entity.UserData;
 import ru.nubby.playstream.presentation.base.BasePresenter;
 import ru.nubby.playstream.presentation.base.BaseView;
 

@@ -3,14 +3,11 @@ Bugs
     fix displaying appsecret at failed load in login activity
     exclude unfollowed channel from online stream list, when returned
     fix schedulers everywhere, think how to separate responsibilities between views and repo
-    figure out how to stop caching instantly on stopping of activity, we waste traffic
-    think how to make use of picasso scaling.
     add schedulers dependencies in presenters by di
 
 Architecture
     think how to implement presenters interaction one with another
     ex:
-        navbar state might be Observable<State>
         fullscreen mode might be Observable<Boolean>
     etc.
     links:
@@ -20,7 +17,7 @@ Architecture
     think how to make states abit prettier (enums?)
 
 More features gradually from nearest to farthest:
-    ?add games to db and to
+    ?add games to db and to main screen
     sleep mode and setup to it
     backnav!
     chat answers
@@ -29,7 +26,6 @@ More features gradually from nearest to farthest:
     user view screen (prob with possibilities to edit urself)
     suggestions
     subscriptions workaround (? figure out how it works)
-    syncing it periodically (prob on weekly basis? it doesnot change too often)
     animations (learning some ui stuff)
     launcher icon and overall beautify
 

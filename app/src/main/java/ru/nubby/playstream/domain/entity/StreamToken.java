@@ -1,11 +1,11 @@
-package ru.nubby.playstream.model;
+package ru.nubby.playstream.domain.entity;
 
 import com.google.gson.annotations.SerializedName;
 
 /**
  * StreamToken info, we need it to get the M3U8 playlist
  */
-public class StreamToken {
+public final class StreamToken {
 
     @SerializedName("token")
     private String token;

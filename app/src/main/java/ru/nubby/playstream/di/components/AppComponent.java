@@ -11,20 +11,22 @@ import dagger.android.support.AndroidSupportInjectionModule;
 import ru.nubby.playstream.PlayStreamApp;
 import ru.nubby.playstream.di.modules.ActivityBindingModule;
 import ru.nubby.playstream.di.modules.AppModule;
-import ru.nubby.playstream.data.RepositoriesModule;
+import ru.nubby.playstream.data.DataModule;
 import ru.nubby.playstream.data.twitchapi.TwitchApiModule;
+import ru.nubby.playstream.di.modules.RxSchedulersModule;
 import ru.nubby.playstream.di.modules.ServiceBindingModule;
 import ru.nubby.playstream.di.modules.PresentersModule;
 
 @Singleton
 @Component(modules = {
         AppModule.class,
-        RepositoriesModule.class,
+        DataModule.class,
         TwitchApiModule.class,
         PresentersModule.class,
         ActivityBindingModule.class,
         ServiceBindingModule.class,
-        AndroidSupportInjectionModule.class})
+        AndroidSupportInjectionModule.class,
+        RxSchedulersModule.class})
 
 public interface AppComponent extends AndroidInjector<PlayStreamApp> {
 

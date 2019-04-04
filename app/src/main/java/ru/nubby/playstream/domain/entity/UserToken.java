@@ -1,4 +1,4 @@
-package ru.nubby.playstream.model;
+package ru.nubby.playstream.domain.entity;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -7,7 +7,7 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 
-public class UserToken {
+public final class UserToken {
 
     @NonNull
     @SerializedName("access_token")

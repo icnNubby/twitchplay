@@ -17,7 +17,7 @@ import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.domain.entity.Stream;
 import ru.nubby.playstream.presentation.base.BaseActivity;
 import ru.nubby.playstream.presentation.stream.chat.ChatFragment;
 import ru.nubby.playstream.presentation.stream.streamplayer.StreamFragment;

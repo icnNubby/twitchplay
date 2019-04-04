@@ -7,6 +7,8 @@ import javax.inject.Named;
 
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.Scheduler;
+import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.services.ServicesScheduler;
 
 @Module

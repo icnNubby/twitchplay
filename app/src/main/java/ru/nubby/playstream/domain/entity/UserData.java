@@ -1,4 +1,4 @@
-package ru.nubby.playstream.model;
+package ru.nubby.playstream.domain.entity;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -13,29 +13,38 @@ import androidx.room.PrimaryKey;
  * <a href = "https://dev.twitch.tv/docs/api/reference/#get-users">User data.</a>
  */
 @Entity (tableName = "user_data")
-public class UserData implements Serializable {
+public final class UserData implements Serializable {
 
     @PrimaryKey
+    @NonNull
     @SerializedName("id")
-    @NonNull
     private String id = "";
-    @SerializedName("login")
+
     @NonNull
+    @SerializedName("login")
     private String login = "";
+
     @SerializedName("display_name")
     private String displayName;
+
     @SerializedName("type")
     private String type;
+
     @SerializedName("broadcaster_type")
     private String broadcasterType;
+
     @SerializedName("description")
     private String description;
+
     @SerializedName("profile_image_url")
     private String profileImageUrl;
+
     @SerializedName("offline_image_url")
     private String offlineImageUrl;
+
     @SerializedName("view_count")
     private Integer viewCount;
+
     @SerializedName("email")
     private String email;
 

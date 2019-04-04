@@ -7,27 +7,27 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import ru.nubby.playstream.data.sharedprefs.DefaultPreferences;
-import ru.nubby.playstream.model.FollowRelations;
-import ru.nubby.playstream.model.Pagination;
-import ru.nubby.playstream.model.Quality;
-import ru.nubby.playstream.model.Stream;
-import ru.nubby.playstream.model.StreamListNavigationState;
-import ru.nubby.playstream.model.StreamsRequest;
-import ru.nubby.playstream.model.UserData;
+import ru.nubby.playstream.domain.entity.FollowRelations;
+import ru.nubby.playstream.domain.entity.Pagination;
+import ru.nubby.playstream.domain.entity.Quality;
+import ru.nubby.playstream.domain.entity.Stream;
+import ru.nubby.playstream.domain.entity.StreamListNavigationState;
+import ru.nubby.playstream.domain.entity.StreamsResponse;
+import ru.nubby.playstream.domain.entity.UserData;
 
 public interface Repository {
     /**
      * Gets stream list from remote repository
      * @return list of top streams
      */
-    Single<StreamsRequest> getTopStreams();
+    Single<StreamsResponse> getTopStreams();
 
     /**
      * Gets stream list from remote repository
      * @param pagination pagination cursor
      * @return list of streams after pagination cursor
      */
-    Single<StreamsRequest> getTopStreams(Pagination pagination);
+    Single<StreamsResponse> getTopStreams(Pagination pagination);
 
     /**
      * Gets user follows list from remote or local(cached) repository

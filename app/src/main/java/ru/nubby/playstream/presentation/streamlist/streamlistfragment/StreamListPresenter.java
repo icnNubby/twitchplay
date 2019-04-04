@@ -12,9 +12,9 @@ import androidx.lifecycle.Lifecycle;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.data.Repository;
-import ru.nubby.playstream.model.Pagination;
-import ru.nubby.playstream.model.Stream;
-import ru.nubby.playstream.model.StreamListNavigationState;
+import ru.nubby.playstream.domain.entity.Pagination;
+import ru.nubby.playstream.domain.entity.Stream;
+import ru.nubby.playstream.domain.entity.StreamListNavigationState;
 import ru.nubby.playstream.presentation.base.BaseRxPresenter;
 
 import static ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListContract.View.ErrorMessage.ERROR_BAD_CONNECTION;

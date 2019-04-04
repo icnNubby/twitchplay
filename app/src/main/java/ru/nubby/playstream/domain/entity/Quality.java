@@ -1,4 +1,4 @@
-package ru.nubby.playstream.model;
+package ru.nubby.playstream.domain.entity;
 
 import android.content.Context;
 import android.content.res.Resources;

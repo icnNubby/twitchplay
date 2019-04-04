@@ -1,8 +1,8 @@
-package ru.nubby.playstream.model;
+package ru.nubby.playstream.domain.entity;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Pagination{
+public final class Pagination{
 
     @SerializedName("cursor")
     private String cursor;

@@ -6,8 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.data.Repository;
-import ru.nubby.playstream.model.StreamListNavigationState;
-import ru.nubby.playstream.model.UserData;
+import ru.nubby.playstream.domain.entity.StreamListNavigationState;
+import ru.nubby.playstream.domain.entity.UserData;
 import ru.nubby.playstream.presentation.base.BaseRxPresenter;
 
 public class StreamListActivityPresenter extends BaseRxPresenter<StreamListActivityContract.View>

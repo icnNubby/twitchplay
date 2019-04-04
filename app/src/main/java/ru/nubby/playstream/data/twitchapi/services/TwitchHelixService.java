@@ -6,39 +6,26 @@ import io.reactivex.Single;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Query;
-import ru.nubby.playstream.model.StreamsRequest;
-import ru.nubby.playstream.model.UserDataList;
-import ru.nubby.playstream.model.UserFollowsRequest;
+import ru.nubby.playstream.domain.entity.StreamsResponse;
+import ru.nubby.playstream.domain.entity.UserDataList;
+import ru.nubby.playstream.domain.entity.UserFollowsResponse;
 
 public interface TwitchHelixService {
 
     @GET("streams")
-    Single<StreamsRequest> getTopStreams();
-
-    @GET("streams")
-    Single<StreamsRequest> getTopStreams(@Query("after") String cursor);
+    Single<StreamsResponse> getTopStreams(@Query("after") String cursor);
 
     @GET("users")
-    Single<UserDataList> getUserDataListById(@Query("id") String streamId);
-
-    @GET("users")
-    Single<UserDataList> getUserDataListByIdsList(@Query("id") List<String> streamIdList);
+    Single<UserDataList> getUserDataListByIds(@Query("id") List<String> streamIdList);
 
     @GET("users")
     Single<UserDataList> getUserDataListByToken(@Header("Authorization") String token);
 
     @GET("users/follows?first=100")
-    Single<UserFollowsRequest> getUserFollowsById(@Query("from_id") String userId);
-
-    @GET("users/follows?first=100")
-    Single<UserFollowsRequest> getUserFollowsById(@Query("from_id") String userId,
-                                                  @Query("after") String cursor);
-
-    @GET("streams")
-    Single<StreamsRequest> updateStream(@Query("user_id") String userId);
+    Single<UserFollowsResponse> getUserFollowsById(@Query("from_id") String userId,
+                                                   @Query("after") String cursor);
 
     @GET("streams?first=100")
-    Single<StreamsRequest> getAllStreamsByUserList(@Query("user_id") List<String> userId);
-
+    Single<StreamsResponse> getAllStreamsByUserList(@Query("user_id") List<String> userId);
 
 }

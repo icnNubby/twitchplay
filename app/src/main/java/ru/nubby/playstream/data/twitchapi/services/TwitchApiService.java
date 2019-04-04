@@ -4,7 +4,7 @@ package ru.nubby.playstream.data.twitchapi.services;
 import io.reactivex.Single;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
-import ru.nubby.playstream.model.StreamToken;
+import ru.nubby.playstream.domain.entity.StreamToken;
 
 public interface TwitchApiService {
 

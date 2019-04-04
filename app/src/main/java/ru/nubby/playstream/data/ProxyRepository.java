@@ -23,13 +23,13 @@ import ru.nubby.playstream.data.sharedprefs.AuthorizationStorage;
 import ru.nubby.playstream.data.sharedprefs.DefaultPreferences;
 import ru.nubby.playstream.data.sharedprefs.PersistentStorage;
 import ru.nubby.playstream.data.twitchapi.RemoteRepository;
-import ru.nubby.playstream.model.FollowRelations;
-import ru.nubby.playstream.model.Pagination;
-import ru.nubby.playstream.model.Quality;
-import ru.nubby.playstream.model.Stream;
-import ru.nubby.playstream.model.StreamListNavigationState;
-import ru.nubby.playstream.model.StreamsRequest;
-import ru.nubby.playstream.model.UserData;
+import ru.nubby.playstream.domain.entity.FollowRelations;
+import ru.nubby.playstream.domain.entity.Pagination;
+import ru.nubby.playstream.domain.entity.Quality;
+import ru.nubby.playstream.domain.entity.Stream;
+import ru.nubby.playstream.domain.entity.StreamListNavigationState;
+import ru.nubby.playstream.domain.entity.StreamsResponse;
+import ru.nubby.playstream.domain.entity.UserData;
 
 /**
  * Contains decision making on what kind of repo we should use.
@@ -40,6 +40,7 @@ import ru.nubby.playstream.model.UserData;
 
 @Singleton
 public class ProxyRepository implements Repository {
+
     public enum LoggedStatus {
         NOT_LOGGED, TOKEN_ONLY, LOGGED
     }
@@ -77,7 +78,7 @@ public class ProxyRepository implements Repository {
     }
 
     @Override
-    public Single<StreamsRequest> getTopStreams() {
+    public Single<StreamsResponse> getTopStreams() {
         return mRemoteRepository
                 .getTopStreams()
                 .flatMap(this::fetchAdditionalInfo)
@@ -85,7 +86,7 @@ public class ProxyRepository implements Repository {
     }
 
     @Override
-    public Single<StreamsRequest> getTopStreams(Pagination pagination) {
+    public Single<StreamsResponse> getTopStreams(Pagination pagination) {
         return mRemoteRepository
                 .getTopStreams(pagination)
                 .flatMap(this::fetchAdditionalInfo)
@@ -97,7 +98,6 @@ public class ProxyRepository implements Repository {
         if (mFollowsFullUpdate) {
             return mRemoteRepository
                     .getUserFollows(userId)
-                    .subscribeOn(Schedulers.io())
                     .doOnSuccess(followRelationsList -> mFollowsFullUpdate = false)
                     .flatMap(followRelationsList ->
                             mLocalRepository
@@ -109,8 +109,7 @@ public class ProxyRepository implements Repository {
 
         } else {
             return mLocalRepository
-                    .getFollowRelationsEntriesById(userId)
-                    .subscribeOn(Schedulers.io());
+                    .getFollowRelationsEntriesById(userId);
         }
     }
 
@@ -136,7 +135,6 @@ public class ProxyRepository implements Repository {
     public Single<UserData> getUserFromStreamer(Stream stream) {
         return mLocalRepository
                 .findUserDataById(stream.getUserId())
-                .subscribeOn(Schedulers.io())
                 .switchIfEmpty(mRemoteRepository
                         .getStreamerInfo(stream)
                         .flatMap(userData ->
@@ -150,7 +148,6 @@ public class ProxyRepository implements Repository {
     public Single<UserData> getUserFromToken(String token) {
         return mRemoteRepository
                 .getUserDataFromToken(token)
-                .subscribeOn(Schedulers.io())
                 .flatMap(userData ->
                         mLocalRepository
                                 .insertUserData(userData)
@@ -168,7 +165,6 @@ public class ProxyRepository implements Repository {
     @Override
     public Completable followStream(Stream targetStream) {
         return getCurrentLoginInfo()
-                .subscribeOn(Schedulers.io())
                 .flatMapCompletable(userData ->
                         mRemoteRepository
                                 .followTargetUser(mAuthorizationStorage.getUserAccessToken(),
@@ -179,15 +175,13 @@ public class ProxyRepository implements Repository {
                                                         userData.getLogin(),
                                                         targetStream.getUserId(),
                                                         targetStream.getStreamerLogin(),
-                                                        ""))
-                                        .subscribeOn(Schedulers.io())));
+                                                        ""))));
         //todo fix empty fields;
     }
 
     @Override
     public Completable unfollowStream(Stream targetStream) {
         return getCurrentLoginInfo()
-                .subscribeOn(Schedulers.io())
                 .flatMapCompletable(userData ->
                         mRemoteRepository
                                 .unfollowTargetUser(mAuthorizationStorage.getUserAccessToken(),
@@ -198,8 +192,7 @@ public class ProxyRepository implements Repository {
                                                         userData.getLogin(),
                                                         targetStream.getUserId(),
                                                         targetStream.getStreamerLogin(),
-                                                        ""))
-                                        .subscribeOn(Schedulers.io())));
+                                                        ""))));
     }
 
     @Override
@@ -291,16 +284,16 @@ public class ProxyRepository implements Repository {
         }
     }
 
-    private Single<StreamsRequest> fetchAdditionalInfo(final StreamsRequest streamsRequest) {
-        //makes deep copy of streamsRequest, modifies its "data" field (List<Streams>)
+    private Single<StreamsResponse> fetchAdditionalInfo(final StreamsResponse streamsResponse) {
+        //makes deep copy of streamsResponse, modifies its "data" field (List<Streams>)
         Gson gson = new Gson();
-        final StreamsRequest streamsRequestCopy =
-                gson.fromJson(gson.toJson(streamsRequest, StreamsRequest.class), StreamsRequest.class);
+        final StreamsResponse streamsResponseCopy =
+                gson.fromJson(gson.toJson(streamsResponse, StreamsResponse.class), StreamsResponse.class);
 
-        return fetchAdditionalInfo(streamsRequestCopy.getData(), false)
+        return fetchAdditionalInfo(streamsResponseCopy.getData(), false)
                 .flatMap(streams -> {
-                    streamsRequestCopy.setData(streams);
-                    return Single.just(streamsRequestCopy);
+                    streamsResponseCopy.setData(streams);
+                    return Single.just(streamsResponseCopy);
                 });
 
     }
@@ -331,7 +324,6 @@ public class ProxyRepository implements Repository {
         if (!forceUpdateDb) {
             localSource = Observable
                     .fromIterable(streamListCopy)
-                    .subscribeOn(Schedulers.io())
                     .map(Stream::getUserId)
                     .flatMapMaybe(mLocalRepository::findUserDataById)
                     .doOnEach(userDataNotification -> {

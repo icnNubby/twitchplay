@@ -1,10 +1,10 @@
-package ru.nubby.playstream.model;
+package ru.nubby.playstream.domain.entity;
 
 import java.util.List;
-import com.google.gson.annotations.Expose;
+
 import com.google.gson.annotations.SerializedName;
 
-public class UserDataList {
+public final class UserDataList {
 
     @SerializedName("data")
     private List<UserData> data;

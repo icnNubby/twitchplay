@@ -1,4 +1,4 @@
-package ru.nubby.playstream.model;
+package ru.nubby.playstream.domain.entity;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -8,7 +8,7 @@ import java.util.List;
  * <a href = "https://dev.twitch.tv/docs/api/reference/#get-users-follows">
  * Query parameters here.</a>
  */
-public class UserFollowsRequest {
+public final class UserFollowsResponse {
 
     @SerializedName("total")
     private Integer total;

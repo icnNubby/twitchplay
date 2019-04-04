@@ -13,7 +13,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.domain.entity.Stream;
 
 @Singleton
 public class PersistentStorage {

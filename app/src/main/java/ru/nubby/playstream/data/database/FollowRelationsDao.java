@@ -9,7 +9,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import io.reactivex.Completable;
 import io.reactivex.Single;
-import ru.nubby.playstream.model.FollowRelations;
+import ru.nubby.playstream.domain.entity.FollowRelations;
 
 @Dao
 public interface FollowRelationsDao {

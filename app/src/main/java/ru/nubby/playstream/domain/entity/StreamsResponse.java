@@ -1,4 +1,4 @@
-package ru.nubby.playstream.model;
+package ru.nubby.playstream.domain.entity;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -8,7 +8,7 @@ import java.util.List;
  * <a href = "https://dev.twitch.tv/docs/api/reference/#get-streams">
  * Query parameters here.</a>
  */
-public class StreamsRequest {
+public final class StreamsResponse {
 
     /**
      * Contains an array of {@link Stream} information elements.

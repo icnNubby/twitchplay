@@ -1,4 +1,4 @@
-package ru.nubby.playstream.model;
+package ru.nubby.playstream.domain.entity;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
  * Stream class. Contains information about user, stream title, viewer count, etc.
  * <a href = "https://dev.twitch.tv/docs/api/reference/#get-streams">Documentation here.</a>
  */
-public class Stream implements Comparable<Stream>, Serializable {
+public final class Stream implements Comparable<Stream>, Serializable {
 
     @SerializedName("title")
     private String title;
@@ -22,6 +22,9 @@ public class Stream implements Comparable<Stream>, Serializable {
 
     @SerializedName("user_name")
     private String streamerName;
+
+    @SerializedName("game_id")
+    private String gameId;
 
     /**
      * This is always in latin letters(english alphabet), should be used in some queries instead of
@@ -125,5 +128,13 @@ public class Stream implements Comparable<Stream>, Serializable {
             return false;
         }
         return this.userId.equals(((Stream) obj).userId);
+    }
+
+    public String getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(String gameId) {
+        this.gameId = gameId;
     }
 }

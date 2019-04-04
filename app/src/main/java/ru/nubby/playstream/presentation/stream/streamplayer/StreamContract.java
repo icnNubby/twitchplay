@@ -3,10 +3,10 @@ package ru.nubby.playstream.presentation.stream.streamplayer;
 import java.util.List;
 
 import androidx.lifecycle.Lifecycle;
-import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.domain.entity.Stream;
 import ru.nubby.playstream.presentation.base.BasePresenter;
 import ru.nubby.playstream.presentation.base.BaseView;
-import ru.nubby.playstream.model.Quality;
+import ru.nubby.playstream.domain.entity.Quality;
 
 public interface StreamContract {
     interface View extends BaseView {

@@ -8,7 +8,7 @@ import com.google.gson.Gson;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import ru.nubby.playstream.model.UserData;
+import ru.nubby.playstream.domain.entity.UserData;
 
 @Singleton
 public class AuthorizationStorage {

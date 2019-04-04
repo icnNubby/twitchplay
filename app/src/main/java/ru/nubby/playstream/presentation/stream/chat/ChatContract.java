@@ -1,8 +1,8 @@
 package ru.nubby.playstream.presentation.stream.chat;
 
 import androidx.lifecycle.Lifecycle;
-import ru.nubby.playstream.model.ChatMessage;
-import ru.nubby.playstream.model.Stream;
+import ru.nubby.playstream.domain.entity.ChatMessage;
+import ru.nubby.playstream.domain.entity.Stream;
 import ru.nubby.playstream.presentation.base.BasePresenter;
 import ru.nubby.playstream.presentation.base.BaseView;
 
