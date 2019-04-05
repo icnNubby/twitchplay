@@ -36,7 +36,6 @@ public interface Repository {
      */
     Single<List<FollowRelations>> getUserFollows(String userId);
 
-
     /**
      * Gets active stream list from remote or local(cached) repository
      * @return list of user's followed streams
@@ -105,45 +104,6 @@ public interface Repository {
      * @return Boolean value of follow existence
      */
     Single<Boolean> isStreamFollowed(Stream targetStream);
-
-    /**
-     * Gets current login info. If current login procedure was not complete - finishes it.
-     * @return {@link UserData} object with logged user info.
-     */
-    Single<UserData> getCurrentLoginInfo();
-
-    /**
-     * Saves token to shared prefs and performs further login.
-     * @param token OAuth token
-     * @return {@link UserData} object with logged user info.
-     */
-    Single<UserData> loginAttempt(String token);
-
-    /**
-     * Gets shared preferences object of the app.
-     * @return {@link DefaultPreferences} object to read shared preferences
-     */
-    DefaultPreferences getSharedPreferences();
-
-    /**
-     * Gets navigation state of stream list screen.
-     * It lives here because one presenter should emit it's changes, but other should respond
-     * with view changes. We make this connection by creating Observable source.
-     * @return {@link StreamListNavigationState} enum.
-     */
-    Observable<StreamListNavigationState> getObservableNavigationState();
-
-    /**
-     * Gets navigation state of stream list screen. Will return default value on first retrieve.
-     * @return {@link StreamListNavigationState} enum.
-     */
-    StreamListNavigationState getCurrentNavigationState();
-
-    /**
-     * Makes getObservableNavigationState Observable to emit next state value.
-     * @param state state to be emitted.
-     */
-    void setCurrentNavigationState(StreamListNavigationState state);
 
     /**
      * Synchronizes user follows list from remote to local repository.

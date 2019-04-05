@@ -8,14 +8,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+
+import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.domain.entity.Pagination;
 import ru.nubby.playstream.domain.entity.Stream;
 import ru.nubby.playstream.domain.entity.StreamListNavigationState;
+import ru.nubby.playstream.domain.interactor.NavigationStateInteractor;
+import ru.nubby.playstream.domain.interactor.PreferencesInteractor;
 import ru.nubby.playstream.presentation.base.BaseRxPresenter;
+import ru.nubby.playstream.utils.RxSchedulersProvider;
 
 import static ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListContract.View.ErrorMessage.ERROR_BAD_CONNECTION;
 
@@ -26,36 +33,44 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
     private static final String TAG = StreamListPresenter.class.getSimpleName();
     private final long UPDATE_INTERVAL_MILLIS = 1000 * 60 * 5; // 5 minutes
 
+    private final Repository mRepository;
+    private final NavigationStateInteractor mNavigationStateInteractor;
+    private final PreferencesInteractor mPreferencesInteractor;
+    private final Scheduler mMainThreadScheduler;
+
     private Disposable mDisposableFetchingTask;
 
     private Pagination mPagination;
-    private Repository mRepository;
 
     private List<Stream> mCurrentStreamList;
     private Map<String, Stream> mCurrentStreamMap;
     private Observable<StreamListNavigationState> mListStateObservable;
-    private StreamListNavigationState mCurrentState;
     private boolean mForceReload = false;
 
-    public StreamListPresenter(Repository repository) {
-        this.mRepository = repository;
-        this.mListStateObservable = repository.getObservableNavigationState();
+    public StreamListPresenter(@NonNull Repository repository,
+                               @NonNull NavigationStateInteractor navigationStateInteractor,
+                               @NonNull PreferencesInteractor preferencesInteractor,
+                               @NonNull RxSchedulersProvider rxSchedulersProvider) {
+        mRepository = repository;
+        mNavigationStateInteractor = navigationStateInteractor;
+        mPreferencesInteractor = preferencesInteractor;
+        mMainThreadScheduler = rxSchedulersProvider.getUiScheduler();
+        mListStateObservable = mNavigationStateInteractor.getObservableNavigationState();
     }
 
     @Override
     public void subscribe(StreamListContract.View view, Lifecycle lifecycle, long interval) {
         super.subscribe(view, lifecycle);
-        mView.setPreviewSize(mRepository.getSharedPreferences().getPreviewSize());
+        mView.setPreviewSize(mPreferencesInteractor.getPreviewSize());
 
         mForceReload = (interval >= UPDATE_INTERVAL_MILLIS ||
                 interval == 0 ||
                 mCurrentStreamList == null ||
                 mCurrentStreamList.isEmpty());
 
-        mCurrentState = mRepository.getCurrentNavigationState();
         Disposable disposableListState = mListStateObservable
+                .observeOn(mMainThreadScheduler)
                 .subscribe(streamListNavigationState -> {
-                    mCurrentState = streamListNavigationState;
                     if (mForceReload) {
                         updateStreams();
                     } else {
@@ -63,6 +78,7 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
                         mView.displayStreamList(mCurrentStreamList);
                     }
                 });
+
         mCompositeDisposable.add(disposableListState);
     }
 
@@ -77,9 +93,10 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
             mCompositeDisposable.remove(mDisposableFetchingTask);
             mDisposableFetchingTask.dispose();
         }
-        if (mCurrentState == StreamListNavigationState.MODE_TOP) {
+        StreamListNavigationState state = mNavigationStateInteractor.getCurrentNavigationState();
+        if (state == StreamListNavigationState.MODE_TOP) {
             getTopStreams();
-        } else if (mCurrentState == StreamListNavigationState.MODE_FAVOURITES) {
+        } else if (state == StreamListNavigationState.MODE_FAVOURITES) {
             getFollowedStreams();
         }
     }
@@ -145,7 +162,8 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
 
     @Override
     public void getMoreStreams() {
-        if (mCurrentState == StreamListNavigationState.MODE_TOP && mPagination != null) {
+        StreamListNavigationState state = mNavigationStateInteractor.getCurrentNavigationState();
+        if (state == StreamListNavigationState.MODE_TOP && mPagination != null) {
             if (mDisposableFetchingTask != null) {
                 mCompositeDisposable.remove(mDisposableFetchingTask);
                 mDisposableFetchingTask.dispose();
@@ -164,7 +182,7 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
             mCompositeDisposable.add(mDisposableFetchingTask);
         } else {
             Log.e(TAG, "Wrong mode to fetch more streams, pagination cursor = " +
-                    mPagination + ", state = " + mCurrentState);
+                    mPagination + ", state = " + state);
         }
     }
 

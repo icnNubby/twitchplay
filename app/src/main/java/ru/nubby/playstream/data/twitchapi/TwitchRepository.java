@@ -27,9 +27,10 @@ import ru.nubby.playstream.domain.entity.Stream;
 import ru.nubby.playstream.domain.entity.StreamToken;
 import ru.nubby.playstream.domain.entity.StreamsResponse;
 import ru.nubby.playstream.domain.entity.UserData;
-import ru.nubby.playstream.domain.entity.UserDataList;
+import ru.nubby.playstream.domain.entity.UserDataResponse;
 import ru.nubby.playstream.domain.entity.UserFollowsResponse;
 import ru.nubby.playstream.utils.M3U8Parser;
+import ru.nubby.playstream.utils.RxSchedulersProvider;
 
 @Singleton
 public class TwitchRepository implements RemoteRepository {
@@ -49,14 +50,13 @@ public class TwitchRepository implements RemoteRepository {
                             TwitchApiService twitchApiService,
                             TwitchKrakenService twitchKrakenService,
                             TwitchHelixService twitchHelixService,
-                            @Named("Io") Scheduler ioScheduler,
-                            @Named("Computation") Scheduler computationScheduler) {
+                            RxSchedulersProvider rxSchedulersProvider) {
         mRawJsonService = rawJsonService;
         mTwitchApiService = twitchApiService;
         mTwitchKrakenService = twitchKrakenService;
         mTwitchHelixService = twitchHelixService;
-        mIoScheduler = ioScheduler;
-        mComputationScheduler = computationScheduler;
+        mIoScheduler = rxSchedulersProvider.getIoScheduler();
+        mComputationScheduler = rxSchedulersProvider.getComputationScheduler();
     }
 
     @Override
@@ -108,10 +108,10 @@ public class TwitchRepository implements RemoteRepository {
         oneElementList.add(stream.getUserId());
 
         return mTwitchHelixService
-                .getUserDataListByIds(oneElementList)
+                .getUserDataByIds(oneElementList)
                 .subscribeOn(mIoScheduler)
-                .filter(userDataList -> !userDataList.getData().isEmpty())
-                .map(userDataList -> userDataList.getData().get(0))
+                .filter(userDataResponse -> !userDataResponse.getData().isEmpty())
+                .map(userDataResponse -> userDataResponse.getData().get(0))
                 .toSingle();
     }
 
@@ -138,10 +138,10 @@ public class TwitchRepository implements RemoteRepository {
     @Override
     public Single<UserData> getUserDataFromToken(String token) {
         return mTwitchHelixService
-                .getUserDataListByToken("Bearer " + token)
+                .getUserDataByToken("Bearer " + token)
                 .subscribeOn(mIoScheduler)
-                .filter(userDataList -> !userDataList.getData().isEmpty())
-                .map(userDataList -> userDataList.getData().get(0))
+                .filter(userDataResponse -> !userDataResponse.getData().isEmpty())
+                .map(userDataResponse -> userDataResponse.getData().get(0))
                 .toSingle();
     }
 
@@ -279,8 +279,8 @@ public class TwitchRepository implements RemoteRepository {
                 .buffer(100)
                 .subscribeOn(mIoScheduler)
                 .flatMap(idListBuffered -> mTwitchHelixService
-                        .getUserDataListByIds(idListBuffered)
-                        .map(UserDataList::getData)
+                        .getUserDataByIds(idListBuffered)
+                        .map(UserDataResponse::getData)
                         .subscribeOn(mIoScheduler)
                         .toObservable())
                 .subscribeOn(mComputationScheduler)

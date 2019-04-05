@@ -14,6 +14,9 @@ import dagger.Module;
 import dagger.Provides;
 import dagger.multibindings.IntoMap;
 import ru.nubby.playstream.data.Repository;
+import ru.nubby.playstream.domain.interactor.AuthInteractor;
+import ru.nubby.playstream.domain.interactor.NavigationStateInteractor;
+import ru.nubby.playstream.domain.interactor.PreferencesInteractor;
 import ru.nubby.playstream.presentation.base.PresenterFactory;
 import ru.nubby.playstream.presentation.login.LoginPresenter;
 import ru.nubby.playstream.presentation.preferences.PreferencesPresenter;
@@ -21,6 +24,7 @@ import ru.nubby.playstream.presentation.stream.chat.ChatPresenter;
 import ru.nubby.playstream.presentation.stream.streamplayer.StreamPresenter;
 import ru.nubby.playstream.presentation.streamlist.StreamListActivityPresenter;
 import ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListPresenter;
+import ru.nubby.playstream.utils.RxSchedulersProvider;
 
 @Module
 public abstract class PresentersModule {
@@ -40,22 +44,35 @@ public abstract class PresentersModule {
     @Provides
     @IntoMap
     @PresenterKey(value = StreamListPresenter.class)
-    static ViewModel streamListPresenter(Repository repository) {
-        return new StreamListPresenter(repository);
+    static ViewModel streamListPresenter(Repository repository,
+                                         NavigationStateInteractor navigationStateInteractor,
+                                         PreferencesInteractor preferencesInteractor,
+                                         RxSchedulersProvider rxSchedulersProvider) {
+        return new StreamListPresenter(
+                repository,
+                navigationStateInteractor,
+                preferencesInteractor,
+                rxSchedulersProvider);
     }
 
     @Provides
     @IntoMap
     @PresenterKey(value = StreamListActivityPresenter.class)
-    static ViewModel streamListActivityPresenter(Repository repository) {
-        return new StreamListActivityPresenter(repository);
+    static ViewModel streamListActivityPresenter(AuthInteractor authInteractor,
+                                                 NavigationStateInteractor navigationInteractor,
+                                                 RxSchedulersProvider rxSchedulersProvider) {
+        return new StreamListActivityPresenter(
+                authInteractor,
+                navigationInteractor,
+                rxSchedulersProvider);
     }
 
     @Provides
     @IntoMap
     @PresenterKey(value = StreamPresenter.class)
-    static ViewModel streamPresenter(Repository repository) {
-        return new StreamPresenter( repository);
+    static ViewModel streamPresenter(Repository repository,
+                                     PreferencesInteractor preferencesInteractor) {
+        return new StreamPresenter(repository, preferencesInteractor);
     }
 
     @Provides
@@ -75,7 +92,8 @@ public abstract class PresentersModule {
     @Provides
     @IntoMap
     @PresenterKey(value = LoginPresenter.class)
-    static ViewModel loginPresenter(Repository repository) {
-        return new LoginPresenter(repository);
+    static ViewModel loginPresenter(AuthInteractor authInteractor,
+                                    RxSchedulersProvider rxSchedulersProvider) {
+        return new LoginPresenter(authInteractor, rxSchedulersProvider);
     }
 }

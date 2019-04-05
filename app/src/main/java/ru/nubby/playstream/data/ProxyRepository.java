@@ -30,6 +30,7 @@ import ru.nubby.playstream.domain.entity.Stream;
 import ru.nubby.playstream.domain.entity.StreamListNavigationState;
 import ru.nubby.playstream.domain.entity.StreamsResponse;
 import ru.nubby.playstream.domain.entity.UserData;
+import ru.nubby.playstream.domain.interactor.AuthInteractor;
 
 /**
  * Contains decision making on what kind of repo we should use.
@@ -40,41 +41,28 @@ import ru.nubby.playstream.domain.entity.UserData;
 
 @Singleton
 public class ProxyRepository implements Repository {
-
-    public enum LoggedStatus {
-        NOT_LOGGED, TOKEN_ONLY, LOGGED
-    }
-
     private final String TAG = ProxyRepository.class.getSimpleName();
 
     private final RemoteRepository mRemoteRepository;
     private final LocalRepository mLocalRepository;
     private final AuthorizationStorage mAuthorizationStorage;
-    private final DefaultPreferences mDefaultPreferences;
     private final PersistentStorage mPersistentStorage;
+    private final AuthInteractor mAuthInteractor;
 
     private boolean mFollowsFullUpdate = true; //TODO IDK implement in some other way its too hacky
-
-    //TODO maybe there is better way? =(
-    private BehaviorSubject<StreamListNavigationState> mNavigationStateObservable;
-    private StreamListNavigationState mNavigationState;
 
     @Inject
     public ProxyRepository(@NonNull RemoteRepository remoteRepository,
                            @NonNull LocalRepository localRepository,
                            @NonNull AuthorizationStorage authorizationStorage,
-                           @NonNull DefaultPreferences defaultPreferences,
-                           @NonNull PersistentStorage persistentStorage) {
+                           @NonNull PersistentStorage persistentStorage,
+                           @NonNull AuthInteractor authInteractor) {
+
         mRemoteRepository = remoteRepository;
         mLocalRepository = localRepository;
         mAuthorizationStorage = authorizationStorage;
-        mDefaultPreferences = defaultPreferences;
         mPersistentStorage = persistentStorage;
-
-        mNavigationState = StreamListNavigationState
-                .values()[defaultPreferences.getDefaultStreamListMode()];
-        mNavigationStateObservable = BehaviorSubject.create();
-        mNavigationStateObservable.onNext(mNavigationState);
+        mAuthInteractor = authInteractor;
     }
 
     @Override
@@ -115,7 +103,8 @@ public class ProxyRepository implements Repository {
 
     @Override
     public Single<List<Stream>> getLiveStreamsFollowedByUser() {
-        return getCurrentLoginInfo()
+        return mAuthInteractor
+                .getCurrentLoginInfo()
                 .subscribeOn(Schedulers.io())
                 .flatMap(userData -> mRemoteRepository
                         .getLiveStreamsFromRelationList(getUserFollows(userData.getId())))
@@ -164,24 +153,29 @@ public class ProxyRepository implements Repository {
 
     @Override
     public Completable followStream(Stream targetStream) {
-        return getCurrentLoginInfo()
-                .flatMapCompletable(userData ->
-                        mRemoteRepository
-                                .followTargetUser(mAuthorizationStorage.getUserAccessToken(),
-                                        userData.getId(), targetStream.getUserId())
-                                .andThen(mLocalRepository
-                                        .insertFollowRelationsEntry(
-                                                new FollowRelations(userData.getId(),
-                                                        userData.getLogin(),
-                                                        targetStream.getUserId(),
-                                                        targetStream.getStreamerLogin(),
-                                                        ""))));
+        return mAuthInteractor
+                .getCurrentLoginInfo()
+                .flatMapCompletable(
+                        userData ->
+                                mRemoteRepository
+                                        .followTargetUser(
+                                                mAuthorizationStorage.getUserAccessToken(),
+                                                userData.getId(),
+                                                targetStream.getUserId())
+                                        .andThen(mLocalRepository
+                                                .insertFollowRelationsEntry(
+                                                        new FollowRelations(userData.getId(),
+                                                                userData.getLogin(),
+                                                                targetStream.getUserId(),
+                                                                targetStream.getStreamerLogin(),
+                                                                ""))));
         //todo fix empty fields;
     }
 
     @Override
     public Completable unfollowStream(Stream targetStream) {
-        return getCurrentLoginInfo()
+        return mAuthInteractor
+                .getCurrentLoginInfo()
                 .flatMapCompletable(userData ->
                         mRemoteRepository
                                 .unfollowTargetUser(mAuthorizationStorage.getUserAccessToken(),
@@ -197,53 +191,12 @@ public class ProxyRepository implements Repository {
 
     @Override
     public Single<Boolean> isStreamFollowed(Stream targetStream) {
-        return getCurrentLoginInfo()
+        return mAuthInteractor
+                .getCurrentLoginInfo()
                 .flatMap(userData -> mLocalRepository.findRelation(userData.getId(),
                         targetStream.getUserId()))
                 .flatMap(followRelationsList ->
                         Single.create(emitter -> emitter.onSuccess(!followRelationsList.isEmpty())));
-    }
-
-    @Override
-    public Single<UserData> getCurrentLoginInfo() {
-        LoggedStatus currentStatus = getCurrentLoggedStatus();
-        if (currentStatus == LoggedStatus.NOT_LOGGED) {
-            return Single.create(emitter -> emitter.onError(new Throwable("Not logged in")));
-        } else if (currentStatus == LoggedStatus.LOGGED) {
-            return Single.create(emitter -> {
-                emitter.onSuccess(mAuthorizationStorage.getUserData());
-            });
-        } else { //LoggedStatus.TOKEN_ONLY
-            return getUserFromToken(mAuthorizationStorage.getUserAccessToken())
-                    .doOnSuccess(mAuthorizationStorage::setUserData);
-        }
-    }
-
-    @Override
-    public Single<UserData> loginAttempt(String token) {
-        mAuthorizationStorage.setUserAccessToken(token);
-        return getCurrentLoginInfo();
-    }
-
-    @Override
-    public DefaultPreferences getSharedPreferences() {
-        return mDefaultPreferences;
-    }
-
-    @Override
-    public Observable<StreamListNavigationState> getObservableNavigationState() {
-        return mNavigationStateObservable;
-    }
-
-    @Override
-    public StreamListNavigationState getCurrentNavigationState() {
-        return mNavigationState;
-    }
-
-    @Override
-    public void setCurrentNavigationState(StreamListNavigationState state) {
-        mNavigationState = state;
-        mNavigationStateObservable.onNext(state);
     }
 
     @Override
@@ -255,7 +208,7 @@ public class ProxyRepository implements Repository {
 
     @Override
     public Completable synchronizeUserData() {
-        return  mLocalRepository
+        return mLocalRepository
                 .getAllUserDataEntries()
                 .toSingle()
                 .flatMap(mRemoteRepository::getUpdatedUserDataList)
@@ -269,20 +222,6 @@ public class ProxyRepository implements Repository {
     }
 
     //Private methods
-
-    private LoggedStatus getCurrentLoggedStatus() {
-        String token = mAuthorizationStorage.getUserAccessToken();
-        if (token != null && !token.equals("")) {
-            UserData data = mAuthorizationStorage.getUserData();
-            if (data == null) {
-                return LoggedStatus.TOKEN_ONLY;
-            } else {
-                return LoggedStatus.LOGGED;
-            }
-        } else {
-            return LoggedStatus.NOT_LOGGED;
-        }
-    }
 
     private Single<StreamsResponse> fetchAdditionalInfo(final StreamsResponse streamsResponse) {
         //makes deep copy of streamsResponse, modifies its "data" field (List<Streams>)

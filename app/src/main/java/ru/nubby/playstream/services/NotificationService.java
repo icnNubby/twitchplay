@@ -35,6 +35,7 @@ import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.data.sharedprefs.DefaultPreferences;
 import ru.nubby.playstream.domain.entity.Stream;
 import ru.nubby.playstream.domain.entity.UserData;
+import ru.nubby.playstream.domain.interactor.PreferencesInteractor;
 import ru.nubby.playstream.presentation.preferences.utils.TimePreference;
 import ru.nubby.playstream.presentation.stream.StreamChatActivity;
 import ru.nubby.playstream.presentation.streamlist.StreamListActivity;
@@ -63,7 +64,8 @@ public class NotificationService extends JobService {
 
     Picasso mPicasso;
 
-    private DefaultPreferences mDefaultPreferences;
+    @Inject
+    PreferencesInteractor mPreferencesInteractor;
 
     private Disposable mRetrieveLiveStreams;
     private Disposable mRetrieveAvatarBitmaps;
@@ -71,7 +73,6 @@ public class NotificationService extends JobService {
     @Override
     public void onCreate() {
         AndroidInjection.inject(this);
-        mDefaultPreferences = mRepository.getSharedPreferences();
         super.onCreate();
         mPicasso = Picasso.get();
     }
@@ -108,27 +109,27 @@ public class NotificationService extends JobService {
 
     private boolean conditionsSatisfied() {
 
-        if (!mDefaultPreferences.getNotificationsAreOn()) {
+        if (!mPreferencesInteractor.getNotificationsAreOn()) {
             return false;
         }
 
         boolean silent = false;
 
-        if (mDefaultPreferences.getSilentHoursAreOn()) {
-            if (mDefaultPreferences.getSilentHoursStartTime()
-                    .equals(mDefaultPreferences.getSilentHoursFinishTime())) {
+        if (mPreferencesInteractor.getSilentHoursAreOn()) {
+            if (mPreferencesInteractor.getSilentHoursStartTime()
+                    .equals(mPreferencesInteractor.getSilentHoursFinishTime())) {
                 return true;
             }
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(System.currentTimeMillis());
 
-            int startHour = TimePreference.parseHour(mDefaultPreferences.getSilentHoursStartTime());
-            int startMinute = TimePreference.parseMinute(mDefaultPreferences.getSilentHoursStartTime());
+            int startHour = TimePreference.parseHour(mPreferencesInteractor.getSilentHoursStartTime());
+            int startMinute = TimePreference.parseMinute(mPreferencesInteractor.getSilentHoursStartTime());
             int startTimeTotal = startHour * 60 + startMinute;
 
-            int endHour = TimePreference.parseHour(mDefaultPreferences.getSilentHoursFinishTime());
-            int endMinute = TimePreference.parseMinute(mDefaultPreferences.getSilentHoursFinishTime());
+            int endHour = TimePreference.parseHour(mPreferencesInteractor.getSilentHoursFinishTime());
+            int endMinute = TimePreference.parseMinute(mPreferencesInteractor.getSilentHoursFinishTime());
             int endTimeTotal = endHour * 60 + endMinute;
 
             int currentHour = calendar.get(Calendar.HOUR_OF_DAY);

@@ -12,6 +12,7 @@ import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import ru.nubby.playstream.domain.entity.FollowRelations;
 import ru.nubby.playstream.domain.entity.UserData;
+import ru.nubby.playstream.utils.RxSchedulersProvider;
 
 @Singleton
 public class RoomLocalDataSource implements LocalRepository {
@@ -26,12 +27,11 @@ public class RoomLocalDataSource implements LocalRepository {
     @Inject
     public RoomLocalDataSource(FollowRelationsDao followRelationsDao,
                                UserDataDao userDataDao,
-                               @Named("Io") Scheduler ioScheduler,
-                               @Named("Computation") Scheduler computationScheduler) {
+                               RxSchedulersProvider schedulersProvider) {
         mFollowRelationsDao = followRelationsDao;
         mUserDataDao = userDataDao;
-        mIoScheduler = ioScheduler;
-        mComputationScheduler = computationScheduler;
+        mIoScheduler = schedulersProvider.getIoScheduler();
+        mComputationScheduler = schedulersProvider.getComputationScheduler();
     }
 
     @Override

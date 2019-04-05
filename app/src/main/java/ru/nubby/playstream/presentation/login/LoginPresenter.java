@@ -4,11 +4,14 @@ import android.util.Log;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
+import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.SensitiveStorage;
-import ru.nubby.playstream.data.Repository;
+import ru.nubby.playstream.domain.interactor.AuthInteractor;
 import ru.nubby.playstream.presentation.base.BaseRxPresenter;
+import ru.nubby.playstream.utils.RxSchedulersProvider;
 
 public class LoginPresenter extends BaseRxPresenter<LoginContract.View>
         implements LoginContract.Presenter {
@@ -18,11 +21,14 @@ public class LoginPresenter extends BaseRxPresenter<LoginContract.View>
                     + SensitiveStorage.getClientApiKey()
                     + "&redirect_uri=http%3A%2F%2Flocalhost&scope=user_read+user_follows_edit+user_subscriptions";
 
-    private Repository mRepository;
+    private final AuthInteractor mAuthInteractor;
+    private final Scheduler mMainThreadScheduler;
 
     @Inject
-    public LoginPresenter(Repository repository) {
-        mRepository = repository;
+    public LoginPresenter(@NonNull AuthInteractor authInteractor,
+                          @NonNull RxSchedulersProvider schedulersProvider) {
+        mAuthInteractor = authInteractor;
+        mMainThreadScheduler = schedulersProvider.getUiScheduler();
     }
 
     @Override
@@ -43,12 +49,15 @@ public class LoginPresenter extends BaseRxPresenter<LoginContract.View>
     @Override
     public boolean interceptedAnswer(String url) {
         if (url.contains("#access_token=")) {
+
             String mAccessToken = getAccessTokenFromURL(url);
-            Disposable disposableUserFetchTask = mRepository
+            Disposable disposableUserFetchTask = mAuthInteractor
                     .loginAttempt(mAccessToken)
+                    .observeOn(mMainThreadScheduler)
                     .subscribe(
                             userData -> mView.handleUserInfoFetched(true),
                             error -> Log.e(TAG, "Error while fetching user data", error));
+
             mCompositeDisposable.add(disposableUserFetchTask);
             return true;
         }

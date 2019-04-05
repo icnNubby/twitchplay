@@ -16,6 +16,7 @@ import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.domain.entity.Quality;
 import ru.nubby.playstream.domain.entity.Stream;
+import ru.nubby.playstream.domain.interactor.PreferencesInteractor;
 import ru.nubby.playstream.presentation.base.BaseRxPresenter;
 
 import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.ERROR_CHANNEL_FOLLOW_UNFOLLOW;
@@ -37,11 +38,14 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
 
     private Stream mCurrentStream;
 
-    private Repository mRepository;
+    private final Repository mRepository;
+    private final PreferencesInteractor mPreferencesInteractor;
 
     @Inject
-    public StreamPresenter(Repository repository) {
+    public StreamPresenter(Repository repository,
+                           PreferencesInteractor preferencesInteractor) {
         mRepository = repository;
+        mPreferencesInteractor = preferencesInteractor;
     }
 
     @Override
@@ -163,9 +167,7 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
                             mView.setQualitiesMenu(mQualities);
 
                             //get url for default or if not exists for closest better quality.
-                            Quality defaultQuality = mRepository
-                                            .getSharedPreferences()
-                                            .getDefaultQuality();
+                            Quality defaultQuality = mPreferencesInteractor.getDefaultQuality();
                             Quality nextQuality = defaultQuality;
                             String url = mQualityUrls.get(defaultQuality);
                             while (url == null && nextQuality.ordinal() > 0) {
