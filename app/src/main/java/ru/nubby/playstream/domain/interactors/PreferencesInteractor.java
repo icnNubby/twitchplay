@@ -3,7 +3,7 @@ package ru.nubby.playstream.domain.interactors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import ru.nubby.playstream.data.sharedprefs.DefaultPreferences;
+import ru.nubby.playstream.data.sources.sharedprefs.DefaultPreferences;
 import ru.nubby.playstream.domain.entities.Quality;
 
 /**

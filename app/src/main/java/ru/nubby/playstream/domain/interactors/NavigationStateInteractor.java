@@ -6,7 +6,7 @@ import javax.inject.Singleton;
 import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
-import ru.nubby.playstream.data.sharedprefs.DefaultPreferences;
+import ru.nubby.playstream.data.sources.sharedprefs.DefaultPreferences;
 import ru.nubby.playstream.domain.entities.StreamListNavigationState;
 
 /**

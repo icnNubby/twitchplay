@@ -12,7 +12,7 @@ import ru.nubby.playstream.PlayStreamApp;
 import ru.nubby.playstream.di.modules.ActivityBindingModule;
 import ru.nubby.playstream.di.modules.AppModule;
 import ru.nubby.playstream.data.DataModule;
-import ru.nubby.playstream.data.twitchapi.TwitchApiModule;
+import ru.nubby.playstream.data.sources.twitchapi.TwitchApiModule;
 import ru.nubby.playstream.di.modules.RxSchedulersModule;
 import ru.nubby.playstream.di.modules.ServiceBindingModule;
 import ru.nubby.playstream.di.modules.PresentersModule;

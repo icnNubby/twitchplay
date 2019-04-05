@@ -8,9 +8,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Single;
-import ru.nubby.playstream.data.Repository;
-import ru.nubby.playstream.data.sharedprefs.DefaultPreferences;
-import ru.nubby.playstream.data.sharedprefs.PersistentStorage;
+import ru.nubby.playstream.domain.StreamsRepository;
+import ru.nubby.playstream.data.sources.sharedprefs.DefaultPreferences;
+import ru.nubby.playstream.data.sources.sharedprefs.PersistentStorage;
 import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.presentation.preferences.utils.TimePreference;
 
@@ -23,16 +23,16 @@ public class NotificationsInteractor {
     private final PersistentStorage mPersistentStorage;
     private final DefaultPreferences mDefaultPreferences;
     private final AuthInteractor mAuthInteractor;
-    private final Repository mRepository;
+    private final StreamsRepository mStreamsRepository;
 
     @Inject
     public NotificationsInteractor(PersistentStorage persistentStorage,
                                    DefaultPreferences defaultPreferences,
                                    AuthInteractor authInteractor,
-                                   Repository repository) {
+                                   StreamsRepository streamsRepository) {
         mPersistentStorage = persistentStorage;
         mDefaultPreferences = defaultPreferences;
-        mRepository = repository;
+        mStreamsRepository = streamsRepository;
         mAuthInteractor = authInteractor;
     }
 
@@ -95,7 +95,7 @@ public class NotificationsInteractor {
      * @return
      */
     public Single<List<Stream>> getLiveStreams() {
-        return mRepository.getLiveStreamsFollowedByUser();
+        return mStreamsRepository.getLiveStreamsFollowedByUser();
     }
 
     /**
@@ -117,7 +117,7 @@ public class NotificationsInteractor {
 
     /**
      * Gets last retrieved stream list.
-     * This stream list is saved in {@link ru.nubby.playstream.data.sharedprefs.PersistentStorage}.
+     * This stream list is saved in {@link ru.nubby.playstream.data.sources.sharedprefs.PersistentStorage}.
      */
     public List<Stream> getLastLiveStreams() {
         return mPersistentStorage.getStreamList();

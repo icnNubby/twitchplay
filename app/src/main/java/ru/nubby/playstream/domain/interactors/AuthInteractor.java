@@ -4,9 +4,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Single;
-import ru.nubby.playstream.data.database.LocalRepository;
-import ru.nubby.playstream.data.sharedprefs.AuthorizationStorage;
-import ru.nubby.playstream.data.twitchapi.RemoteRepository;
+import ru.nubby.playstream.data.sources.database.LocalRepository;
+import ru.nubby.playstream.data.sources.sharedprefs.AuthorizationStorage;
+import ru.nubby.playstream.data.sources.twitchapi.RemoteRepository;
 import ru.nubby.playstream.domain.entities.UserData;
 
 /**
@@ -92,7 +92,7 @@ public class AuthInteractor {
      *
      * @return {@link LoggedStatus} status.
      */
-    LoggedStatus getCurrentLoggedStatus() {
+    public LoggedStatus getCurrentLoggedStatus() {
         String token = mAuthorizationStorage.getUserAccessToken();
         if (token != null && !token.isEmpty()) {
             UserData data = mAuthorizationStorage.getUserData();

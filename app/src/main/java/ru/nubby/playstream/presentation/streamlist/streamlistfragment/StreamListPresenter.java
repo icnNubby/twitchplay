@@ -13,7 +13,7 @@ import androidx.lifecycle.Lifecycle;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
-import ru.nubby.playstream.data.Repository;
+import ru.nubby.playstream.domain.StreamsRepository;
 import ru.nubby.playstream.domain.entities.Pagination;
 import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.domain.entities.StreamListNavigationState;
@@ -31,7 +31,7 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
     private static final String TAG = StreamListPresenter.class.getSimpleName();
     private final long UPDATE_INTERVAL_MILLIS = 1000 * 60 * 5; // 5 minutes
 
-    private final Repository mRepository;
+    private final StreamsRepository mStreamsRepository;
     private final NavigationStateInteractor mNavigationStateInteractor;
     private final PreferencesInteractor mPreferencesInteractor;
     private final Scheduler mMainThreadScheduler;
@@ -45,11 +45,11 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
     private Observable<StreamListNavigationState> mListStateObservable;
     private boolean mForceReload = false;
 
-    public StreamListPresenter(@NonNull Repository repository,
+    public StreamListPresenter(@NonNull StreamsRepository streamsRepository,
                                @NonNull NavigationStateInteractor navigationStateInteractor,
                                @NonNull PreferencesInteractor preferencesInteractor,
                                @NonNull RxSchedulersProvider rxSchedulersProvider) {
-        mRepository = repository;
+        mStreamsRepository = streamsRepository;
         mNavigationStateInteractor = navigationStateInteractor;
         mPreferencesInteractor = preferencesInteractor;
         mMainThreadScheduler = rxSchedulersProvider.getUiScheduler();
@@ -106,7 +106,7 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
             mDisposableFetchingTask.dispose();
         }
 
-        mDisposableFetchingTask = mRepository
+        mDisposableFetchingTask = mStreamsRepository
                 .getLiveStreamsFollowedByUser()
                 .doOnSubscribe(disposable -> {
                     Log.d(TAG, "getFollowedStreams do on sub: " + this.toString());
@@ -133,7 +133,7 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
 
     @Override
     public void getTopStreams() {
-        mDisposableFetchingTask = mRepository
+        mDisposableFetchingTask = mStreamsRepository
                 .getTopStreams()
                 .doOnSubscribe(disposable -> {
                     Log.d(TAG, "getTopStreams: do on sub " + this.toString());
@@ -166,7 +166,7 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
                 mCompositeDisposable.remove(mDisposableFetchingTask);
                 mDisposableFetchingTask.dispose();
             }
-            mDisposableFetchingTask = mRepository
+            mDisposableFetchingTask = mStreamsRepository
                     .getTopStreams(mPagination)
                     .subscribe(streams -> {
                                 List<Stream> moreStreams = checkAndAddStreams(streams.getData());

@@ -13,7 +13,9 @@ import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import ru.nubby.playstream.data.Repository;
+import ru.nubby.playstream.domain.FollowsRepository;
+import ru.nubby.playstream.domain.StreamsRepository;
+import ru.nubby.playstream.domain.UsersRepository;
 import ru.nubby.playstream.domain.entities.Quality;
 import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.domain.interactors.PreferencesInteractor;
@@ -38,13 +40,18 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
 
     private Stream mCurrentStream;
 
-    private final Repository mRepository;
+    private final StreamsRepository mStreamsRepository;
+    private final FollowsRepository mFollowsRepository;
     private final PreferencesInteractor mPreferencesInteractor;
+    private final UsersRepository mUsersRepository;
 
     @Inject
-    public StreamPresenter(Repository repository,
+    public StreamPresenter(StreamsRepository streamsRepository,
+                           FollowsRepository followsRepository, UsersRepository usersRepository,
                            PreferencesInteractor preferencesInteractor) {
-        mRepository = repository;
+        mStreamsRepository = streamsRepository;
+        mFollowsRepository = followsRepository;
+        mUsersRepository = usersRepository;
         mPreferencesInteractor = preferencesInteractor;
     }
 
@@ -53,7 +60,7 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
         super.subscribe(view, lifecycle);
 
         Stream streamCopy = new Stream(stream);
-        Single<Stream> initialStreamRequest = mRepository
+        Single<Stream> initialStreamRequest = mUsersRepository
                 .getUserFromStreamer(stream)
                 .map(updatedLogin -> {
                     streamCopy.setStreamerLogin(updatedLogin.getLogin());
@@ -69,7 +76,7 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
                             mView.displayLoading(false);
                             mView.displayTitle(streamReturned.getTitle());
                             mView.displayViewerCount(streamReturned.getViewerCount());
-                            mFollowDisplayTask = mRepository
+                            mFollowDisplayTask = mFollowsRepository
                                     .isStreamFollowed(streamReturned)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
@@ -111,17 +118,17 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
     @Override
     public void followOrUnfollowChannel() {
         if (mCurrentStream != null) {
-            mFollowUnfollowTask = mRepository
+            mFollowUnfollowTask = mFollowsRepository
                     .isStreamFollowed(mCurrentStream)
                     .subscribeOn(Schedulers.io())
                     .flatMapCompletable(result -> {
                         if (result) {
-                            return mRepository.unfollowStream(mCurrentStream);
+                            return mFollowsRepository.unfollowStream(mCurrentStream);
                         } else {
-                            return mRepository.followStream(mCurrentStream);
+                            return mFollowsRepository.followStream(mCurrentStream);
                         }
                     })
-                    .andThen(mRepository.isStreamFollowed(mCurrentStream))
+                    .andThen(mFollowsRepository.isStreamFollowed(mCurrentStream))
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(followStatus -> {
                                 mView.displayFollowStatus(followStatus);
@@ -157,7 +164,7 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
         }
 
         mView.displayLoading(true);
-        mStreamResolutionsInfoTask = mRepository
+        mStreamResolutionsInfoTask = mStreamsRepository
                 .getQualityUrls(stream)
                 .subscribe(fetchedQualityTable -> {
                             mQualityUrls = fetchedQualityTable;
@@ -190,7 +197,7 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
                         });
         mCompositeDisposable.add(mStreamResolutionsInfoTask);
 
-        mStreamInfoUpdater = mRepository
+        mStreamInfoUpdater = mStreamsRepository
                 .getUpdatableStreamInfo(stream)
                 .subscribe(streamUpdated -> {
                             mView.displayTitle(streamUpdated.getTitle());

@@ -8,7 +8,7 @@ import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
 import io.reactivex.disposables.Disposable;
-import ru.nubby.playstream.data.Repository;
+import ru.nubby.playstream.domain.UsersRepository;
 import ru.nubby.playstream.utils.RxSchedulersProvider;
 
 public class SyncUserDataService extends JobService {
@@ -16,7 +16,7 @@ public class SyncUserDataService extends JobService {
     private static final String TAG = SyncUserDataService.class.getSimpleName();
 
     @Inject
-    Repository mRepository;
+    UsersRepository mRepository;
 
     @Inject
     RxSchedulersProvider mSchedulersProvider;

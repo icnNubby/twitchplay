@@ -13,7 +13,8 @@ import dagger.MapKey;
 import dagger.Module;
 import dagger.Provides;
 import dagger.multibindings.IntoMap;
-import ru.nubby.playstream.data.Repository;
+import ru.nubby.playstream.domain.StreamsRepository;
+import ru.nubby.playstream.domain.UsersRepository;
 import ru.nubby.playstream.domain.interactors.AuthInteractor;
 import ru.nubby.playstream.domain.interactors.NavigationStateInteractor;
 import ru.nubby.playstream.domain.interactors.PreferencesInteractor;
@@ -44,12 +45,12 @@ public abstract class PresentersModule {
     @Provides
     @IntoMap
     @PresenterKey(value = StreamListPresenter.class)
-    static ViewModel streamListPresenter(Repository repository,
+    static ViewModel streamListPresenter(StreamsRepository streamsRepository,
                                          NavigationStateInteractor navigationStateInteractor,
                                          PreferencesInteractor preferencesInteractor,
                                          RxSchedulersProvider rxSchedulersProvider) {
         return new StreamListPresenter(
-                repository,
+                streamsRepository,
                 navigationStateInteractor,
                 preferencesInteractor,
                 rxSchedulersProvider);
@@ -70,23 +71,27 @@ public abstract class PresentersModule {
     @Provides
     @IntoMap
     @PresenterKey(value = StreamPresenter.class)
-    static ViewModel streamPresenter(Repository repository,
+    static ViewModel streamPresenter(StreamsRepository streamsRepository,
+                                     UsersRepository usersRepository,
                                      PreferencesInteractor preferencesInteractor) {
-        return new StreamPresenter(repository, preferencesInteractor);
+        return new StreamPresenter(
+                streamsRepository,
+                followsRepository, usersRepository,
+                preferencesInteractor);
     }
 
     @Provides
     @IntoMap
     @PresenterKey(value = ChatPresenter.class)
-    static ViewModel chatPresenter(Repository repository) {
+    static ViewModel chatPresenter(UsersRepository repository) {
         return new ChatPresenter(repository);
     }
 
     @Provides
     @IntoMap
     @PresenterKey(value = PreferencesPresenter.class)
-    static ViewModel preferencesPresenter(Repository repository) {
-        return new PreferencesPresenter(repository);
+    static ViewModel preferencesPresenter(StreamsRepository streamsRepository) {
+        return new PreferencesPresenter(streamsRepository);
     }
 
     @Provides

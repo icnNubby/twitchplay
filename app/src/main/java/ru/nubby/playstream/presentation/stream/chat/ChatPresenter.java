@@ -13,8 +13,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.SensitiveStorage;
-import ru.nubby.playstream.data.Repository;
-import ru.nubby.playstream.data.ircapi.ChatChannelApi;
+import ru.nubby.playstream.domain.UsersRepository;
+import ru.nubby.playstream.data.sources.ircapi.ChatChannelApi;
 import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.presentation.base.BaseRxPresenter;
 
@@ -32,11 +32,11 @@ public class ChatPresenter extends BaseRxPresenter<ChatContract.View>
     private Disposable mChatListener;
     private Disposable mChatInitializer;
 
-    private Repository mRepository;
+    private UsersRepository mRepository;
     private ChatChannelApi mChatApi = null;
 
     @Inject
-    public ChatPresenter(Repository repository) {
+    public ChatPresenter(UsersRepository repository) {
         mRepository = repository;
     }
 
