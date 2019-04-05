@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import ru.nubby.playstream.domain.entity.ChatMessage;
+import ru.nubby.playstream.domain.entities.ChatMessage;
 
 //todo think more
 public class ChatChannelApi {

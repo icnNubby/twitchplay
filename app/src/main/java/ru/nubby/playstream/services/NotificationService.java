@@ -17,8 +17,6 @@ import android.util.Pair;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,12 +29,9 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.data.Repository;
-import ru.nubby.playstream.data.sharedprefs.DefaultPreferences;
-import ru.nubby.playstream.domain.entity.Stream;
-import ru.nubby.playstream.domain.entity.UserData;
-import ru.nubby.playstream.domain.interactor.PreferencesInteractor;
-import ru.nubby.playstream.presentation.preferences.utils.TimePreference;
+import ru.nubby.playstream.domain.entities.Stream;
+import ru.nubby.playstream.domain.entities.UserData;
+import ru.nubby.playstream.domain.interactors.NotificationsInteractor;
 import ru.nubby.playstream.presentation.stream.StreamChatActivity;
 import ru.nubby.playstream.presentation.streamlist.StreamListActivity;
 import ru.nubby.playstream.utils.Constants;
@@ -51,9 +46,6 @@ public class NotificationService extends JobService {
     private static final int NOTIFICATION_SUMMARY = 112112;
 
     @Inject
-    Repository mRepository;
-
-    @Inject
     RxSchedulersProvider mSchedulersProvider;
 
     @Inject
@@ -62,10 +54,10 @@ public class NotificationService extends JobService {
     @Inject
     Gson mGson;
 
-    Picasso mPicasso;
-
     @Inject
-    PreferencesInteractor mPreferencesInteractor;
+    NotificationsInteractor mNotificationsInteractor;
+
+    private Picasso mPicasso;
 
     private Disposable mRetrieveLiveStreams;
     private Disposable mRetrieveAvatarBitmaps;
@@ -80,23 +72,25 @@ public class NotificationService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
 
-        if (!conditionsSatisfied()) {
+        if (!mNotificationsInteractor.conditionsSatisfied()) {
             jobFinished(params, false);
             return true;
         }
 
-        final List<Stream> lastStreams = getLastLiveStreams();
+        final List<Stream> lastStreams = mNotificationsInteractor.getLastLiveStreams();
 
-        mRetrieveLiveStreams = getLiveStreams()
+        mRetrieveLiveStreams = mNotificationsInteractor.getLiveStreams()
                 .filter(streamList -> !streamList.isEmpty())
                 .subscribeOn(mSchedulersProvider.getIoScheduler())
                 .observeOn(mSchedulersProvider.getUiScheduler())
                 .subscribe(
                         streams -> {
                             List<Stream> freshStreams =
-                                    compareAndGetFreshStreams(lastStreams, streams);
+                                    mNotificationsInteractor.compareAndGetFreshStreams(lastStreams,
+                                            streams);
                             List<Stream> deadStreams =
-                                    compareAndGetDeadStreams(lastStreams, streams);
+                                    mNotificationsInteractor.compareAndGetDeadStreams(lastStreams,
+                                            streams);
 
                             constructNotifications(freshStreams, deadStreams);
                             jobFinished(params, false);
@@ -105,51 +99,6 @@ public class NotificationService extends JobService {
                             jobFinished(params, true);
                         });
         return true;
-    }
-
-    private boolean conditionsSatisfied() {
-
-        if (!mPreferencesInteractor.getNotificationsAreOn()) {
-            return false;
-        }
-
-        boolean silent = false;
-
-        if (mPreferencesInteractor.getSilentHoursAreOn()) {
-            if (mPreferencesInteractor.getSilentHoursStartTime()
-                    .equals(mPreferencesInteractor.getSilentHoursFinishTime())) {
-                return true;
-            }
-
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(System.currentTimeMillis());
-
-            int startHour = TimePreference.parseHour(mPreferencesInteractor.getSilentHoursStartTime());
-            int startMinute = TimePreference.parseMinute(mPreferencesInteractor.getSilentHoursStartTime());
-            int startTimeTotal = startHour * 60 + startMinute;
-
-            int endHour = TimePreference.parseHour(mPreferencesInteractor.getSilentHoursFinishTime());
-            int endMinute = TimePreference.parseMinute(mPreferencesInteractor.getSilentHoursFinishTime());
-            int endTimeTotal = endHour * 60 + endMinute;
-
-            int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
-            int currentMinute = calendar.get(Calendar.MINUTE);
-            int currentTimeTotal = currentHour * 60 + currentMinute;
-
-            //start time is at same day as end time
-            if (startTimeTotal < endTimeTotal &&
-                    currentTimeTotal >= startTimeTotal &&
-                    currentTimeTotal <= endTimeTotal) {
-                silent = true;
-            }
-            //start time is at another day than end time
-            if (startTimeTotal > endTimeTotal &&
-                    (currentTimeTotal > startTimeTotal ||
-                    currentTimeTotal < endTimeTotal)) {
-                silent = true;
-            }
-        }
-        return !silent;
     }
 
     @Override
@@ -161,41 +110,6 @@ public class NotificationService extends JobService {
             mRetrieveAvatarBitmaps.dispose();
         }
         return false;
-    }
-
-    private List<Stream> compareAndGetDeadStreams(List<Stream> oldStreams,
-                                                  List<Stream> newStreams) {
-        List<Stream> outList = new ArrayList<>();
-        for (Stream newElement : oldStreams) {
-            if (!newStreams.contains(newElement)) {
-                outList.add(newElement);
-            }
-        }
-        return outList;
-    }
-
-
-    private List<Stream> getLastLiveStreams() {
-        List<Stream> streams = mRepository.getLastStreamList();
-        for (Stream element : streams) {
-            Log.d(TAG, element.getStreamerName());
-        }
-        return streams;
-    }
-
-    private Single<List<Stream>> getLiveStreams() {
-        return mRepository.getLiveStreamsFollowedByUser();
-    }
-
-    private List<Stream> compareAndGetFreshStreams(List<Stream> oldStreams,
-                                                   List<Stream> newStreams) {
-        List<Stream> outList = new ArrayList<>();
-        for (Stream newElement : newStreams) {
-            if (!oldStreams.contains(newElement)) {
-                outList.add(newElement);
-            }
-        }
-        return outList;
     }
 
     private void constructNotifications(List<Stream> freshStreams, List<Stream> deadStreams) {

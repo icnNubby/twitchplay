@@ -33,8 +33,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProviders;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.domain.entity.Quality;
-import ru.nubby.playstream.domain.entity.Stream;
+import ru.nubby.playstream.domain.entities.Quality;
+import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.presentation.base.BaseFragment;
 import ru.nubby.playstream.presentation.base.PresenterFactory;
 

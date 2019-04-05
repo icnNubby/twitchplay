@@ -8,7 +8,6 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import io.reactivex.Completable;
@@ -20,15 +19,15 @@ import ru.nubby.playstream.data.twitchapi.services.RawJsonService;
 import ru.nubby.playstream.data.twitchapi.services.TwitchApiService;
 import ru.nubby.playstream.data.twitchapi.services.TwitchHelixService;
 import ru.nubby.playstream.data.twitchapi.services.TwitchKrakenService;
-import ru.nubby.playstream.domain.entity.FollowRelations;
-import ru.nubby.playstream.domain.entity.Pagination;
-import ru.nubby.playstream.domain.entity.Quality;
-import ru.nubby.playstream.domain.entity.Stream;
-import ru.nubby.playstream.domain.entity.StreamToken;
-import ru.nubby.playstream.domain.entity.StreamsResponse;
-import ru.nubby.playstream.domain.entity.UserData;
-import ru.nubby.playstream.domain.entity.UserDataResponse;
-import ru.nubby.playstream.domain.entity.UserFollowsResponse;
+import ru.nubby.playstream.domain.entities.FollowRelations;
+import ru.nubby.playstream.domain.entities.Pagination;
+import ru.nubby.playstream.domain.entities.Quality;
+import ru.nubby.playstream.domain.entities.Stream;
+import ru.nubby.playstream.domain.entities.StreamToken;
+import ru.nubby.playstream.domain.entities.StreamsResponse;
+import ru.nubby.playstream.domain.entities.UserData;
+import ru.nubby.playstream.domain.entities.UserDataResponse;
+import ru.nubby.playstream.domain.entities.UserFollowsResponse;
 import ru.nubby.playstream.utils.M3U8Parser;
 import ru.nubby.playstream.utils.RxSchedulersProvider;
 

@@ -28,7 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import ru.nubby.playstream.R;
 import ru.nubby.playstream.di.scopes.ActivityScope;
-import ru.nubby.playstream.domain.entity.Stream;
+import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.presentation.base.BaseFragment;
 import ru.nubby.playstream.presentation.base.PresenterFactory;
 import ru.nubby.playstream.presentation.stream.StreamChatActivity;

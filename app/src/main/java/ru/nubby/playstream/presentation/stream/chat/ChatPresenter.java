@@ -15,7 +15,7 @@ import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.SensitiveStorage;
 import ru.nubby.playstream.data.Repository;
 import ru.nubby.playstream.data.ircapi.ChatChannelApi;
-import ru.nubby.playstream.domain.entity.Stream;
+import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.presentation.base.BaseRxPresenter;
 
 import static ru.nubby.playstream.presentation.stream.chat.ChatContract.View.InfoMessage.ERROR_DISCONNECTED;

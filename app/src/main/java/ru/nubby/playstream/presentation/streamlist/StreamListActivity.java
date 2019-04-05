@@ -12,16 +12,16 @@ import javax.inject.Inject;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProviders;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.domain.entity.StreamListNavigationState;
-import ru.nubby.playstream.domain.entity.UserData;
+import ru.nubby.playstream.domain.entities.StreamListNavigationState;
+import ru.nubby.playstream.domain.entities.UserData;
 import ru.nubby.playstream.presentation.base.BaseActivity;
 import ru.nubby.playstream.presentation.base.PresenterFactory;
 import ru.nubby.playstream.presentation.login.LoginActivity;
 import ru.nubby.playstream.presentation.preferences.PreferencesActivity;
 import ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListFragment;
 
-import static ru.nubby.playstream.domain.entity.StreamListNavigationState.MODE_FAVOURITES;
-import static ru.nubby.playstream.domain.entity.StreamListNavigationState.MODE_TOP;
+import static ru.nubby.playstream.domain.entities.StreamListNavigationState.MODE_FAVOURITES;
+import static ru.nubby.playstream.domain.entities.StreamListNavigationState.MODE_TOP;
 
 
 public class StreamListActivity extends BaseActivity

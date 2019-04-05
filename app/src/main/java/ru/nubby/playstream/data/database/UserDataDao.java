@@ -9,7 +9,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
-import ru.nubby.playstream.domain.entity.UserData;
+import ru.nubby.playstream.domain.entities.UserData;
 
 @Dao
 public interface UserDataDao {

@@ -1,10 +1,10 @@
-package ru.nubby.playstream.domain.interactor;
+package ru.nubby.playstream.domain.interactors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import ru.nubby.playstream.data.sharedprefs.DefaultPreferences;
-import ru.nubby.playstream.domain.entity.Quality;
+import ru.nubby.playstream.domain.entities.Quality;
 
 /**
  * Business logic for retrieving preferences.
@@ -16,12 +16,8 @@ public class PreferencesInteractor {
     private final DefaultPreferences mDefaultPreferences;
 
     @Inject
-    PreferencesInteractor(DefaultPreferences defaultPreferences) {
+    public PreferencesInteractor(DefaultPreferences defaultPreferences) {
         mDefaultPreferences = defaultPreferences;
-    }
-
-    public int getDefaultStreamListMode() {
-        return mDefaultPreferences.getDefaultStreamListMode();
     }
 
     public Quality getDefaultQuality() {

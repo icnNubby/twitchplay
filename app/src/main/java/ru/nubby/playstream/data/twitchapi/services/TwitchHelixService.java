@@ -6,9 +6,9 @@ import io.reactivex.Single;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Query;
-import ru.nubby.playstream.domain.entity.StreamsResponse;
-import ru.nubby.playstream.domain.entity.UserDataResponse;
-import ru.nubby.playstream.domain.entity.UserFollowsResponse;
+import ru.nubby.playstream.domain.entities.StreamsResponse;
+import ru.nubby.playstream.domain.entities.UserDataResponse;
+import ru.nubby.playstream.domain.entities.UserFollowsResponse;
 
 public interface TwitchHelixService {
 

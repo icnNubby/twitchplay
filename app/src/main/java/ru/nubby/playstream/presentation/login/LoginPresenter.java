@@ -9,7 +9,7 @@ import androidx.lifecycle.Lifecycle;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.SensitiveStorage;
-import ru.nubby.playstream.domain.interactor.AuthInteractor;
+import ru.nubby.playstream.domain.interactors.AuthInteractor;
 import ru.nubby.playstream.presentation.base.BaseRxPresenter;
 import ru.nubby.playstream.utils.RxSchedulersProvider;
 

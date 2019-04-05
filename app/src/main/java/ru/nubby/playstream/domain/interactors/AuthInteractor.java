@@ -1,14 +1,13 @@
-package ru.nubby.playstream.domain.interactor;
+package ru.nubby.playstream.domain.interactors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import ru.nubby.playstream.data.database.LocalRepository;
 import ru.nubby.playstream.data.sharedprefs.AuthorizationStorage;
 import ru.nubby.playstream.data.twitchapi.RemoteRepository;
-import ru.nubby.playstream.domain.entity.UserData;
+import ru.nubby.playstream.domain.entities.UserData;
 
 /**
  * Business logic for authorization.
@@ -80,6 +79,34 @@ public class AuthInteractor {
     }
 
     /**
+     * Retrieves token from storage.
+     * @return token or empty string.
+     */
+    public String getOauthToken() {
+        return mAuthorizationStorage.getUserAccessToken();
+    }
+
+    /**
+     * Gets current status of logging procedure.
+     * We may be unlogged, logged and might have only token.
+     *
+     * @return {@link LoggedStatus} status.
+     */
+    LoggedStatus getCurrentLoggedStatus() {
+        String token = mAuthorizationStorage.getUserAccessToken();
+        if (token != null && !token.isEmpty()) {
+            UserData data = mAuthorizationStorage.getUserData();
+            if (data == null) {
+                return LoggedStatus.TOKEN_ONLY;
+            } else {
+                return LoggedStatus.LOGGED;
+            }
+        } else {
+            return LoggedStatus.NOT_LOGGED;
+        }
+    }
+
+    /**
      * Fetches remote {@link UserData} for currently logged user.
      * Saves fetched  {@link UserData} to local storage.
      *
@@ -95,24 +122,5 @@ public class AuthInteractor {
                                 .andThen(Single.just(userData)));
     }
 
-    /**
-     * Helper function to get current status of logging procedure.
-     * We may be unlogged, logged and might have only token.
-     *
-     * @return {@link LoggedStatus} status.
-     */
-    private LoggedStatus getCurrentLoggedStatus() {
-        String token = mAuthorizationStorage.getUserAccessToken();
-        if (token != null && !token.isEmpty()) {
-            UserData data = mAuthorizationStorage.getUserData();
-            if (data == null) {
-                return LoggedStatus.TOKEN_ONLY;
-            } else {
-                return LoggedStatus.LOGGED;
-            }
-        } else {
-            return LoggedStatus.NOT_LOGGED;
-        }
-    }
 
 }

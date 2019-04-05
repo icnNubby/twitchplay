@@ -14,9 +14,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.data.Repository;
-import ru.nubby.playstream.domain.entity.Quality;
-import ru.nubby.playstream.domain.entity.Stream;
-import ru.nubby.playstream.domain.interactor.PreferencesInteractor;
+import ru.nubby.playstream.domain.entities.Quality;
+import ru.nubby.playstream.domain.entities.Stream;
+import ru.nubby.playstream.domain.interactors.PreferencesInteractor;
 import ru.nubby.playstream.presentation.base.BaseRxPresenter;
 
 import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.ERROR_CHANNEL_FOLLOW_UNFOLLOW;

@@ -6,14 +6,12 @@ import java.util.List;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import ru.nubby.playstream.data.sharedprefs.DefaultPreferences;
-import ru.nubby.playstream.domain.entity.FollowRelations;
-import ru.nubby.playstream.domain.entity.Pagination;
-import ru.nubby.playstream.domain.entity.Quality;
-import ru.nubby.playstream.domain.entity.Stream;
-import ru.nubby.playstream.domain.entity.StreamListNavigationState;
-import ru.nubby.playstream.domain.entity.StreamsResponse;
-import ru.nubby.playstream.domain.entity.UserData;
+import ru.nubby.playstream.domain.entities.FollowRelations;
+import ru.nubby.playstream.domain.entities.Pagination;
+import ru.nubby.playstream.domain.entities.Quality;
+import ru.nubby.playstream.domain.entities.Stream;
+import ru.nubby.playstream.domain.entities.StreamsResponse;
+import ru.nubby.playstream.domain.entities.UserData;
 
 public interface Repository {
     /**
@@ -118,10 +116,4 @@ public interface Repository {
      */
     Completable synchronizeUserData();
 
-    /**
-     * Gets last retrieved stream list.
-     * This stream list is saved in {@link ru.nubby.playstream.data.sharedprefs.PersistentStorage}
-     * each time when {@link #getLiveStreamsFollowedByUser()} method is called.
-     */
-    List<Stream> getLastStreamList();
 }

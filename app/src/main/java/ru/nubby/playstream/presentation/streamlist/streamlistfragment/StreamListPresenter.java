@@ -8,19 +8,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Named;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.data.Repository;
-import ru.nubby.playstream.domain.entity.Pagination;
-import ru.nubby.playstream.domain.entity.Stream;
-import ru.nubby.playstream.domain.entity.StreamListNavigationState;
-import ru.nubby.playstream.domain.interactor.NavigationStateInteractor;
-import ru.nubby.playstream.domain.interactor.PreferencesInteractor;
+import ru.nubby.playstream.domain.entities.Pagination;
+import ru.nubby.playstream.domain.entities.Stream;
+import ru.nubby.playstream.domain.entities.StreamListNavigationState;
+import ru.nubby.playstream.domain.interactors.NavigationStateInteractor;
+import ru.nubby.playstream.domain.interactors.PreferencesInteractor;
 import ru.nubby.playstream.presentation.base.BaseRxPresenter;
 import ru.nubby.playstream.utils.RxSchedulersProvider;
 

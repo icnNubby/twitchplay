@@ -1,4 +1,4 @@
-package ru.nubby.playstream.domain.entity;
+package ru.nubby.playstream.domain.entities;
 
 import java.util.List;
 import com.google.gson.annotations.Expose;

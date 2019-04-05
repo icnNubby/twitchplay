@@ -1,4 +1,4 @@
-package ru.nubby.playstream.domain.interactor;
+package ru.nubby.playstream.domain.interactors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 import ru.nubby.playstream.data.sharedprefs.DefaultPreferences;
-import ru.nubby.playstream.domain.entity.StreamListNavigationState;
+import ru.nubby.playstream.domain.entities.StreamListNavigationState;
 
 /**
  * Business logic for main screen navigation.
@@ -16,7 +16,7 @@ import ru.nubby.playstream.domain.entity.StreamListNavigationState;
 @Singleton
 public class NavigationStateInteractor {
 
-    private BehaviorSubject<StreamListNavigationState> mNavigationStateObservable;
+    private final BehaviorSubject<StreamListNavigationState> mNavigationStateObservable;
     private StreamListNavigationState mNavigationState;
 
     @Inject

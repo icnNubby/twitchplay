@@ -17,27 +17,24 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.BehaviorSubject;
 import ru.nubby.playstream.data.database.LocalRepository;
 import ru.nubby.playstream.data.sharedprefs.AuthorizationStorage;
-import ru.nubby.playstream.data.sharedprefs.DefaultPreferences;
 import ru.nubby.playstream.data.sharedprefs.PersistentStorage;
 import ru.nubby.playstream.data.twitchapi.RemoteRepository;
-import ru.nubby.playstream.domain.entity.FollowRelations;
-import ru.nubby.playstream.domain.entity.Pagination;
-import ru.nubby.playstream.domain.entity.Quality;
-import ru.nubby.playstream.domain.entity.Stream;
-import ru.nubby.playstream.domain.entity.StreamListNavigationState;
-import ru.nubby.playstream.domain.entity.StreamsResponse;
-import ru.nubby.playstream.domain.entity.UserData;
-import ru.nubby.playstream.domain.interactor.AuthInteractor;
+import ru.nubby.playstream.domain.entities.FollowRelations;
+import ru.nubby.playstream.domain.entities.Pagination;
+import ru.nubby.playstream.domain.entities.Quality;
+import ru.nubby.playstream.domain.entities.Stream;
+import ru.nubby.playstream.domain.entities.StreamsResponse;
+import ru.nubby.playstream.domain.entities.UserData;
+import ru.nubby.playstream.domain.interactors.AuthInteractor;
 
 /**
  * Contains decision making on what kind of repo we should use.
  * Some logic definitely can be decoupled into usecases/interactors.
  * Although its already some sort of interactor.
  */
-//todo split into some usecases(or logically connected entities ex. UsersInteractor, StreamsInteractor, etc.)
+//todo split into some usecases(or logically connected entities ex. UsersRepository, StreamsInteractor, etc.)
 
 @Singleton
 public class ProxyRepository implements Repository {
@@ -45,7 +42,6 @@ public class ProxyRepository implements Repository {
 
     private final RemoteRepository mRemoteRepository;
     private final LocalRepository mLocalRepository;
-    private final AuthorizationStorage mAuthorizationStorage;
     private final PersistentStorage mPersistentStorage;
     private final AuthInteractor mAuthInteractor;
 
@@ -54,13 +50,11 @@ public class ProxyRepository implements Repository {
     @Inject
     public ProxyRepository(@NonNull RemoteRepository remoteRepository,
                            @NonNull LocalRepository localRepository,
-                           @NonNull AuthorizationStorage authorizationStorage,
                            @NonNull PersistentStorage persistentStorage,
                            @NonNull AuthInteractor authInteractor) {
 
         mRemoteRepository = remoteRepository;
         mLocalRepository = localRepository;
-        mAuthorizationStorage = authorizationStorage;
         mPersistentStorage = persistentStorage;
         mAuthInteractor = authInteractor;
     }
@@ -159,7 +153,7 @@ public class ProxyRepository implements Repository {
                         userData ->
                                 mRemoteRepository
                                         .followTargetUser(
-                                                mAuthorizationStorage.getUserAccessToken(),
+                                                mAuthInteractor.getOauthToken(),
                                                 userData.getId(),
                                                 targetStream.getUserId())
                                         .andThen(mLocalRepository
@@ -178,7 +172,7 @@ public class ProxyRepository implements Repository {
                 .getCurrentLoginInfo()
                 .flatMapCompletable(userData ->
                         mRemoteRepository
-                                .unfollowTargetUser(mAuthorizationStorage.getUserAccessToken(),
+                                .unfollowTargetUser(mAuthInteractor.getOauthToken(),
                                         userData.getId(), targetStream.getUserId())
                                 .andThen(mLocalRepository
                                         .deleteFollowRelationsEntry(
@@ -214,11 +208,6 @@ public class ProxyRepository implements Repository {
                 .flatMap(mRemoteRepository::getUpdatedUserDataList)
                 .flatMapCompletable(updatedUserDataList -> mLocalRepository
                         .insertUserDataList(updatedUserDataList.toArray(new UserData[0])));
-    }
-
-    @Override
-    public List<Stream> getLastStreamList() {
-        return mPersistentStorage.getStreamList();
     }
 
     //Private methods

@@ -1,4 +1,4 @@
-package ru.nubby.playstream.domain.entity;
+package ru.nubby.playstream.domain.entities;
 
 public enum StreamListNavigationState {
     MODE_FAVOURITES, MODE_TOP

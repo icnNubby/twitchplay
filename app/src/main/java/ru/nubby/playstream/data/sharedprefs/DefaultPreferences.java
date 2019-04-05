@@ -8,7 +8,7 @@ import javax.inject.Singleton;
 
 import androidx.preference.PreferenceManager;
 import ru.nubby.playstream.R;
-import ru.nubby.playstream.domain.entity.Quality;
+import ru.nubby.playstream.domain.entities.Quality;
 
 @Singleton
 public class DefaultPreferences {

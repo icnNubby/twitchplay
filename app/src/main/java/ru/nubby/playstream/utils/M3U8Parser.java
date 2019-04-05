@@ -8,7 +8,7 @@ import io.lindstrom.m3u8.model.MasterPlaylist;
 import io.lindstrom.m3u8.model.Variant;
 import io.lindstrom.m3u8.parser.MasterPlaylistParser;
 import io.lindstrom.m3u8.parser.PlaylistParserException;
-import ru.nubby.playstream.domain.entity.Quality;
+import ru.nubby.playstream.domain.entities.Quality;
 
 /**
  * Helper class to make non standard parsing.

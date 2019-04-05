@@ -2,17 +2,14 @@ package ru.nubby.playstream.presentation.streamlist;
 
 import android.util.Log;
 
-import javax.inject.Named;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
-import ru.nubby.playstream.data.Repository;
-import ru.nubby.playstream.domain.entity.StreamListNavigationState;
-import ru.nubby.playstream.domain.entity.UserData;
-import ru.nubby.playstream.domain.interactor.AuthInteractor;
-import ru.nubby.playstream.domain.interactor.NavigationStateInteractor;
+import ru.nubby.playstream.domain.entities.StreamListNavigationState;
+import ru.nubby.playstream.domain.entities.UserData;
+import ru.nubby.playstream.domain.interactors.AuthInteractor;
+import ru.nubby.playstream.domain.interactors.NavigationStateInteractor;
 import ru.nubby.playstream.presentation.base.BaseRxPresenter;
 import ru.nubby.playstream.utils.RxSchedulersProvider;
 

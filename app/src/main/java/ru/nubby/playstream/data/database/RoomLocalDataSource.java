@@ -3,15 +3,14 @@ package ru.nubby.playstream.data.database;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
-import ru.nubby.playstream.domain.entity.FollowRelations;
-import ru.nubby.playstream.domain.entity.UserData;
+import ru.nubby.playstream.domain.entities.FollowRelations;
+import ru.nubby.playstream.domain.entities.UserData;
 import ru.nubby.playstream.utils.RxSchedulersProvider;
 
 @Singleton

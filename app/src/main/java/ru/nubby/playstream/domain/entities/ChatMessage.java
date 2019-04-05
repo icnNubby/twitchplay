@@ -1,4 +1,4 @@
-package ru.nubby.playstream.domain.entity;
+package ru.nubby.playstream.domain.entities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
