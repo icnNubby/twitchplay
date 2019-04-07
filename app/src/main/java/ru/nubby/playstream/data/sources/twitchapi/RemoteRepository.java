@@ -7,6 +7,7 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import ru.nubby.playstream.domain.entities.FollowRelations;
+import ru.nubby.playstream.domain.entities.GamesResponse;
 import ru.nubby.playstream.domain.entities.Pagination;
 import ru.nubby.playstream.domain.entities.Quality;
 import ru.nubby.playstream.domain.entities.Stream;
@@ -43,4 +44,9 @@ public interface RemoteRepository {
 
     Completable unfollowTargetUser(String token, String userId, String targetUserId);
 
+    Single<GamesResponse> getTopGames();
+
+    Single<GamesResponse> getTopGames(Pagination pagination);
+
+    Single<GamesResponse> getGamesByIds(List<String> gamesIds);
 }

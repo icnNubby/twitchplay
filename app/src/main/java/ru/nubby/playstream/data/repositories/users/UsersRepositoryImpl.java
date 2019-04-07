@@ -5,9 +5,9 @@ import javax.inject.Singleton;
 
 import io.reactivex.Completable;
 import io.reactivex.Single;
-import ru.nubby.playstream.domain.UsersRepository;
 import ru.nubby.playstream.data.sources.database.LocalRepository;
 import ru.nubby.playstream.data.sources.twitchapi.RemoteRepository;
+import ru.nubby.playstream.domain.UsersRepository;
 import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.domain.entities.UserData;
 

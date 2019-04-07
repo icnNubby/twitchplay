@@ -49,12 +49,18 @@ public final class Stream implements Comparable<Stream>, Serializable {
 
     private Game game;
 
-    public Stream(){
+    public Stream() {
 
     }
 
+    /**
+     * Copy constructor.
+     * Also copies game and userData fields.
+     * @param stream stream to copy
+     */
     public Stream(@NonNull Stream stream) {
         this.userId = stream.getUserId();
+        this.gameId = stream.getGameId();
         this.streamerName = stream.getStreamerName();
         this.streamerLogin = stream.getStreamerLogin();
         this.title = stream.getTitle();
@@ -65,6 +71,12 @@ public final class Stream implements Comparable<Stream>, Serializable {
             this.userData = new UserData(stream.getUserData());
         } else {
             this.userData = null;
+        }
+
+        if (stream.getGame() != null) {
+            this.game = new Game(stream.getGame());
+        } else {
+            this.game = null;
         }
 
     }
@@ -111,12 +123,11 @@ public final class Stream implements Comparable<Stream>, Serializable {
         return userData;
     }
 
-    public void setUserData(UserData userData) throws IllegalArgumentException {
-        if (userData.getId().equals(userId)) {
-            this.userData = userData;
-        } else {
-            throw new IllegalArgumentException("Id's of userData and Stream objects must be the same.");
-        }
+    public void setUserData(@NonNull UserData userData) {
+        this.userData = userData;
+        this.userId = userData.getId();
+        this.streamerLogin = userData.getLogin();
+        this.streamerName = userData.getDisplayName();
     }
 
     @Override
@@ -138,5 +149,14 @@ public final class Stream implements Comparable<Stream>, Serializable {
 
     public void setGameId(String gameId) {
         this.gameId = gameId;
+    }
+
+    public void setGame(@NonNull Game game) {
+        this.game = game;
+        this.gameId = game.getId();
+    }
+
+    public Game getGame() {
+        return game;
     }
 }

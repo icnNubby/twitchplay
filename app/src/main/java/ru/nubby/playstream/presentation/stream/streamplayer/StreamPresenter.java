@@ -5,11 +5,9 @@ import android.util.Log;
 import javax.inject.Inject;
 
 import androidx.lifecycle.Lifecycle;
-import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.domain.FollowsRepository;
 import ru.nubby.playstream.domain.StreamsRepository;
-import ru.nubby.playstream.domain.UsersRepository;
 import ru.nubby.playstream.domain.entities.Quality;
 import ru.nubby.playstream.domain.entities.QualityLinks;
 import ru.nubby.playstream.domain.entities.Stream;
@@ -29,7 +27,6 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
     private final String TAG = StreamPresenter.class.getSimpleName();
 
     private Disposable mStreamResolutionsInfoTask;
-    private Disposable mStreamAdditionalInfoTask;
     private Disposable mStreamInfoUpdater;
     private Disposable mFollowUnfollowTask;
     private Disposable mFollowDisplayTask;
@@ -39,7 +36,6 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
 
     private final StreamsRepository mStreamsRepository;
     private final FollowsRepository mFollowsRepository;
-    private final UsersRepository mUsersRepository;
     private final StreamsInteractor mStreamsInteractor;
     private final PreferencesInteractor mPreferencesInteractor;
 
@@ -48,13 +44,11 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
     @Inject
     public StreamPresenter(StreamsRepository streamsRepository,
                            FollowsRepository followsRepository,
-                           UsersRepository usersRepository,
                            StreamsInteractor streamsInteractor,
                            PreferencesInteractor preferencesInteractor,
                            RxSchedulersProvider rxSchedulersProvider) {
         mStreamsRepository = streamsRepository;
         mFollowsRepository = followsRepository;
-        mUsersRepository = usersRepository;
         mPreferencesInteractor = preferencesInteractor;
         mStreamsInteractor = streamsInteractor;
         mRxSchedulersProvider = rxSchedulersProvider;
@@ -64,49 +58,29 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
     public void subscribe(StreamContract.View view, Lifecycle lifecycle, Stream stream) {
         super.subscribe(view, lifecycle);
 
-        Stream streamCopy = new Stream(stream);
-        Single<Stream> initialStreamRequest = mUsersRepository
-                .getUserFromStreamer(stream)
-                .map(updatedLogin -> {
-                    streamCopy.setStreamerLogin(updatedLogin.getLogin());
-                    return streamCopy;
-                });
+        mCurrentStream = stream;
+        playStream(stream);
 
-        mStreamAdditionalInfoTask = initialStreamRequest
-                .doOnSubscribe(streamReturned -> mView.displayLoading(true))
+        mView.displayTitle(stream.getTitle());
+        mView.displayViewerCount(stream.getViewerCount());
+
+        mFollowDisplayTask = mFollowsRepository
+                .isStreamFollowed(stream)
                 .observeOn(mRxSchedulersProvider.getUiScheduler())
                 .subscribe(
-                        streamReturned -> {
-                            mCurrentStream = streamReturned;
-                            playStream(streamReturned);
-                            mView.displayLoading(false);
-                            mView.displayTitle(streamReturned.getTitle());
-                            mView.displayViewerCount(streamReturned.getViewerCount());
-                            mFollowDisplayTask = mFollowsRepository
-                                    .isStreamFollowed(streamReturned)
-                                    .observeOn(mRxSchedulersProvider.getUiScheduler())
-                                    .subscribe(
-                                            followStatus -> {
-                                                mView.displayFollowStatus(followStatus);
-                                                mView.enableFollow(true);
-                                            },
-                                            error -> {
-                                                Log.e(TAG, "Follow error " + error, error);
-                                                mView.enableFollow(false);
-                                                mView.displayInfoMessage(
-                                                        ERROR_CHANNEL_FOLLOW_UNFOLLOW,
-                                                        mCurrentStream.getStreamerName());
-                                            }
-                                    );
-                            mCompositeDisposable.add(mFollowDisplayTask);
+                        followStatus -> {
+                            mView.displayFollowStatus(followStatus);
+                            mView.enableFollow(true);
                         },
                         error -> {
-                            mCurrentStream = null;
-                            mView.displayLoading(false);
+                            Log.e(TAG, "Follow error " + error, error);
                             mView.enableFollow(false);
-                            Log.e(TAG, "Error while fetching additional data ", error);
-                        });
-        mCompositeDisposable.add(mStreamAdditionalInfoTask);
+                            mView.displayInfoMessage(
+                                    ERROR_CHANNEL_FOLLOW_UNFOLLOW,
+                                    mCurrentStream.getStreamerName());
+                        }
+                );
+        mCompositeDisposable.add(mFollowDisplayTask);
     }
 
     @Override
@@ -200,7 +174,6 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
                                 mView.displayInfoMessage(ERROR_FETCHING_ADDITIONAL_INFO,
                                         mCurrentStream.getStreamerName());
                             }
-
                         },
                         error -> {
                             mView.displayInfoMessage(ERROR_FETCHING_ADDITIONAL_INFO,

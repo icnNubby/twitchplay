@@ -9,6 +9,7 @@ import javax.inject.Singleton;
 import androidx.room.Room;
 import dagger.Module;
 import dagger.Provides;
+import ru.nubby.playstream.data.sources.database.GamesDao;
 import ru.nubby.playstream.domain.FollowsRepository;
 import ru.nubby.playstream.data.repositories.follows.FollowsRepositoryImpl;
 import ru.nubby.playstream.data.repositories.streams.StreamsRepositoryImpl;
@@ -48,6 +49,12 @@ public class DataModule {
     @Singleton
     public UserDataDao provideUserDataDao(AppDatabase db) {
         return db.userDataDao();
+    }
+
+    @Provides
+    @Singleton
+    public GamesDao provideGamesDao(AppDatabase db) {
+        return db.gamesDao();
     }
 
     @Provides

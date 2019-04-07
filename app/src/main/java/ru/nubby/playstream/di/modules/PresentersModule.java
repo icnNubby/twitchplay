@@ -74,7 +74,6 @@ public abstract class PresentersModule {
     @IntoMap
     @PresenterKey(value = StreamPresenter.class)
     static ViewModel streamPresenter(StreamsRepository streamsRepository,
-                                     UsersRepository usersRepository,
                                      FollowsRepository followsRepository,
                                      StreamsInteractor streamsInteractor,
                                      PreferencesInteractor preferencesInteractor,
@@ -82,7 +81,6 @@ public abstract class PresentersModule {
         return new StreamPresenter(
                 streamsRepository,
                 followsRepository,
-                usersRepository,
                 streamsInteractor,
                 preferencesInteractor,
                 rxSchedulersProvider);
@@ -91,18 +89,15 @@ public abstract class PresentersModule {
     @Provides
     @IntoMap
     @PresenterKey(value = ChatPresenter.class)
-    static ViewModel chatPresenter(UsersRepository repository,
-                                   RxSchedulersProvider rxSchedulersProvider) {
-        return new ChatPresenter(
-                repository,
-                rxSchedulersProvider);
+    static ViewModel chatPresenter(RxSchedulersProvider rxSchedulersProvider) {
+        return new ChatPresenter(rxSchedulersProvider);
     }
 
     @Provides
     @IntoMap
     @PresenterKey(value = PreferencesPresenter.class)
-    static ViewModel preferencesPresenter(StreamsRepository streamsRepository) {
-        return new PreferencesPresenter(streamsRepository);
+    static ViewModel preferencesPresenter(PreferencesInteractor preferencesInteractor) {
+        return new PreferencesPresenter(preferencesInteractor);
     }
 
     @Provides

@@ -10,6 +10,7 @@ import io.reactivex.Maybe;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import ru.nubby.playstream.domain.entities.FollowRelations;
+import ru.nubby.playstream.domain.entities.Game;
 import ru.nubby.playstream.domain.entities.UserData;
 import ru.nubby.playstream.utils.RxSchedulersProvider;
 
@@ -18,6 +19,7 @@ public class RoomLocalDataSource implements LocalRepository {
 
     private final FollowRelationsDao mFollowRelationsDao;
     private final UserDataDao mUserDataDao;
+    private final GamesDao mGamesDao;
 
     private final Scheduler mIoScheduler;
     private final Scheduler mComputationScheduler;
@@ -26,9 +28,11 @@ public class RoomLocalDataSource implements LocalRepository {
     @Inject
     public RoomLocalDataSource(FollowRelationsDao followRelationsDao,
                                UserDataDao userDataDao,
+                               GamesDao gamesDao,
                                RxSchedulersProvider schedulersProvider) {
         mFollowRelationsDao = followRelationsDao;
         mUserDataDao = userDataDao;
+        mGamesDao = gamesDao;
         mIoScheduler = schedulersProvider.getIoScheduler();
         mComputationScheduler = schedulersProvider.getComputationScheduler();
     }
@@ -85,6 +89,14 @@ public class RoomLocalDataSource implements LocalRepository {
     }
 
     @Override
+    public Maybe<List<UserData>> findUserDataByIdList(List<String> idList) {
+        return mUserDataDao
+                .findUserDataByIdList(idList)
+                .subscribeOn(mIoScheduler);
+    }
+
+
+    @Override
     public Maybe<List<UserData>> getAllUserDataEntries() {
         return mUserDataDao
                 .getAll()
@@ -116,6 +128,48 @@ public class RoomLocalDataSource implements LocalRepository {
     public Completable deleteUserDataEntries() {
         return mUserDataDao
                 .deleteUserDataEntries()
+                .subscribeOn(mIoScheduler);
+    }
+
+    @Override
+    public  Maybe<Game> findGame(String id) {
+        return mGamesDao
+                .findGame(id)
+                .subscribeOn(mIoScheduler);
+    }
+
+    @Override
+    public Maybe<List<Game>> findGames(List<String> ids) {
+        return mGamesDao
+                .findGames(ids)
+                .subscribeOn(mIoScheduler);
+    }
+
+    @Override
+    public Completable insertGame(Game game) {
+        return mGamesDao
+                .insertGame(game)
+                .subscribeOn(mIoScheduler);
+    }
+
+    @Override
+    public Completable insertGameList(Game... games) {
+        return mGamesDao
+                .insertGameList(games)
+                .subscribeOn(mIoScheduler);
+    }
+
+    @Override
+    public Completable deleteGame(Game game) {
+        return mGamesDao
+                .deleteGame(game)
+                .subscribeOn(mIoScheduler);
+    }
+
+    @Override
+    public Completable deleteAllGames() {
+        return mGamesDao
+                .deleteAllGames()
                 .subscribeOn(mIoScheduler);
     }
 }

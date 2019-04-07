@@ -2,17 +2,21 @@ package ru.nubby.playstream.domain.entities;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "games")
-public final class Game {
+public final class Game implements Serializable {
 
     @PrimaryKey
+    @NonNull
     @ColumnInfo(name = "id")
     @SerializedName("id")
-    private String id;
+    private String id = "";
 
     @ColumnInfo(name = "name")
     @SerializedName("name")
@@ -21,6 +25,16 @@ public final class Game {
     @ColumnInfo(name = "box_art_url")
     @SerializedName("box_art_url")
     private String boxArtUrl;
+
+    public Game() {
+
+    }
+
+    public Game(Game game) {
+        this.id = game.getId();
+        this.name = game.getName();
+        this.boxArtUrl = game.getBoxArtUrl();
+    }
 
     public String getId() {
         return id;
@@ -46,4 +60,7 @@ public final class Game {
         this.boxArtUrl = boxArtUrl;
     }
 
+    public boolean isEmpty() {
+        return id.isEmpty();
+    }
 }

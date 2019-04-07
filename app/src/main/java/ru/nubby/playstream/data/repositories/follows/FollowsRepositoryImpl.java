@@ -26,7 +26,7 @@ public class FollowsRepositoryImpl implements FollowsRepository {
     private final AuthInteractor mAuthInteractor;
     private final RxSchedulersProvider mRxSchedulersProvider;
 
-    private boolean mFollowsFullUpdate = false;
+    private boolean mFollowsFullUpdate = true;
 
     @Inject
     public FollowsRepositoryImpl(@NonNull RemoteRepository remoteRepository,
@@ -93,7 +93,7 @@ public class FollowsRepositoryImpl implements FollowsRepository {
 
     @Override
     public Completable synchronizeFollows(String userId) {
-        mFollowsFullUpdate = true;
+        mFollowsFullUpdate = false;
         return getUserFollows(userId)
                 .flatMapCompletable(followRelationsList -> CompletableObserver::onComplete);
     }

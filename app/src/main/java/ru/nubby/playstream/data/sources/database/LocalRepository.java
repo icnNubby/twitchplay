@@ -6,9 +6,12 @@ import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import ru.nubby.playstream.domain.entities.FollowRelations;
+import ru.nubby.playstream.domain.entities.Game;
 import ru.nubby.playstream.domain.entities.UserData;
 
 public interface LocalRepository {
+
+    //Follow relations
 
     Single<List<FollowRelations>> getFollowRelationsEntriesById(String fromId);
 
@@ -22,7 +25,11 @@ public interface LocalRepository {
 
     Completable deleteAllFollowRelationsEntries();
 
+    //UserData
+
     Maybe<UserData> findUserDataById(String id);
+
+    Maybe<List<UserData>> findUserDataByIdList(List<String> id);
 
     Maybe<List<UserData>> getAllUserDataEntries();
 
@@ -33,5 +40,19 @@ public interface LocalRepository {
     Completable deleteUserDataEntry(UserData userDataEntry);
 
     Completable deleteUserDataEntries();
+
+    //Games
+
+    Maybe<Game> findGame(String id);
+
+    Maybe<List<Game>> findGames(List<String > ids);
+
+    Completable insertGame(Game game);
+
+    Completable insertGameList(Game... game);
+
+    Completable deleteGame(Game game);
+
+    Completable deleteAllGames();
 
 }

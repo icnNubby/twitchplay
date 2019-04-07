@@ -20,6 +20,7 @@ import ru.nubby.playstream.data.sources.twitchapi.services.TwitchApiService;
 import ru.nubby.playstream.data.sources.twitchapi.services.TwitchHelixService;
 import ru.nubby.playstream.data.sources.twitchapi.services.TwitchKrakenService;
 import ru.nubby.playstream.domain.entities.FollowRelations;
+import ru.nubby.playstream.domain.entities.GamesResponse;
 import ru.nubby.playstream.domain.entities.Pagination;
 import ru.nubby.playstream.domain.entities.Quality;
 import ru.nubby.playstream.domain.entities.Stream;
@@ -226,6 +227,27 @@ public class TwitchRepository implements RemoteRepository {
     public Completable unfollowTargetUser(String token, String userId, String targetUserId){
         return mTwitchKrakenService
                 .unfollowTargetUser(userId, targetUserId, token)
+                .subscribeOn(mIoScheduler);
+    }
+
+    @Override
+    public Single<GamesResponse> getTopGames() {
+        return mTwitchHelixService
+                .getTopGames(null)
+                .subscribeOn(mIoScheduler);
+    }
+
+    @Override
+    public Single<GamesResponse> getTopGames(Pagination pagination) {
+        return mTwitchHelixService
+                .getTopGames(pagination.getCursor())
+                .subscribeOn(mIoScheduler);
+    }
+
+    @Override
+    public Single<GamesResponse> getGamesByIds(List<String> gamesIds) {
+        return mTwitchHelixService
+                .getGamesByIds(gamesIds)
                 .subscribeOn(mIoScheduler);
     }
 

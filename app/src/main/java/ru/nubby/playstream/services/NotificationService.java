@@ -79,9 +79,9 @@ public class NotificationService extends JobService {
 
         final List<Stream> lastStreams = mNotificationsInteractor.getLastLiveStreams();
 
-        mRetrieveLiveStreams = mNotificationsInteractor.getLiveStreams()
+        mRetrieveLiveStreams = mNotificationsInteractor
+                .getLiveStreams()
                 .filter(streamList -> !streamList.isEmpty())
-                .subscribeOn(mSchedulersProvider.getIoScheduler())
                 .observeOn(mSchedulersProvider.getUiScheduler())
                 .subscribe(
                         streams -> {

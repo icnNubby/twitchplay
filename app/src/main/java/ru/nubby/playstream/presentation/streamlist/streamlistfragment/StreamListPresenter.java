@@ -34,7 +34,7 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
     private final StreamsRepository mStreamsRepository;
     private final NavigationStateInteractor mNavigationStateInteractor;
     private final PreferencesInteractor mPreferencesInteractor;
-    private final Scheduler mMainThreadScheduler;
+    private final RxSchedulersProvider mRxSchedulerProvider;
 
     private Disposable mDisposableFetchingTask;
 
@@ -52,7 +52,7 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
         mStreamsRepository = streamsRepository;
         mNavigationStateInteractor = navigationStateInteractor;
         mPreferencesInteractor = preferencesInteractor;
-        mMainThreadScheduler = rxSchedulersProvider.getUiScheduler();
+        mRxSchedulerProvider = rxSchedulersProvider;
         mListStateObservable = mNavigationStateInteractor.getObservableNavigationState();
     }
 
@@ -67,7 +67,7 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
                 mCurrentStreamList.isEmpty());
 
         Disposable disposableListState = mListStateObservable
-                .observeOn(mMainThreadScheduler)
+                .observeOn(mRxSchedulerProvider.getUiScheduler())
                 .subscribe(streamListNavigationState -> {
                     if (mForceReload) {
                         updateStreams();
@@ -108,6 +108,7 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
 
         mDisposableFetchingTask = mStreamsRepository
                 .getLiveStreamsFollowedByUser()
+                .observeOn(mRxSchedulerProvider.getUiScheduler())
                 .doOnSubscribe(disposable -> {
                     Log.d(TAG, "getFollowedStreams do on sub: " + this.toString());
                     if (!disposable.isDisposed()) {
@@ -135,6 +136,7 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
     public void getTopStreams() {
         mDisposableFetchingTask = mStreamsRepository
                 .getTopStreams()
+                .observeOn(mRxSchedulerProvider.getUiScheduler())
                 .doOnSubscribe(disposable -> {
                     Log.d(TAG, "getTopStreams: do on sub " + this.toString());
                     if (!disposable.isDisposed()) {
@@ -168,6 +170,7 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
             }
             mDisposableFetchingTask = mStreamsRepository
                     .getTopStreams(mPagination)
+                    .observeOn(mRxSchedulerProvider.getUiScheduler())
                     .subscribe(streams -> {
                                 List<Stream> moreStreams = checkAndAddStreams(streams.getData());
                                 mView.addStreamList(moreStreams);
@@ -205,5 +208,4 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
         mCurrentStreamList.addAll(moreStreams);
         return moreStreams;
     }
-
 }

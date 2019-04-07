@@ -17,6 +17,9 @@ public interface UserDataDao {
     @Query("SELECT * FROM user_data WHERE id = :id")
     Maybe<UserData> findUserDataById(String id);
 
+    @Query("SELECT * FROM user_data WHERE id IN (:id)")
+    Maybe<List<UserData>> findUserDataByIdList(List<String> id);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Completable insertUserData(UserData userDataEntry);
 
