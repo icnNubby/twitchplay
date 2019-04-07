@@ -10,12 +10,13 @@ import androidx.annotation.NonNull;
 import io.reactivex.Completable;
 import io.reactivex.CompletableObserver;
 import io.reactivex.Single;
-import ru.nubby.playstream.domain.FollowsRepository;
 import ru.nubby.playstream.data.sources.database.LocalRepository;
 import ru.nubby.playstream.data.sources.twitchapi.RemoteRepository;
+import ru.nubby.playstream.domain.FollowsRepository;
 import ru.nubby.playstream.domain.entities.FollowRelations;
 import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.domain.interactors.AuthInteractor;
+import ru.nubby.playstream.utils.RxSchedulersProvider;
 
 @Singleton
 public class FollowsRepositoryImpl implements FollowsRepository {
@@ -23,22 +24,27 @@ public class FollowsRepositoryImpl implements FollowsRepository {
     private final RemoteRepository mRemoteRepository;
     private final LocalRepository mLocalRepository;
     private final AuthInteractor mAuthInteractor;
+    private final RxSchedulersProvider mRxSchedulersProvider;
+
     private boolean mFollowsFullUpdate = false;
 
     @Inject
     public FollowsRepositoryImpl(@NonNull RemoteRepository remoteRepository,
-                           @NonNull LocalRepository localRepository,
-                           @NonNull AuthInteractor authInteractor) {
+                                 @NonNull LocalRepository localRepository,
+                                 @NonNull AuthInteractor authInteractor,
+                                 @NonNull RxSchedulersProvider rxSchedulersProvider) {
 
         mRemoteRepository = remoteRepository;
         mLocalRepository = localRepository;
         mAuthInteractor = authInteractor;
+        mRxSchedulersProvider = rxSchedulersProvider;
     }
 
     @Override
     public Completable followStream(Stream targetStream) {
         return mAuthInteractor
                 .getCurrentLoginInfo()
+                .subscribeOn(mRxSchedulersProvider.getIoScheduler())
                 .flatMapCompletable(
                         userData ->
                                 mRemoteRepository
@@ -60,6 +66,7 @@ public class FollowsRepositoryImpl implements FollowsRepository {
     public Completable unfollowStream(Stream targetStream) {
         return mAuthInteractor
                 .getCurrentLoginInfo()
+                .subscribeOn(mRxSchedulersProvider.getIoScheduler())
                 .flatMapCompletable(userData ->
                         mRemoteRepository
                                 .unfollowTargetUser(mAuthInteractor.getOauthToken(),
@@ -77,6 +84,7 @@ public class FollowsRepositoryImpl implements FollowsRepository {
     public Single<Boolean> isStreamFollowed(Stream targetStream) {
         return mAuthInteractor
                 .getCurrentLoginInfo()
+                .subscribeOn(mRxSchedulersProvider.getIoScheduler())
                 .flatMap(userData -> mLocalRepository.findRelation(userData.getId(),
                         targetStream.getUserId()))
                 .flatMap(followRelationsList ->

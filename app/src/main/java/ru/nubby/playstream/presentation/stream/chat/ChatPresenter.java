@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -17,6 +18,7 @@ import ru.nubby.playstream.domain.UsersRepository;
 import ru.nubby.playstream.data.sources.ircapi.ChatChannelApi;
 import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.presentation.base.BaseRxPresenter;
+import ru.nubby.playstream.utils.RxSchedulersProvider;
 
 import static ru.nubby.playstream.presentation.stream.chat.ChatContract.View.InfoMessage.ERROR_DISCONNECTED;
 import static ru.nubby.playstream.presentation.stream.chat.ChatContract.View.InfoMessage.ERROR_FIRST_CONNECT;
@@ -32,12 +34,15 @@ public class ChatPresenter extends BaseRxPresenter<ChatContract.View>
     private Disposable mChatListener;
     private Disposable mChatInitializer;
 
-    private UsersRepository mRepository;
+    private final UsersRepository mRepository;
+    private final RxSchedulersProvider mRxSchedulersProvider;
     private ChatChannelApi mChatApi = null;
 
     @Inject
-    public ChatPresenter(UsersRepository repository) {
+    public ChatPresenter(@NonNull UsersRepository repository,
+                         @NonNull RxSchedulersProvider rxSchedulersProvider) {
         mRepository = repository;
+        mRxSchedulersProvider = rxSchedulersProvider;
     }
 
     @Override
@@ -57,7 +62,8 @@ public class ChatPresenter extends BaseRxPresenter<ChatContract.View>
                             mChatApi = new ChatChannelApi( //TODO ?DI?
                                     SensitiveStorage.getDefaultChatBotName(),
                                     SensitiveStorage.getDefaultChatBotToken(),
-                                    streamReturned.getStreamerLogin());
+                                    streamReturned.getStreamerLogin(),
+                                    mRxSchedulersProvider);
                             mChatInitializer = mChatApi
                                     .init()
                                     .retryWhen(throwableFlowable -> throwableFlowable
@@ -65,8 +71,7 @@ public class ChatPresenter extends BaseRxPresenter<ChatContract.View>
                                             .observeOn(AndroidSchedulers.mainThread())
                                             .doOnEach(throwableNotification ->
                                                     mView.displayInfoMessage(ERROR_RECONNECT)))
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .observeOn(mRxSchedulersProvider.getUiScheduler())
                                     .subscribe(
                                             success -> {
                                                 mView.displayInfoMessage(INFO_CONNECTED);
@@ -93,8 +98,7 @@ public class ChatPresenter extends BaseRxPresenter<ChatContract.View>
     private void listenToChat() {
         mChatListener = mChatApi
                 .listenToChat()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(mRxSchedulersProvider.getUiScheduler())
                 .subscribe(
                         result -> mView.addChatMessage(result),
                         error -> {

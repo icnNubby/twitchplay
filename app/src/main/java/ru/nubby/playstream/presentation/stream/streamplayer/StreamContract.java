@@ -11,7 +11,9 @@ import ru.nubby.playstream.domain.entities.Quality;
 public interface StreamContract {
     interface View extends BaseView {
         enum InfoMessage {
-            INFO_CHANNEL_FOLLOWED, INFO_CHANNEL_UNFOLLOWED, ERROR_CHANNEL_FOLLOW_UNFOLLOW,
+            INFO_CHANNEL_FOLLOWED,
+            INFO_CHANNEL_UNFOLLOWED,
+            ERROR_CHANNEL_FOLLOW_UNFOLLOW,
             ERROR_FETCHING_ADDITIONAL_INFO
         }
         void displayStream(String url);

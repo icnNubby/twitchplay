@@ -4,8 +4,9 @@ Android twitch client.
 This project was made just for learning purposes.
 You may use any parts of it if you want to.
 
-Current techs used: alot of **RxJava**, **Retrofit** + **OkHttp**, **Exoplayer**, **Room**, **Picasso**, **LeakCanary**.
+Current techs used: alot of **RxJava**, **Retrofit** + **OkHttp**, **Exoplayer**, **Room**, **Picasso**, **LeakCanary**, di by **Dagger2**.
 **MVP** pattern for presentation layer.
+**Clean** approach for whole application. 
 Also huge props to author of that parser
 https://github.com/carlanton/m3u8-parser.
 

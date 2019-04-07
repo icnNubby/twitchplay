@@ -47,6 +47,8 @@ public final class Stream implements Comparable<Stream>, Serializable {
 
     private UserData userData;
 
+    private Game game;
+
     public Stream(){
 
     }

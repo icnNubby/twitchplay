@@ -2,24 +2,21 @@ package ru.nubby.playstream.presentation.stream.streamplayer;
 
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-
 import javax.inject.Inject;
 
 import androidx.lifecycle.Lifecycle;
 import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import ru.nubby.playstream.domain.FollowsRepository;
 import ru.nubby.playstream.domain.StreamsRepository;
 import ru.nubby.playstream.domain.UsersRepository;
 import ru.nubby.playstream.domain.entities.Quality;
+import ru.nubby.playstream.domain.entities.QualityLinks;
 import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.domain.interactors.PreferencesInteractor;
+import ru.nubby.playstream.domain.interactors.StreamsInteractor;
 import ru.nubby.playstream.presentation.base.BaseRxPresenter;
+import ru.nubby.playstream.utils.RxSchedulersProvider;
 
 import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.ERROR_CHANNEL_FOLLOW_UNFOLLOW;
 import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.ERROR_FETCHING_ADDITIONAL_INFO;
@@ -28,31 +25,39 @@ import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContrac
 
 public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
         implements StreamContract.Presenter {
-    private final String TAG = "StreamPresenter";
+
+    private final String TAG = StreamPresenter.class.getSimpleName();
 
     private Disposable mStreamResolutionsInfoTask;
     private Disposable mStreamAdditionalInfoTask;
     private Disposable mStreamInfoUpdater;
     private Disposable mFollowUnfollowTask;
     private Disposable mFollowDisplayTask;
-    private HashMap<Quality, String> mQualityUrls;
-    private ArrayList<Quality> mQualities;
+    private QualityLinks mQualityUrls;
 
     private Stream mCurrentStream;
 
     private final StreamsRepository mStreamsRepository;
     private final FollowsRepository mFollowsRepository;
-    private final PreferencesInteractor mPreferencesInteractor;
     private final UsersRepository mUsersRepository;
+    private final StreamsInteractor mStreamsInteractor;
+    private final PreferencesInteractor mPreferencesInteractor;
+
+    private final RxSchedulersProvider mRxSchedulersProvider;
 
     @Inject
     public StreamPresenter(StreamsRepository streamsRepository,
-                           FollowsRepository followsRepository, UsersRepository usersRepository,
-                           PreferencesInteractor preferencesInteractor) {
+                           FollowsRepository followsRepository,
+                           UsersRepository usersRepository,
+                           StreamsInteractor streamsInteractor,
+                           PreferencesInteractor preferencesInteractor,
+                           RxSchedulersProvider rxSchedulersProvider) {
         mStreamsRepository = streamsRepository;
         mFollowsRepository = followsRepository;
         mUsersRepository = usersRepository;
         mPreferencesInteractor = preferencesInteractor;
+        mStreamsInteractor = streamsInteractor;
+        mRxSchedulersProvider = rxSchedulersProvider;
     }
 
     @Override
@@ -69,6 +74,7 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
 
         mStreamAdditionalInfoTask = initialStreamRequest
                 .doOnSubscribe(streamReturned -> mView.displayLoading(true))
+                .observeOn(mRxSchedulersProvider.getUiScheduler())
                 .subscribe(
                         streamReturned -> {
                             mCurrentStream = streamReturned;
@@ -78,8 +84,7 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
                             mView.displayViewerCount(streamReturned.getViewerCount());
                             mFollowDisplayTask = mFollowsRepository
                                     .isStreamFollowed(streamReturned)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .observeOn(mRxSchedulersProvider.getUiScheduler())
                                     .subscribe(
                                             followStatus -> {
                                                 mView.displayFollowStatus(followStatus);
@@ -111,8 +116,23 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
 
     @Override
     public void playChosenQuality(Quality quality) {
-        String url = mQualityUrls.get(quality);
-        mView.displayStream(url);
+        String url;
+        if (mQualityUrls == null) {
+            mView.displayInfoMessage(ERROR_FETCHING_ADDITIONAL_INFO,
+                    mCurrentStream.getStreamerName());
+            Log.e(TAG, "No quality list found");
+            return;
+        } else {
+            url = mQualityUrls.getUrlForQualityOrClosest(quality);
+        }
+
+        if (url != null) {
+            mView.displayStream(url);
+        } else {
+            mView.displayInfoMessage(ERROR_FETCHING_ADDITIONAL_INFO,
+                    mCurrentStream.getStreamerName());
+            Log.e(TAG, "Url not found for chosen quality " + quality);
+        }
     }
 
     @Override
@@ -120,7 +140,6 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
         if (mCurrentStream != null) {
             mFollowUnfollowTask = mFollowsRepository
                     .isStreamFollowed(mCurrentStream)
-                    .subscribeOn(Schedulers.io())
                     .flatMapCompletable(result -> {
                         if (result) {
                             return mFollowsRepository.unfollowStream(mCurrentStream);
@@ -129,8 +148,9 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
                         }
                     })
                     .andThen(mFollowsRepository.isStreamFollowed(mCurrentStream))
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(followStatus -> {
+                    .observeOn(mRxSchedulersProvider.getUiScheduler())
+                    .subscribe(
+                            followStatus -> {
                                 mView.displayFollowStatus(followStatus);
                                 mView.enableFollow(true);
                                 if (followStatus) {
@@ -163,43 +183,37 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
             mStreamInfoUpdater.dispose();
         }
 
-        mView.displayLoading(true);
-        mStreamResolutionsInfoTask = mStreamsRepository
-                .getQualityUrls(stream)
-                .subscribe(fetchedQualityTable -> {
-                            mQualityUrls = fetchedQualityTable;
-                            //set available qualities to menu, sorted
-                            mQualities = new ArrayList<>(mQualityUrls.keySet());
-                            Collections.sort(mQualities);
-                            mView.setQualitiesMenu(mQualities);
-
-                            //get url for default or if not exists for closest better quality.
+        mStreamResolutionsInfoTask = mStreamsInteractor
+                .getStreamLinks(stream)
+                .doOnSubscribe((x) -> mView.displayLoading(true))
+                .doFinally(() -> mView.displayLoading(false))
+                .observeOn(mRxSchedulersProvider.getUiScheduler())
+                .subscribe(
+                        qualityLinks -> {
+                            mQualityUrls = qualityLinks;
+                            mView.setQualitiesMenu(qualityLinks.getSortedQualities());
                             Quality defaultQuality = mPreferencesInteractor.getDefaultQuality();
-                            Quality nextQuality = defaultQuality;
-                            String url = mQualityUrls.get(defaultQuality);
-                            while (url == null && nextQuality.ordinal() > 0) {
-                                nextQuality = Quality.values()[nextQuality.ordinal() - 1];
-                                url = mQualityUrls.get(nextQuality);
-                            }
-                            if (!mQualities.isEmpty() || url == null) {
+                            String url = qualityLinks.getUrlForQualityOrClosest(defaultQuality);
+                            if (url != null) {
                                 mView.displayStream(url);
                             } else {
                                 mView.displayInfoMessage(ERROR_FETCHING_ADDITIONAL_INFO,
                                         mCurrentStream.getStreamerName());
                             }
-                            mView.displayLoading(false);
+
                         },
                         error -> {
                             mView.displayInfoMessage(ERROR_FETCHING_ADDITIONAL_INFO,
                                     mCurrentStream.getStreamerName());
-                            mView.displayLoading(false);
                             Log.e(TAG, "Error while fetching quality urls " + error, error);
                         });
         mCompositeDisposable.add(mStreamResolutionsInfoTask);
 
         mStreamInfoUpdater = mStreamsRepository
                 .getUpdatableStreamInfo(stream)
-                .subscribe(streamUpdated -> {
+                .observeOn(mRxSchedulersProvider.getUiScheduler())
+                .subscribe(
+                        streamUpdated -> {
                             mView.displayTitle(streamUpdated.getTitle());
                             mView.displayViewerCount(streamUpdated.getViewerCount());
                         },

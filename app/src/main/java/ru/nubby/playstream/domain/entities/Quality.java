@@ -6,9 +6,11 @@ import android.content.res.Resources;
 import ru.nubby.playstream.R;
 
 /**
-* Enumerated list of currently supported qualities. Default is the original quality.
+ * Enumerated list of currently supported qualities.
+ * Default is the original quality.
  */
 public enum Quality {
+    //IMPORTANT, IF U CHANGE ORDER HERE - CHANGE ORDER IN R.array.quality_list!
     DEFAULT,
     QUALITY108060,
     QUALITY108030,
@@ -19,6 +21,12 @@ public enum Quality {
     QUALITY240,
     QUALITY_AUDIO_ONLY;
 
+    /**
+     * Uses string resource array to store names for qualities.
+     * Resources and enum are bound by position index, be aware of it.
+     * @param context android context
+     * @return (translated) representation of enum
+     */
     public String getQualityShortName(Context context) {
         Resources res = context.getResources();
         String[] names = res.getStringArray(R.array.quality_list);

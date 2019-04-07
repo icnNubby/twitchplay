@@ -13,11 +13,13 @@ import dagger.MapKey;
 import dagger.Module;
 import dagger.Provides;
 import dagger.multibindings.IntoMap;
+import ru.nubby.playstream.domain.FollowsRepository;
 import ru.nubby.playstream.domain.StreamsRepository;
 import ru.nubby.playstream.domain.UsersRepository;
 import ru.nubby.playstream.domain.interactors.AuthInteractor;
 import ru.nubby.playstream.domain.interactors.NavigationStateInteractor;
 import ru.nubby.playstream.domain.interactors.PreferencesInteractor;
+import ru.nubby.playstream.domain.interactors.StreamsInteractor;
 import ru.nubby.playstream.presentation.base.PresenterFactory;
 import ru.nubby.playstream.presentation.login.LoginPresenter;
 import ru.nubby.playstream.presentation.preferences.PreferencesPresenter;
@@ -73,18 +75,27 @@ public abstract class PresentersModule {
     @PresenterKey(value = StreamPresenter.class)
     static ViewModel streamPresenter(StreamsRepository streamsRepository,
                                      UsersRepository usersRepository,
-                                     PreferencesInteractor preferencesInteractor) {
+                                     FollowsRepository followsRepository,
+                                     StreamsInteractor streamsInteractor,
+                                     PreferencesInteractor preferencesInteractor,
+                                     RxSchedulersProvider rxSchedulersProvider) {
         return new StreamPresenter(
                 streamsRepository,
-                followsRepository, usersRepository,
-                preferencesInteractor);
+                followsRepository,
+                usersRepository,
+                streamsInteractor,
+                preferencesInteractor,
+                rxSchedulersProvider);
     }
 
     @Provides
     @IntoMap
     @PresenterKey(value = ChatPresenter.class)
-    static ViewModel chatPresenter(UsersRepository repository) {
-        return new ChatPresenter(repository);
+    static ViewModel chatPresenter(UsersRepository repository,
+                                   RxSchedulersProvider rxSchedulersProvider) {
+        return new ChatPresenter(
+                repository,
+                rxSchedulersProvider);
     }
 
     @Provides

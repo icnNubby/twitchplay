@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import ru.nubby.playstream.domain.entities.ChatMessage;
+import ru.nubby.playstream.utils.RxSchedulersProvider;
 
 //todo think more
 public class ChatChannelApi {
@@ -31,6 +32,7 @@ public class ChatChannelApi {
     private final String user;
     private final String oauthKey;
     private final String channelName;
+    private final RxSchedulersProvider rxSchedulersProvider;
     private Socket socket;
 
     private boolean connected;
@@ -43,9 +45,11 @@ public class ChatChannelApi {
 
     public ChatChannelApi(@NonNull String user,
                           @NonNull String oauthKey,
-                          @NonNull String channelName) {
+                          @NonNull String channelName,
+                          @NonNull RxSchedulersProvider rxSchedulersProvider) {
         this.user = user;
         this.oauthKey = oauthKey;
+        this.rxSchedulersProvider = rxSchedulersProvider;
         this.channelName = channelName.toLowerCase();
     }
 
@@ -55,7 +59,7 @@ public class ChatChannelApi {
         //socket, reader and writer
         //if anything went wrong (socket connection, streams instantiation) it would emit error.
 
-        return Single.create(singleEmitter -> {
+        Single<Boolean> initObservable = Single.create(singleEmitter -> {
             try {
                 socket = new Socket(TWITCH_CHAT_SERVER, TWITCH_CHAT_PORT);
                 reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -97,10 +101,13 @@ public class ChatChannelApi {
                 Log.e(TAG, "IOException error while connecting to chat: " + exception, exception);
             }
         });
+        return initObservable
+                .subscribeOn(rxSchedulersProvider.getIoScheduler());
     }
 
     public Observable<ChatMessage> listenToChat() {
         return readerObservable
+                .subscribeOn(rxSchedulersProvider.getIoScheduler())
                 .map(line -> {
                     if (line.contains("376") && !connected) {
                         connected = true;
