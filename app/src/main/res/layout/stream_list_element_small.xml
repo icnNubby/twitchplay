@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/materialCardView"
@@ -56,12 +57,11 @@
             android:textColor="@color/colorBlack"
             android:textSize="14sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/imageViewAvatar"
+            app:layout_constraintBottom_toBottomOf="@+id/avatar"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageViewAvatar"
-            app:layout_constraintTop_toTopOf="@+id/imageViewAvatar"
+            app:layout_constraintStart_toEndOf="@+id/avatar"
+            app:layout_constraintTop_toTopOf="@+id/avatar"
             tools:text="Streamer name" />
-
 
         <TextView
             android:id="@+id/stream_description"
@@ -70,23 +70,43 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
             android:ellipsize="end"
             android:gravity="start"
-            android:lines="2"
-            android:maxHeight="30dp"
-            android:minLines="2"
+            android:lines="1"
+            android:maxHeight="15dp"
             android:textAlignment="viewStart"
             android:textColor="@color/colorBlack"
             android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@+id/stream_game"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/stream_preview_thumbnail"
+            app:layout_constraintTop_toBottomOf="@+id/avatar"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="Stream description" />
+
+        <TextView
+            android:id="@+id/stream_game"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:ellipsize="end"
+            android:gravity="start"
+            android:lines="1"
+            android:maxHeight="15dp"
+            android:textAlignment="viewStart"
+            android:textColor="@color/colorBlack"
+            android:textSize="12sp"
+            android:textStyle="italic"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/stream_preview_thumbnail"
-            app:layout_constraintTop_toBottomOf="@+id/imageViewAvatar"
-            tools:text="Stream description" />
+            app:layout_constraintTop_toBottomOf="@+id/stream_description"
+            tools:text="Current game" />
 
         <ImageView
-            android:id="@+id/imageViewAvatar"
+            android:id="@+id/avatar"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginStart="8dp"

@@ -3,6 +3,7 @@ package ru.nubby.playstream.domain;
 import java.util.List;
 
 import io.reactivex.Single;
+import ru.nubby.playstream.domain.entities.Game;
 import ru.nubby.playstream.domain.entities.GamesResponse;
 import ru.nubby.playstream.domain.entities.Pagination;
 
@@ -26,6 +27,6 @@ public interface GamesRepository {
      * @param gamesIds list of id's
      * @return server response with games objects
      */
-    Single<GamesResponse> getGamesByIds(List<String> gamesIds);
+    Single<List<Game>> getGamesByIds(List<String> gamesIds);
 
 }

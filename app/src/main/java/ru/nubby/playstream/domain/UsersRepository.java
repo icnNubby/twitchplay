@@ -1,5 +1,7 @@
 package ru.nubby.playstream.domain;
 
+import java.util.List;
+
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import ru.nubby.playstream.domain.entities.Stream;
@@ -29,4 +31,5 @@ public interface UsersRepository {
      */
     Completable synchronizeUserData();
 
+    Single<List<UserData>> getUsersByIds(List<String> usersIds);
 }

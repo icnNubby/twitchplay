@@ -8,9 +8,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Single;
-import ru.nubby.playstream.domain.StreamsRepository;
 import ru.nubby.playstream.data.sources.sharedprefs.DefaultPreferences;
 import ru.nubby.playstream.data.sources.sharedprefs.PersistentStorage;
+import ru.nubby.playstream.domain.StreamsRepository;
 import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.presentation.preferences.utils.TimePreference;
 
@@ -39,6 +39,7 @@ public class NotificationsInteractor {
     /**
      * Checks if all the preconditions, setted up in preferences, are true.
      * Ex. notifications are on, user is logged and current time is not in silent zone.
+     *
      * @return can we fire notifications or not.
      */
     public boolean conditionsSatisfied() {
@@ -76,14 +77,12 @@ public class NotificationsInteractor {
 
             //start time is at same day as end time
             if (startTimeTotal < endTimeTotal &&
-                    currentTimeTotal >= startTimeTotal &&
-                    currentTimeTotal <= endTimeTotal) {
+                    currentTimeTotal >= startTimeTotal && currentTimeTotal <= endTimeTotal) {
                 silent = true;
             }
             //start time is at another day than end time
             if (startTimeTotal > endTimeTotal &&
-                    (currentTimeTotal > startTimeTotal ||
-                            currentTimeTotal < endTimeTotal)) {
+                    (currentTimeTotal > startTimeTotal || currentTimeTotal < endTimeTotal)) {
                 silent = true;
             }
         }
@@ -92,14 +91,18 @@ public class NotificationsInteractor {
 
     /**
      * Proxy method to retrieve current live streams from remote repo.
-     * @return
+     *
+     * @return currently live streams
      */
     public Single<List<Stream>> getLiveStreams() {
-        return mStreamsRepository.getLiveStreamsFollowedByUser();
+        return mAuthInteractor
+                .getCurrentLoginInfo()
+                .flatMap(mStreamsRepository::getLiveStreamsFollowedByUser);
     }
 
     /**
      * Compares two stream lists and returns list of streams that came offline from last retrieve.
+     *
      * @param oldStreams list of previously retrieved streams
      * @param newStreams list of streams currently live
      * @return dead streams list.
@@ -125,6 +128,7 @@ public class NotificationsInteractor {
 
     /**
      * Compares two stream lists and returns list of streams that came online from last retrieve.
+     *
      * @param oldStreams list of previously retrieved streams
      * @param newStreams list of streams currently live
      * @return fresh streams list.
@@ -139,7 +143,6 @@ public class NotificationsInteractor {
         }
         return outList;
     }
-
 
 
 }

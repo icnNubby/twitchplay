@@ -17,6 +17,7 @@ import ru.nubby.playstream.domain.FollowsRepository;
 import ru.nubby.playstream.domain.StreamsRepository;
 import ru.nubby.playstream.domain.UsersRepository;
 import ru.nubby.playstream.domain.interactors.AuthInteractor;
+import ru.nubby.playstream.domain.interactors.FollowsInteractor;
 import ru.nubby.playstream.domain.interactors.NavigationStateInteractor;
 import ru.nubby.playstream.domain.interactors.PreferencesInteractor;
 import ru.nubby.playstream.domain.interactors.StreamsInteractor;
@@ -47,12 +48,12 @@ public abstract class PresentersModule {
     @Provides
     @IntoMap
     @PresenterKey(value = StreamListPresenter.class)
-    static ViewModel streamListPresenter(StreamsRepository streamsRepository,
+    static ViewModel streamListPresenter(StreamsInteractor streamsInteractor,
                                          NavigationStateInteractor navigationStateInteractor,
                                          PreferencesInteractor preferencesInteractor,
                                          RxSchedulersProvider rxSchedulersProvider) {
         return new StreamListPresenter(
-                streamsRepository,
+                streamsInteractor,
                 navigationStateInteractor,
                 preferencesInteractor,
                 rxSchedulersProvider);
@@ -73,14 +74,12 @@ public abstract class PresentersModule {
     @Provides
     @IntoMap
     @PresenterKey(value = StreamPresenter.class)
-    static ViewModel streamPresenter(StreamsRepository streamsRepository,
-                                     FollowsRepository followsRepository,
+    static ViewModel streamPresenter(FollowsInteractor followsInteractor,
                                      StreamsInteractor streamsInteractor,
                                      PreferencesInteractor preferencesInteractor,
                                      RxSchedulersProvider rxSchedulersProvider) {
         return new StreamPresenter(
-                streamsRepository,
-                followsRepository,
+                followsInteractor,
                 streamsInteractor,
                 preferencesInteractor,
                 rxSchedulersProvider);

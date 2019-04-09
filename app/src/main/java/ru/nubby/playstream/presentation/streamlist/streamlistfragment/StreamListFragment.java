@@ -206,6 +206,7 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
         private TextView mTextViewStreamDescription;
         private TextView mTextViewStreamerName;
         private TextView mTextViewStreamViewerCount;
+        private TextView mTextViewGame;
         private ImageView mStreamPreview;
         private ImageView mAvatar;
 
@@ -214,6 +215,9 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
             mTextViewStreamerName.setText(stream.getStreamerName());
             mTextViewStreamDescription.setText(stream.getTitle());
             mTextViewStreamViewerCount.setText(stream.getViewerCount());
+            if (stream.getGame() != null) {
+                mTextViewGame.setText(stream.getGame().getName());
+            }
             String formattedUrl = stream
                     .getThumbnailUrl()
                     .replace("{width}", "" + (int) (mStreamCardWidth))
@@ -236,7 +240,8 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
             mTextViewStreamerName = itemView.findViewById(R.id.stream_streamer_name);
             mStreamPreview = itemView.findViewById(R.id.stream_preview_thumbnail);
             mTextViewStreamViewerCount = itemView.findViewById(R.id.stream_viewer_count);
-            mAvatar = itemView.findViewById(R.id.imageViewAvatar);
+            mTextViewGame = itemView.findViewById(R.id.stream_game);
+            mAvatar = itemView.findViewById(R.id.avatar);
         }
 
         @Override

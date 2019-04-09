@@ -7,10 +7,10 @@ import javax.inject.Inject;
 import androidx.lifecycle.Lifecycle;
 import io.reactivex.disposables.Disposable;
 import ru.nubby.playstream.domain.FollowsRepository;
-import ru.nubby.playstream.domain.StreamsRepository;
 import ru.nubby.playstream.domain.entities.Quality;
 import ru.nubby.playstream.domain.entities.QualityLinks;
 import ru.nubby.playstream.domain.entities.Stream;
+import ru.nubby.playstream.domain.interactors.FollowsInteractor;
 import ru.nubby.playstream.domain.interactors.PreferencesInteractor;
 import ru.nubby.playstream.domain.interactors.StreamsInteractor;
 import ru.nubby.playstream.presentation.base.BaseRxPresenter;
@@ -34,21 +34,18 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
 
     private Stream mCurrentStream;
 
-    private final StreamsRepository mStreamsRepository;
-    private final FollowsRepository mFollowsRepository;
+    private final FollowsInteractor mFollowsInteractor;
     private final StreamsInteractor mStreamsInteractor;
     private final PreferencesInteractor mPreferencesInteractor;
 
     private final RxSchedulersProvider mRxSchedulersProvider;
 
     @Inject
-    public StreamPresenter(StreamsRepository streamsRepository,
-                           FollowsRepository followsRepository,
+    public StreamPresenter(FollowsInteractor followsInteractor,
                            StreamsInteractor streamsInteractor,
                            PreferencesInteractor preferencesInteractor,
                            RxSchedulersProvider rxSchedulersProvider) {
-        mStreamsRepository = streamsRepository;
-        mFollowsRepository = followsRepository;
+        mFollowsInteractor = followsInteractor;
         mPreferencesInteractor = preferencesInteractor;
         mStreamsInteractor = streamsInteractor;
         mRxSchedulersProvider = rxSchedulersProvider;
@@ -64,7 +61,7 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
         mView.displayTitle(stream.getTitle());
         mView.displayViewerCount(stream.getViewerCount());
 
-        mFollowDisplayTask = mFollowsRepository
+        mFollowDisplayTask = mFollowsInteractor
                 .isStreamFollowed(stream)
                 .observeOn(mRxSchedulersProvider.getUiScheduler())
                 .subscribe(
@@ -112,16 +109,16 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
     @Override
     public void followOrUnfollowChannel() {
         if (mCurrentStream != null) {
-            mFollowUnfollowTask = mFollowsRepository
+            mFollowUnfollowTask = mFollowsInteractor
                     .isStreamFollowed(mCurrentStream)
                     .flatMapCompletable(result -> {
                         if (result) {
-                            return mFollowsRepository.unfollowStream(mCurrentStream);
+                            return mFollowsInteractor.unfollowStream(mCurrentStream);
                         } else {
-                            return mFollowsRepository.followStream(mCurrentStream);
+                            return mFollowsInteractor.followStream(mCurrentStream);
                         }
                     })
-                    .andThen(mFollowsRepository.isStreamFollowed(mCurrentStream))
+                    .andThen(mFollowsInteractor.isStreamFollowed(mCurrentStream))
                     .observeOn(mRxSchedulersProvider.getUiScheduler())
                     .subscribe(
                             followStatus -> {
@@ -159,9 +156,9 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
 
         mStreamResolutionsInfoTask = mStreamsInteractor
                 .getStreamLinks(stream)
+                .observeOn(mRxSchedulersProvider.getUiScheduler())
                 .doOnSubscribe((x) -> mView.displayLoading(true))
                 .doFinally(() -> mView.displayLoading(false))
-                .observeOn(mRxSchedulersProvider.getUiScheduler())
                 .subscribe(
                         qualityLinks -> {
                             mQualityUrls = qualityLinks;
@@ -182,7 +179,7 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
                         });
         mCompositeDisposable.add(mStreamResolutionsInfoTask);
 
-        mStreamInfoUpdater = mStreamsRepository
+        mStreamInfoUpdater = mStreamsInteractor
                 .getUpdatableStreamInfo(stream)
                 .observeOn(mRxSchedulersProvider.getUiScheduler())
                 .subscribe(

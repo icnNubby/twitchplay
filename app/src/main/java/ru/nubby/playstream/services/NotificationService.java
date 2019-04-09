@@ -184,7 +184,6 @@ public class NotificationService extends JobService {
 
     }
 
-
     private Single<Map<String, Bitmap>> getAvatarsForStreamlist(List<Stream> streamList) {
         return Observable
                 .fromIterable(streamList)

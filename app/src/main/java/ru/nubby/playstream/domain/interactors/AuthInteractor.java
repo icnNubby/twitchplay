@@ -4,9 +4,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Single;
-import ru.nubby.playstream.data.sources.database.LocalRepository;
 import ru.nubby.playstream.data.sources.sharedprefs.AuthorizationStorage;
-import ru.nubby.playstream.data.sources.twitchapi.RemoteRepository;
+import ru.nubby.playstream.domain.UsersRepository;
 import ru.nubby.playstream.domain.entities.UserData;
 
 /**
@@ -30,16 +29,13 @@ public class AuthInteractor {
     }
 
     private final AuthorizationStorage mAuthorizationStorage;
-    private final RemoteRepository mRemoteRepository;
-    private final LocalRepository mLocalRepository;
+    private final UsersRepository mUsersRepository;
 
     @Inject
     public AuthInteractor(AuthorizationStorage authorizationStorage,
-                          RemoteRepository remoteRepository,
-                          LocalRepository localRepository) {
+                          UsersRepository usersRepository) {
         mAuthorizationStorage = authorizationStorage;
-        mRemoteRepository = remoteRepository;
-        mLocalRepository = localRepository;
+        mUsersRepository = usersRepository;
     }
 
     /**
@@ -114,12 +110,8 @@ public class AuthInteractor {
      * @return {@code UserData}, related to logged user.
      */
     private Single<UserData> getUserFromToken(String token) {
-        return mRemoteRepository
-                .getUserDataFromToken(token)
-                .flatMap(userData ->
-                        mLocalRepository
-                                .insertUserData(userData)
-                                .andThen(Single.just(userData)));
+        return mUsersRepository
+                .getUserFromToken(token);
     }
 
 

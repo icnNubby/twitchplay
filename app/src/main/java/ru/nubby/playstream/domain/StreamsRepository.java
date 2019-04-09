@@ -3,10 +3,8 @@ package ru.nubby.playstream.domain;
 import java.util.HashMap;
 import java.util.List;
 
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import ru.nubby.playstream.domain.entities.FollowRelations;
 import ru.nubby.playstream.domain.entities.Pagination;
 import ru.nubby.playstream.domain.entities.Quality;
 import ru.nubby.playstream.domain.entities.Stream;
@@ -29,10 +27,10 @@ public interface StreamsRepository {
     Single<StreamsResponse> getTopStreams(Pagination pagination);
 
     /**
-     * Gets active stream list from remote or local(cached) repository
+     * Gets active stream list from remote repository
      * @return list of user's followed streams
      */
-    Single<List<Stream>> getLiveStreamsFollowedByUser();
+    Single<List<Stream>> getLiveStreamsFollowedByUser(UserData userData);
 
     /**
      * Gets video url from stream object

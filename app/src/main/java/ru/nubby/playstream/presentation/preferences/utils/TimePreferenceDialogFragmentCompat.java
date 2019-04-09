@@ -4,13 +4,15 @@ import android.content.Context;
 import android.view.View;
 import android.widget.TimePicker;
 
+import androidx.annotation.NonNull;
 import androidx.preference.DialogPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceDialogFragmentCompat;
 
 public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragmentCompat
         implements DialogPreference.TargetFragment {
-    TimePicker timePicker = null;
+
+    private TimePicker timePicker = null;
 
     @Override
     protected View onCreateDialogView(Context context) {
@@ -39,8 +41,9 @@ public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragment
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Preference findPreference(CharSequence charSequence) {
+    public Preference findPreference(@NonNull CharSequence charSequence) {
         return getPreference();
     }
 }

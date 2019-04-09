@@ -1,5 +1,9 @@
 package ru.nubby.playstream.data.repositories.users;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -8,6 +12,7 @@ import io.reactivex.Single;
 import ru.nubby.playstream.data.sources.database.LocalRepository;
 import ru.nubby.playstream.data.sources.twitchapi.RemoteRepository;
 import ru.nubby.playstream.domain.UsersRepository;
+import ru.nubby.playstream.domain.entities.Game;
 import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.domain.entities.UserData;
 
@@ -24,6 +29,7 @@ public class UsersRepositoryImpl implements UsersRepository {
         mRemoteRepository = remoteRepository;
     }
 
+    @Override
     public Single<UserData> getUserFromStreamer(Stream stream) {
         return mLocalRepository
                 .findUserDataById(stream.getUserId())
@@ -35,6 +41,7 @@ public class UsersRepositoryImpl implements UsersRepository {
                                         .andThen(Single.just(userData))));
     }
 
+    @Override
     public Single<UserData> getUserFromToken(String token) {
         return mRemoteRepository
                 .getUserDataFromToken(token)
@@ -44,6 +51,7 @@ public class UsersRepositoryImpl implements UsersRepository {
                                 .andThen(Single.just(userData)));
     }
 
+    @Override
     public Completable synchronizeUserData() {
         return mLocalRepository
                 .getAllUserDataEntries()
@@ -51,5 +59,47 @@ public class UsersRepositoryImpl implements UsersRepository {
                 .flatMap(mRemoteRepository::getUpdatedUserDataList)
                 .flatMapCompletable(updatedUserDataList -> mLocalRepository
                         .insertUserDataList(updatedUserDataList.toArray(new UserData[0])));
+    }
+
+    @Override
+    public Single<List<UserData>> getUsersByIds(List<String> usersIds) {
+        final ArrayList<String> locallyFetched = new ArrayList<>();
+        Single<List<UserData>> local = mLocalRepository
+                .findUserDataByIdList(usersIds)
+                .toSingle()
+                .doOnSuccess(users -> {
+                    for (UserData item : users) {
+                        if (item != null) {
+                            locallyFetched.add(item.getId());
+                        }
+                    }
+                });
+
+        Single<List<UserData>> remote =
+                Single.defer(() -> mRemoteRepository
+                        .getUserDataListByStreamList(getUnfetchedIds(usersIds, locallyFetched)))
+                        .flatMap(userData ->
+                                mLocalRepository
+                                        .insertUserDataList(userData.toArray(new UserData[0]))
+                                        .andThen(Single.just(userData)));
+
+        return local
+                .concatWith(remote)
+                .flatMapIterable(items -> items)
+                .toObservable()
+                .toList();
+    }
+
+    private List<String> getUnfetchedIds(List<String> allIds, List<String> alreadyFetched) {
+
+        HashMap<String, Void> allIdsMapped = new HashMap<>();
+        for (String id : allIds) {
+            allIdsMapped.put(id, null);
+        }
+        for (String id : alreadyFetched) {
+            allIdsMapped.remove(id);
+        }
+        return new ArrayList<>(allIdsMapped.keySet());
+
     }
 }

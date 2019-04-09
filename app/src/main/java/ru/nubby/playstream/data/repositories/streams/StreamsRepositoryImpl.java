@@ -1,11 +1,8 @@
 package ru.nubby.playstream.data.repositories.streams;
 
-import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -13,14 +10,13 @@ import javax.inject.Singleton;
 import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import ru.nubby.playstream.data.sources.database.LocalRepository;
 import ru.nubby.playstream.data.sources.sharedprefs.PersistentStorage;
 import ru.nubby.playstream.data.sources.twitchapi.RemoteRepository;
 import ru.nubby.playstream.domain.FollowsRepository;
+import ru.nubby.playstream.domain.GamesRepository;
 import ru.nubby.playstream.domain.StreamsRepository;
+import ru.nubby.playstream.domain.UsersRepository;
 import ru.nubby.playstream.domain.entities.Game;
-import ru.nubby.playstream.domain.entities.GamesResponse;
 import ru.nubby.playstream.domain.entities.Pagination;
 import ru.nubby.playstream.domain.entities.Quality;
 import ru.nubby.playstream.domain.entities.Stream;
@@ -37,26 +33,23 @@ public class StreamsRepositoryImpl implements StreamsRepository {
     private final String TAG = StreamsRepositoryImpl.class.getSimpleName();
 
     private final RemoteRepository mRemoteRepository;
-    private final LocalRepository mLocalRepository;
     private final FollowsRepository mFollowsRepository;
     private final PersistentStorage mPersistentStorage;
-    private final AuthInteractor mAuthInteractor;
-    private final RxSchedulersProvider mRxSchedulersProvider;
+    private final GamesRepository mGamesRepository;
+    private final UsersRepository mUsersRepository;
 
     @Inject
     public StreamsRepositoryImpl(@NonNull RemoteRepository remoteRepository,
-                                 @NonNull LocalRepository localRepository,
                                  @NonNull FollowsRepository followsRepository,
-                                 @NonNull PersistentStorage persistentStorage,
-                                 @NonNull AuthInteractor authInteractor,
-                                 @NonNull RxSchedulersProvider rxSchedulersProvider) {
+                                 @NonNull GamesRepository gamesRepository,
+                                 @NonNull UsersRepository usersRepository,
+                                 @NonNull PersistentStorage persistentStorage) {
 
         mRemoteRepository = remoteRepository;
-        mLocalRepository = localRepository;
         mFollowsRepository = followsRepository;
+        mGamesRepository = gamesRepository;
         mPersistentStorage = persistentStorage;
-        mAuthInteractor = authInteractor;
-        mRxSchedulersProvider = rxSchedulersProvider;
+        mUsersRepository = usersRepository;
     }
 
     @Override
@@ -75,29 +68,22 @@ public class StreamsRepositoryImpl implements StreamsRepository {
                 .flatMap(this::fetchGameInfo);
     }
 
-
     @Override
-    public Single<List<Stream>> getLiveStreamsFollowedByUser() {
-        return mAuthInteractor
-                .getCurrentLoginInfo()
-                .subscribeOn(mRxSchedulersProvider.getIoScheduler())
-                .flatMap(userData ->
-                        mRemoteRepository
-                                .getLiveStreamsFromRelationList(
-                                        mFollowsRepository.getUserFollows(userData.getId())))
-                .flatMap(streams -> this.fetchUserInfo(streams, false))
-                .flatMap(streams -> this.fetchGameInfo(streams, false))
+    public Single<List<Stream>> getLiveStreamsFollowedByUser(UserData userData) {
+        return mRemoteRepository
+                .getLiveStreamsFromRelationList(
+                        mFollowsRepository.getUserFollows(userData.getId()))
+                .flatMap(this::fetchUserInfo)
+                .flatMap(this::fetchGameInfo)
                 .doOnSuccess(this::saveLiveStreamList);
     }
 
     @Override
     public Single<HashMap<Quality, String>> getQualityUrls(Stream stream) {
         return mRemoteRepository
-                .getQualityUrls(stream)
-                .observeOn(AndroidSchedulers.mainThread());
+                .getQualityUrls(stream);
     }
 
-    //todo make fetch here aswell
     @Override
     public Observable<Stream> getUpdatableStreamInfo(Stream stream) {
         return mRemoteRepository
@@ -106,10 +92,9 @@ public class StreamsRepositoryImpl implements StreamsRepository {
 
     private Single<StreamsResponse> fetchUserInfo(final StreamsResponse streamsResponse) {
         //makes deep copy of streamsResponse, modifies its "data" field (List<Streams>)
-
         final StreamsResponse streamsResponseCopy = new StreamsResponse(streamsResponse);
 
-        return fetchUserInfo(streamsResponseCopy.getData(), false)
+        return fetchUserInfo(streamsResponseCopy.getData())
                 .flatMap(streams -> {
                     streamsResponseCopy.setData(streams);
                     return Single.just(streamsResponseCopy);
@@ -117,84 +102,41 @@ public class StreamsRepositoryImpl implements StreamsRepository {
 
     }
 
-    private Single<List<Stream>> fetchUserInfo(final List<Stream> streamList,
-                                               boolean forceUpdateDb) {
+    private Single<List<Stream>> fetchUserInfo(final List<Stream> streamList) {
         //makes deep copy of streamList
         final List<Stream> streamListCopy = new ArrayList<>();
         for (Stream item : streamList) {
             streamListCopy.add(new Stream(item));
         }
-        final Map<String, Integer> streamsIndexes = new HashMap<>();
-        for (int i = 0; i < streamListCopy.size(); i++) {
-            streamsIndexes.put(streamListCopy.get(i).getUserId(), i);
-        }
 
-        /*
-             1. tries to fetch UserData from db by Id, updates streamListCopy with that data
-             2. for all streams id's that are not in db, performs net request, updates
-                streamListCopy
-             3. writes fetched UserData from step 2 to db.
-             if forceUpdateDb == true - skips step 1.
-             result - updated COPY of streamList
-         */
-
-        Observable<UserData> localSource;
-        if (!forceUpdateDb) {
-            localSource = Observable
-                    .fromIterable(streamListCopy)
-                    .map(Stream::getUserId)
-                    .flatMapMaybe(mLocalRepository::findUserDataById)
-                    .doOnEach(userDataNotification -> {
-                        UserData value = userDataNotification.getValue();
-                        if (value != null) {
-                            Integer index = streamsIndexes.get(value.getId());
-                            if (index != null) {
-                                streamListCopy
-                                        .get(index)
-                                        .setUserData(userDataNotification.getValue());
-                            }
-                        }
-                    });
-        } else {
-            localSource = Observable.empty();
-        }
-
-        Observable<UserData> remoteSource = Observable
-                .fromIterable(streamListCopy)
-                .filter(stream -> (stream.getUserData() == null || stream.getUserData().isEmpty()))
+        return Observable
+                .fromIterable(streamList)
+                .map(Stream::getUserId)
                 .toList()
-                .flatMap(mRemoteRepository::getUserDataListByStreamList)
-                .flatMap(userDataList -> mLocalRepository
-                        .insertUserDataList(userDataList.toArray(new UserData[0]))
-                        .andThen(Single.just(userDataList)))
-                .flatMapObservable(Observable::fromIterable)
-                .doOnEach(userDataNotification -> {
-                    UserData value = userDataNotification.getValue();
-                    if (value != null) {
-                        mLocalRepository.insertUserData(userDataNotification.getValue());
-                        Integer index = streamsIndexes.get(value.getId());
-                        if (index != null) {
-                            streamListCopy
-                                    .get(index)
-                                    .setUserData(userDataNotification.getValue());
+                .flatMap(mUsersRepository::getUsersByIds)
+                .flatMap(users -> {
+                    HashMap<String, UserData> usersMap = new HashMap<>();
+                    for (UserData user : users) {
+                        usersMap.put(user.getId(), user);
+                    }
+                    for (Stream stream : streamListCopy) {
+                        UserData userForStream = usersMap.get(stream.getUserId());
+                        if (userForStream != null) {
+                            stream.setUserData(userForStream);
+                        } else {
+                            stream.setUserData(new UserData());
                         }
                     }
+                    return Single.just(streamListCopy);
                 });
 
-        return localSource
-                .concatWith(remoteSource)
-                .toList()
-                .flatMap(userDataList -> Single.just(streamListCopy));
-
     }
-
 
     private Single<StreamsResponse> fetchGameInfo(final StreamsResponse streamsResponse) {
         //makes deep copy of streamsResponse, modifies its "data" field (List<Streams>)
-
         final StreamsResponse streamsResponseCopy = new StreamsResponse(streamsResponse);
 
-        return fetchGameInfo(streamsResponseCopy.getData(), false)
+        return fetchGameInfo(streamsResponseCopy.getData())
                 .flatMap(streams -> {
                     streamsResponseCopy.setData(streams);
                     return Single.just(streamsResponseCopy);
@@ -202,76 +144,33 @@ public class StreamsRepositoryImpl implements StreamsRepository {
 
     }
 
-    private Single<List<Stream>> fetchGameInfo(final List<Stream> streamList,
-                                               boolean forceUpdateDb) {
+    private Single<List<Stream>> fetchGameInfo(final List<Stream> streamList) {
         //makes deep copy of streamList
         final List<Stream> streamListCopy = new ArrayList<>();
         for (Stream item : streamList) {
             streamListCopy.add(new Stream(item));
         }
-        final Map<String, Integer> streamsIndexes = new HashMap<>();
-        for (int i = 0; i < streamListCopy.size(); i++) {
-            streamsIndexes.put(streamListCopy.get(i).getUserId(), i);
-        }
 
-        /*
-             1. tries to fetch Games from db by Id, updates streamListCopy with that data
-             2. for all streams id's that are not in db, performs net request, updates
-                streamListCopy
-             3. writes fetched Games from step 2 to db.
-             if forceUpdateDb == true - skips step 1.
-             result - updated COPY of streamList
-         */
-
-        Observable<Game> localSource;
-        if (!forceUpdateDb) {
-            localSource = Observable
-                    .fromIterable(streamListCopy)
-                    .map(Stream::getUserId)
-                    .flatMapMaybe(mLocalRepository::findGame)
-                    .doOnEach(gameNotification -> {
-                        Game value = gameNotification.getValue();
-                        if (value != null) {
-                            Integer index = streamsIndexes.get(value.getId());
-                            if (index != null) {
-                                streamListCopy
-                                        .get(index)
-                                        .setGame(gameNotification.getValue());
-                            }
-                        }
-                    });
-        } else {
-            localSource = Observable.empty();
-        }
-
-        Observable<Game> remoteSource = Observable
-                .fromIterable(streamListCopy)
-                .filter(stream -> (stream.getGame() == null || stream.getGame().isEmpty()))
+        return Observable
+                .fromIterable(streamList)
                 .map(Stream::getGameId)
                 .toList()
-                .flatMap(mRemoteRepository::getGamesByIds)
-                .flatMap(gamesResponse -> mLocalRepository
-                        .insertGameList(gamesResponse.getData().toArray(new Game[0]))
-                        .andThen(Single.just(gamesResponse)))
-                .map(GamesResponse::getData)
-                .flatMapObservable(Observable::fromIterable)
-                .doOnEach(gameNotification -> {
-                    Game value = gameNotification.getValue();
-                    if (value != null) {
-                        mLocalRepository.insertGame(gameNotification.getValue());
-                        Integer index = streamsIndexes.get(value.getId());
-                        if (index != null) {
-                            streamListCopy
-                                    .get(index)
-                                    .setGame(gameNotification.getValue());
+                .flatMap(mGamesRepository::getGamesByIds)
+                .flatMap(games -> {
+                    HashMap<String, Game> gamesMap = new HashMap<>();
+                    for (Game game : games) {
+                        gamesMap.put(game.getId(), game);
+                    }
+                    for (Stream stream : streamListCopy) {
+                        Game gameForStream = gamesMap.get(stream.getGameId());
+                        if (gameForStream != null) {
+                            stream.setGame(gameForStream);
+                        } else {
+                            stream.setGame(new Game());
                         }
                     }
+                    return Single.just(streamListCopy);
                 });
-
-        return localSource
-                .concatWith(remoteSource)
-                .toList()
-                .flatMap(userDataList -> Single.just(streamListCopy));
 
     }
 

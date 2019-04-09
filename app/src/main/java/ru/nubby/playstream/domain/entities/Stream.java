@@ -9,6 +9,8 @@ import androidx.annotation.Nullable;
 
 /**
  * Stream class. Contains information about user, stream title, viewer count, etc.
+ * <p></p>
+ * Comes incomplete. userData and game fields have to be fetched with additional requests.
  * <a href = "https://dev.twitch.tv/docs/api/reference/#get-streams">Documentation here.</a>
  */
 public final class Stream implements Comparable<Stream>, Serializable {

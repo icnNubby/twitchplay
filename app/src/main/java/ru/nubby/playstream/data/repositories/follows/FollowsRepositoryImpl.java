@@ -93,7 +93,7 @@ public class FollowsRepositoryImpl implements FollowsRepository {
 
     @Override
     public Completable synchronizeFollows(String userId) {
-        mFollowsFullUpdate = false;
+        mFollowsFullUpdate = true;
         return getUserFollows(userId)
                 .flatMapCompletable(followRelationsList -> CompletableObserver::onComplete);
     }

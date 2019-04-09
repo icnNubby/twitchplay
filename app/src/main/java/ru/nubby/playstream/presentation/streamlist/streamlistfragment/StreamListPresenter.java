@@ -11,14 +11,13 @@ import java.util.Map;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
-import ru.nubby.playstream.domain.StreamsRepository;
 import ru.nubby.playstream.domain.entities.Pagination;
 import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.domain.entities.StreamListNavigationState;
 import ru.nubby.playstream.domain.interactors.NavigationStateInteractor;
 import ru.nubby.playstream.domain.interactors.PreferencesInteractor;
+import ru.nubby.playstream.domain.interactors.StreamsInteractor;
 import ru.nubby.playstream.presentation.base.BaseRxPresenter;
 import ru.nubby.playstream.utils.RxSchedulersProvider;
 
@@ -31,7 +30,7 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
     private static final String TAG = StreamListPresenter.class.getSimpleName();
     private final long UPDATE_INTERVAL_MILLIS = 1000 * 60 * 5; // 5 minutes
 
-    private final StreamsRepository mStreamsRepository;
+    private final StreamsInteractor mStreamsInteractor;
     private final NavigationStateInteractor mNavigationStateInteractor;
     private final PreferencesInteractor mPreferencesInteractor;
     private final RxSchedulersProvider mRxSchedulerProvider;
@@ -45,11 +44,11 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
     private Observable<StreamListNavigationState> mListStateObservable;
     private boolean mForceReload = false;
 
-    public StreamListPresenter(@NonNull StreamsRepository streamsRepository,
+    public StreamListPresenter(@NonNull StreamsInteractor streamsInteractor,
                                @NonNull NavigationStateInteractor navigationStateInteractor,
                                @NonNull PreferencesInteractor preferencesInteractor,
                                @NonNull RxSchedulersProvider rxSchedulersProvider) {
-        mStreamsRepository = streamsRepository;
+        mStreamsInteractor = streamsInteractor;
         mNavigationStateInteractor = navigationStateInteractor;
         mPreferencesInteractor = preferencesInteractor;
         mRxSchedulerProvider = rxSchedulersProvider;
@@ -106,7 +105,7 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
             mDisposableFetchingTask.dispose();
         }
 
-        mDisposableFetchingTask = mStreamsRepository
+        mDisposableFetchingTask = mStreamsInteractor
                 .getLiveStreamsFollowedByUser()
                 .observeOn(mRxSchedulerProvider.getUiScheduler())
                 .doOnSubscribe(disposable -> {
@@ -134,7 +133,7 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
 
     @Override
     public void getTopStreams() {
-        mDisposableFetchingTask = mStreamsRepository
+        mDisposableFetchingTask = mStreamsInteractor
                 .getTopStreams()
                 .observeOn(mRxSchedulerProvider.getUiScheduler())
                 .doOnSubscribe(disposable -> {
@@ -168,7 +167,7 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
                 mCompositeDisposable.remove(mDisposableFetchingTask);
                 mDisposableFetchingTask.dispose();
             }
-            mDisposableFetchingTask = mStreamsRepository
+            mDisposableFetchingTask = mStreamsInteractor
                     .getTopStreams(mPagination)
                     .observeOn(mRxSchedulerProvider.getUiScheduler())
                     .subscribe(streams -> {

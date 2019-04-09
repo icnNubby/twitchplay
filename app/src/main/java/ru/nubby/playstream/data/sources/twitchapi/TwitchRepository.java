@@ -20,6 +20,7 @@ import ru.nubby.playstream.data.sources.twitchapi.services.TwitchApiService;
 import ru.nubby.playstream.data.sources.twitchapi.services.TwitchHelixService;
 import ru.nubby.playstream.data.sources.twitchapi.services.TwitchKrakenService;
 import ru.nubby.playstream.domain.entities.FollowRelations;
+import ru.nubby.playstream.domain.entities.Game;
 import ru.nubby.playstream.domain.entities.GamesResponse;
 import ru.nubby.playstream.domain.entities.Pagination;
 import ru.nubby.playstream.domain.entities.Quality;
@@ -116,13 +117,8 @@ public class TwitchRepository implements RemoteRepository {
     }
 
     @Override
-    public Single<List<UserData>> getUserDataListByStreamList(List<Stream> streamIdList) {
-        return Observable
-                .fromIterable(streamIdList)
-                .subscribeOn(mComputationScheduler)
-                .map(Stream::getUserId)
-                .toList()
-                .flatMap(this::getUserDataListByStringIds);
+    public Single<List<UserData>> getUserDataListByStreamList(List<String> streamIdList) {
+        return getUserDataListByStringIds(streamIdList);
     }
 
     @Override
@@ -157,6 +153,7 @@ public class TwitchRepository implements RemoteRepository {
                 .map(streamsResponse -> streamsResponse.getData().get(0))
                 .delay(30, TimeUnit.SECONDS)
                 .repeat()
+                .retry()
                 .toObservable();
     }
 
@@ -245,9 +242,14 @@ public class TwitchRepository implements RemoteRepository {
     }
 
     @Override
-    public Single<GamesResponse> getGamesByIds(List<String> gamesIds) {
-        return mTwitchHelixService
-                .getGamesByIds(gamesIds)
+    public Single<List<Game>> getGamesByIds(List<String> gamesIds) {
+        return Observable
+                .fromIterable(gamesIds)
+                .buffer(100)
+                .flatMapSingle(mTwitchHelixService::getGamesByIds)
+                .map(GamesResponse::getData)
+                .flatMap(Observable::fromIterable)
+                .toList()
                 .subscribeOn(mIoScheduler);
     }
 

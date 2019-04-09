@@ -7,6 +7,7 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import ru.nubby.playstream.domain.entities.FollowRelations;
+import ru.nubby.playstream.domain.entities.Game;
 import ru.nubby.playstream.domain.entities.GamesResponse;
 import ru.nubby.playstream.domain.entities.Pagination;
 import ru.nubby.playstream.domain.entities.Quality;
@@ -21,7 +22,7 @@ public interface RemoteRepository {
 
     Single<UserData> getStreamerInfo(Stream stream);
 
-    Single<List<UserData>> getUserDataListByStreamList(List<Stream> streamIdList);
+    Single<List<UserData>> getUserDataListByStreamList(List<String> streamIdList);
 
     Single<List<UserData>> getUpdatedUserDataList(List<UserData> userDataList);
 
@@ -48,5 +49,5 @@ public interface RemoteRepository {
 
     Single<GamesResponse> getTopGames(Pagination pagination);
 
-    Single<GamesResponse> getGamesByIds(List<String> gamesIds);
+    Single<List<Game>> getGamesByIds(List<String> gamesIds);
 }

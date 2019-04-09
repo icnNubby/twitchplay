@@ -36,6 +36,6 @@ public interface TwitchHelixService {
     Single<GamesResponse> getTopGames(@Query("after") String cursor);
 
     @GET("games?first=100")
-    Single<GamesResponse> getGamesByIds(@Query("id")  List<String> gameIds);
+    Single<GamesResponse> getGamesByIds(@Query("id") List<String> gameIds);
 
 }
