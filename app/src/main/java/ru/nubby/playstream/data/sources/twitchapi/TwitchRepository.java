@@ -19,6 +19,7 @@ import ru.nubby.playstream.data.sources.twitchapi.services.RawJsonService;
 import ru.nubby.playstream.data.sources.twitchapi.services.TwitchApiService;
 import ru.nubby.playstream.data.sources.twitchapi.services.TwitchHelixService;
 import ru.nubby.playstream.data.sources.twitchapi.services.TwitchKrakenService;
+import ru.nubby.playstream.domain.entities.ChannelPanel;
 import ru.nubby.playstream.domain.entities.FollowRelations;
 import ru.nubby.playstream.domain.entities.Game;
 import ru.nubby.playstream.domain.entities.GamesResponse;
@@ -196,11 +197,10 @@ public class TwitchRepository implements RemoteRepository {
 
     @Override
     public Single<List<Stream>> getLiveStreamsFromRelationList(
-            Single<List<FollowRelations>> singleFollowRelationsList) {
-        return singleFollowRelationsList
+            List<FollowRelations> followRelationsList) {
+        return Observable
+                .fromIterable(followRelationsList)
                 .subscribeOn(mComputationScheduler)
-                .toObservable()
-                .flatMap(Observable::fromIterable)
                 .map(FollowRelations::getToId)
                 .buffer(100)
                 .subscribeOn(mIoScheduler)
@@ -250,6 +250,13 @@ public class TwitchRepository implements RemoteRepository {
                 .map(GamesResponse::getData)
                 .flatMap(Observable::fromIterable)
                 .toList()
+                .subscribeOn(mIoScheduler);
+    }
+
+    @Override
+    public Single<List<ChannelPanel>> getPanelsForUser(String userId) {
+        return mTwitchApiService
+                .getChannelPanelsForUser(userId)
                 .subscribeOn(mIoScheduler);
     }
 

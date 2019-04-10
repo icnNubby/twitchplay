@@ -12,6 +12,7 @@ import io.reactivex.Single;
 import ru.nubby.playstream.data.sources.database.LocalRepository;
 import ru.nubby.playstream.data.sources.twitchapi.RemoteRepository;
 import ru.nubby.playstream.domain.UsersRepository;
+import ru.nubby.playstream.domain.entities.ChannelPanel;
 import ru.nubby.playstream.domain.entities.Game;
 import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.domain.entities.UserData;
@@ -88,6 +89,11 @@ public class UsersRepositoryImpl implements UsersRepository {
                 .flatMapIterable(items -> items)
                 .toObservable()
                 .toList();
+    }
+
+    @Override
+    public Single<List<ChannelPanel>> getPanelsForUser(String userId) {
+        return mRemoteRepository.getPanelsForUser(userId);
     }
 
     private List<String> getUnfetchedIds(List<String> allIds, List<String> alreadyFetched) {

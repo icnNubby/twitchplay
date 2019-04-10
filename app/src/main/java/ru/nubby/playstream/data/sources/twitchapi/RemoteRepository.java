@@ -6,6 +6,7 @@ import java.util.List;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import ru.nubby.playstream.domain.entities.ChannelPanel;
 import ru.nubby.playstream.domain.entities.FollowRelations;
 import ru.nubby.playstream.domain.entities.Game;
 import ru.nubby.playstream.domain.entities.GamesResponse;
@@ -39,7 +40,7 @@ public interface RemoteRepository {
     Single<List<Stream>> getLiveStreamsFollowedByUser(String userId);
 
     Single<List<Stream>> getLiveStreamsFromRelationList(
-            Single<List<FollowRelations>> singleFollowRelationsList);
+            List<FollowRelations> followRelationsList);
 
     Completable followTargetUser(String token, String userId, String targetUserId);
 
@@ -50,4 +51,6 @@ public interface RemoteRepository {
     Single<GamesResponse> getTopGames(Pagination pagination);
 
     Single<List<Game>> getGamesByIds(List<String> gamesIds);
+
+    Single<List<ChannelPanel>> getPanelsForUser(String userId);
 }

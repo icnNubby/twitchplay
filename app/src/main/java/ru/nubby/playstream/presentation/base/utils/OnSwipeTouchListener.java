@@ -1,4 +1,4 @@
-package ru.nubby.playstream.presentation.uiutils;
+package ru.nubby.playstream.presentation.base.utils;
 
 import android.content.Context;
 import android.util.Log;

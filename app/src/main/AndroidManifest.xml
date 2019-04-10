@@ -38,6 +38,7 @@
             android:name=".presentation.preferences.PreferencesActivity"
             android:parentActivityName=".presentation.streamlist.StreamListActivity">
         </activity>
+        <activity android:name=".presentation.user.UserActivity" />
 
         <service android:name=".services.SyncUserDataService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>

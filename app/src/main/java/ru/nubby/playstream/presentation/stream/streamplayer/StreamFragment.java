@@ -88,7 +88,9 @@ public class StreamFragment extends BaseFragment
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.fragment_stream, container, false);
         mVideoView = fragmentView.findViewById(R.id.stream_player);
         if (mExoPlayer == null)
@@ -104,7 +106,8 @@ public class StreamFragment extends BaseFragment
         });
 
         mFullscreenToggle = fragmentView.findViewById(R.id.fullscreen_toggle);
-        mFullscreenToggle.setOnClickListener(v -> mActivityCallbacks.toggleFullscreen(!mActivityCallbacks.getFullscreenState()));
+        mFullscreenToggle.setOnClickListener(v ->
+                mActivityCallbacks.toggleFullscreen(!mActivityCallbacks.getFullscreenState()));
 
         mFollowUnfollowButton = fragmentView.findViewById(R.id.follow_unfollow);
         mFollowUnfollowButton.setOnClickListener(v -> mPresenter.followOrUnfollowChannel());
@@ -126,17 +129,26 @@ public class StreamFragment extends BaseFragment
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         mPresenter.subscribe(this, this.getLifecycle(), mCurrentStream);
         mVideoView.onResume();
         mExoPlayer.setPlayWhenReady(true);
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
-        mPresenter.unsubscribe();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
         mVideoView.onPause();
         mExoPlayer.setPlayWhenReady(false);
     }

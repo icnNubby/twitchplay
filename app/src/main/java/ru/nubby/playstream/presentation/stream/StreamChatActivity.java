@@ -21,13 +21,14 @@ import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.presentation.base.BaseActivity;
 import ru.nubby.playstream.presentation.stream.chat.ChatFragment;
 import ru.nubby.playstream.presentation.stream.streamplayer.StreamFragment;
-import ru.nubby.playstream.presentation.uiutils.OnSwipeTouchListener;
+import ru.nubby.playstream.presentation.base.utils.OnSwipeTouchListener;
 import ru.nubby.playstream.utils.Constants;
 
 /**
  * Should be called with extra JSON : gsonned model.Stream object
  */
-public class StreamChatActivity extends BaseActivity implements StreamFragment.StreamActivityCallbacks {
+public class StreamChatActivity extends BaseActivity
+        implements StreamFragment.StreamActivityCallbacks {
 
     private final static String BUNDLE_FULLSCREEN_ON = "fullscreen_on";
 

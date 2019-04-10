@@ -21,6 +21,7 @@ import ru.nubby.playstream.domain.interactors.FollowsInteractor;
 import ru.nubby.playstream.domain.interactors.NavigationStateInteractor;
 import ru.nubby.playstream.domain.interactors.PreferencesInteractor;
 import ru.nubby.playstream.domain.interactors.StreamsInteractor;
+import ru.nubby.playstream.domain.interactors.UsersInteractor;
 import ru.nubby.playstream.presentation.base.PresenterFactory;
 import ru.nubby.playstream.presentation.login.LoginPresenter;
 import ru.nubby.playstream.presentation.preferences.PreferencesPresenter;
@@ -28,6 +29,7 @@ import ru.nubby.playstream.presentation.stream.chat.ChatPresenter;
 import ru.nubby.playstream.presentation.stream.streamplayer.StreamPresenter;
 import ru.nubby.playstream.presentation.streamlist.StreamListActivityPresenter;
 import ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListPresenter;
+import ru.nubby.playstream.presentation.user.UserPresenter;
 import ru.nubby.playstream.utils.RxSchedulersProvider;
 
 @Module
@@ -105,5 +107,17 @@ public abstract class PresentersModule {
     static ViewModel loginPresenter(AuthInteractor authInteractor,
                                     RxSchedulersProvider rxSchedulersProvider) {
         return new LoginPresenter(authInteractor, rxSchedulersProvider);
+    }
+
+    @Provides
+    @IntoMap
+    @PresenterKey(value = UserPresenter.class)
+    static ViewModel userPresenter(FollowsInteractor followsInteractor,
+                                    UsersInteractor usersInteractor,
+                                    RxSchedulersProvider rxSchedulersProvider) {
+        return new UserPresenter(
+                followsInteractor,
+                usersInteractor,
+                rxSchedulersProvider);
     }
 }

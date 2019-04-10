@@ -109,7 +109,6 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
                 .getLiveStreamsFollowedByUser()
                 .observeOn(mRxSchedulerProvider.getUiScheduler())
                 .doOnSubscribe(disposable -> {
-                    Log.d(TAG, "getFollowedStreams do on sub: " + this.toString());
                     if (!disposable.isDisposed()) {
                         mView.clearStreamList();
                         mCurrentStreamList = new ArrayList<>();
@@ -117,14 +116,15 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
                         mView.setupProgressBar(true);
                     }
                 })
-                .subscribe(streams -> {
+                .doFinally(() -> mView.setupProgressBar(false))
+                .subscribe(
+                        streams -> {
                             checkAndAddStreams(streams);
                             mView.displayStreamList(mCurrentStreamList);
-                            mView.setupProgressBar(false);
+
                             mPagination = null;
                         },
                         error -> {
-                            mView.setupProgressBar(false);
                             mView.displayError(ERROR_BAD_CONNECTION);
                             Log.e(TAG, "Error while fetching user follows ", error);
                         });
@@ -137,7 +137,6 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
                 .getTopStreams()
                 .observeOn(mRxSchedulerProvider.getUiScheduler())
                 .doOnSubscribe(disposable -> {
-                    Log.d(TAG, "getTopStreams: do on sub " + this.toString());
                     if (!disposable.isDisposed()) {
                         mView.clearStreamList();
                         mCurrentStreamList = new ArrayList<>();
@@ -145,16 +144,16 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
                         mView.setupProgressBar(true);
                     }
                 })
-                .subscribe(streams -> {
-                            mView.setupProgressBar(false);
+                .doFinally(() -> mView.setupProgressBar(false))
+                .subscribe(
+                        streams -> {
                             checkAndAddStreams(streams.getData());
                             mView.displayStreamList(mCurrentStreamList);
                             mPagination = streams.getPagination();
                         },
-                        e -> {
-                            mView.setupProgressBar(false);
+                        error -> {
                             mView.displayError(ERROR_BAD_CONNECTION);
-                            Log.e(TAG, "Error while fetching streams", e);
+                            Log.e(TAG, "Error while fetching streams", error);
                         });
         mCompositeDisposable.add(mDisposableFetchingTask);
     }
@@ -170,14 +169,15 @@ public class StreamListPresenter extends BaseRxPresenter<StreamListContract.View
             mDisposableFetchingTask = mStreamsInteractor
                     .getTopStreams(mPagination)
                     .observeOn(mRxSchedulerProvider.getUiScheduler())
-                    .subscribe(streams -> {
+                    .subscribe(
+                            streams -> {
                                 List<Stream> moreStreams = checkAndAddStreams(streams.getData());
                                 mView.addStreamList(moreStreams);
                                 mPagination = streams.getPagination();
                             },
-                            e -> {
+                            error -> {
                                 mView.displayError(ERROR_BAD_CONNECTION);
-                                Log.e(TAG, "Error while fetching more streams", e);
+                                Log.e(TAG, "Error while fetching more streams", error);
                             });
             mCompositeDisposable.add(mDisposableFetchingTask);
         } else {

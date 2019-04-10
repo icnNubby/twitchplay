@@ -11,6 +11,8 @@ import ru.nubby.playstream.presentation.stream.StreamChatActivity;
 import ru.nubby.playstream.presentation.stream.StreamChatModule;
 import ru.nubby.playstream.presentation.streamlist.StreamListActivity;
 import ru.nubby.playstream.presentation.streamlist.StreamListModule;
+import ru.nubby.playstream.presentation.user.UserActivity;
+import ru.nubby.playstream.presentation.user.UserActivityModule;
 
 @Module
 public abstract class ActivityBindingModule {
@@ -29,4 +31,8 @@ public abstract class ActivityBindingModule {
     @ActivityScope
     @ContributesAndroidInjector(modules = StreamListModule.class)
     abstract StreamListActivity streamListActivity();
+
+    @ActivityScope
+    @ContributesAndroidInjector(modules = UserActivityModule.class)
+    abstract UserActivity userActivity();
 }

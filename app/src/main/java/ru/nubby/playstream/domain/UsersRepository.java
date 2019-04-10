@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Single;
+import ru.nubby.playstream.domain.entities.ChannelPanel;
 import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.domain.entities.UserData;
 
@@ -32,4 +33,6 @@ public interface UsersRepository {
     Completable synchronizeUserData();
 
     Single<List<UserData>> getUsersByIds(List<String> usersIds);
+
+    Single<List<ChannelPanel>> getPanelsForUser(String userId);
 }

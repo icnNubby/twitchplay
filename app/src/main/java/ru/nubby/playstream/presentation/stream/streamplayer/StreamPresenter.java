@@ -6,10 +6,10 @@ import javax.inject.Inject;
 
 import androidx.lifecycle.Lifecycle;
 import io.reactivex.disposables.Disposable;
-import ru.nubby.playstream.domain.FollowsRepository;
 import ru.nubby.playstream.domain.entities.Quality;
 import ru.nubby.playstream.domain.entities.QualityLinks;
 import ru.nubby.playstream.domain.entities.Stream;
+import ru.nubby.playstream.domain.entities.UserData;
 import ru.nubby.playstream.domain.interactors.FollowsInteractor;
 import ru.nubby.playstream.domain.interactors.PreferencesInteractor;
 import ru.nubby.playstream.domain.interactors.StreamsInteractor;
@@ -28,8 +28,6 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
 
     private Disposable mStreamResolutionsInfoTask;
     private Disposable mStreamInfoUpdater;
-    private Disposable mFollowUnfollowTask;
-    private Disposable mFollowDisplayTask;
     private QualityLinks mQualityUrls;
 
     private Stream mCurrentStream;
@@ -61,8 +59,8 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
         mView.displayTitle(stream.getTitle());
         mView.displayViewerCount(stream.getViewerCount());
 
-        mFollowDisplayTask = mFollowsInteractor
-                .isStreamFollowed(stream)
+        Disposable followDisplayTask = mFollowsInteractor
+                .isUserFollowed(stream.getUserData())
                 .observeOn(mRxSchedulersProvider.getUiScheduler())
                 .subscribe(
                         followStatus -> {
@@ -77,7 +75,7 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
                                     mCurrentStream.getStreamerName());
                         }
                 );
-        mCompositeDisposable.add(mFollowDisplayTask);
+        mCompositeDisposable.add(followDisplayTask);
     }
 
     @Override
@@ -109,16 +107,17 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
     @Override
     public void followOrUnfollowChannel() {
         if (mCurrentStream != null) {
-            mFollowUnfollowTask = mFollowsInteractor
-                    .isStreamFollowed(mCurrentStream)
+            UserData streamer = mCurrentStream.getUserData();
+            Disposable followUnfollowTask = mFollowsInteractor
+                    .isUserFollowed(streamer)
                     .flatMapCompletable(result -> {
                         if (result) {
-                            return mFollowsInteractor.unfollowStream(mCurrentStream);
+                            return mFollowsInteractor.unfollowUser(streamer);
                         } else {
-                            return mFollowsInteractor.followStream(mCurrentStream);
+                            return mFollowsInteractor.followUser(streamer);
                         }
                     })
-                    .andThen(mFollowsInteractor.isStreamFollowed(mCurrentStream))
+                    .andThen(mFollowsInteractor.isUserFollowed(streamer))
                     .observeOn(mRxSchedulersProvider.getUiScheduler())
                     .subscribe(
                             followStatus -> {
@@ -138,7 +137,7 @@ public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
                                 mView.displayInfoMessage(ERROR_CHANNEL_FOLLOW_UNFOLLOW,
                                         mCurrentStream.getStreamerName());
                             });
-            mCompositeDisposable.add(mFollowUnfollowTask);
+            mCompositeDisposable.add(followUnfollowTask);
         } else {
             mView.enableFollow(false);
         }

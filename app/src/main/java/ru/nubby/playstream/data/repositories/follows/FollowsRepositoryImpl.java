@@ -15,6 +15,7 @@ import ru.nubby.playstream.data.sources.twitchapi.RemoteRepository;
 import ru.nubby.playstream.domain.FollowsRepository;
 import ru.nubby.playstream.domain.entities.FollowRelations;
 import ru.nubby.playstream.domain.entities.Stream;
+import ru.nubby.playstream.domain.entities.UserData;
 import ru.nubby.playstream.domain.interactors.AuthInteractor;
 import ru.nubby.playstream.utils.RxSchedulersProvider;
 
@@ -41,7 +42,7 @@ public class FollowsRepositoryImpl implements FollowsRepository {
     }
 
     @Override
-    public Completable followStream(Stream targetStream) {
+    public Completable followUser(UserData targetUser) {
         return mAuthInteractor
                 .getCurrentLoginInfo()
                 .subscribeOn(mRxSchedulersProvider.getIoScheduler())
@@ -51,42 +52,42 @@ public class FollowsRepositoryImpl implements FollowsRepository {
                                         .followTargetUser(
                                                 mAuthInteractor.getOauthToken(),
                                                 userData.getId(),
-                                                targetStream.getUserId())
+                                                targetUser.getId())
                                         .andThen(mLocalRepository
                                                 .insertFollowRelationsEntry(
                                                         new FollowRelations(userData.getId(),
                                                                 userData.getLogin(),
-                                                                targetStream.getUserId(),
-                                                                targetStream.getStreamerLogin(),
+                                                                targetUser.getId(),
+                                                                targetUser.getLogin(),
                                                                 ""))));
         //todo fix empty fields;
     }
 
     @Override
-    public Completable unfollowStream(Stream targetStream) {
+    public Completable unfollowUser(UserData targetUser) {
         return mAuthInteractor
                 .getCurrentLoginInfo()
                 .subscribeOn(mRxSchedulersProvider.getIoScheduler())
                 .flatMapCompletable(userData ->
                         mRemoteRepository
                                 .unfollowTargetUser(mAuthInteractor.getOauthToken(),
-                                        userData.getId(), targetStream.getUserId())
+                                        userData.getId(), targetUser.getId())
                                 .andThen(mLocalRepository
                                         .deleteFollowRelationsEntry(
                                                 new FollowRelations(userData.getId(),
                                                         userData.getLogin(),
-                                                        targetStream.getUserId(),
-                                                        targetStream.getStreamerLogin(),
+                                                        targetUser.getId(),
+                                                        targetUser.getLogin(),
                                                         ""))));
     }
 
     @Override
-    public Single<Boolean> isStreamFollowed(Stream targetStream) {
+    public Single<Boolean> isUserFollowed(UserData targetUser) {
         return mAuthInteractor
                 .getCurrentLoginInfo()
                 .subscribeOn(mRxSchedulersProvider.getIoScheduler())
                 .flatMap(userData -> mLocalRepository.findRelation(userData.getId(),
-                        targetStream.getUserId()))
+                        targetUser.getId()))
                 .flatMap(followRelationsList ->
                         Single.create(emitter -> emitter.onSuccess(!followRelationsList.isEmpty())));
     }

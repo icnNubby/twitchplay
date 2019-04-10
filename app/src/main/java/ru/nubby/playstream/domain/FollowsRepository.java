@@ -6,6 +6,7 @@ import io.reactivex.Completable;
 import io.reactivex.Single;
 import ru.nubby.playstream.domain.entities.FollowRelations;
 import ru.nubby.playstream.domain.entities.Stream;
+import ru.nubby.playstream.domain.entities.UserData;
 
 public interface FollowsRepository {
     /**
@@ -21,10 +22,10 @@ public interface FollowsRepository {
      * 1. Put request to remote api. <br>
      * 2. Add follow relation to local db.
      *
-     * @param targetStream {@link Stream} target user's id.
+     * @param targetUser {@link UserData} target user.
      * @return {@link Completable} when succeeded or error.
      */
-    Completable followStream(Stream targetStream);
+    Completable followUser(UserData targetUser);
 
     /**
      * Makes a request to unfollow targetStream by its ID.
@@ -32,18 +33,18 @@ public interface FollowsRepository {
      * 1. Delete request to remote api. <br>
      * 2. Delete follow relation in local db.
      *
-     * @param targetStream {@link Stream} target user's id.
+     * @param targetUser {@link UserData} target user.
      * @return {@link Completable} when succeeded or error.
      */
-    Completable unfollowStream(Stream targetStream);
+    Completable unfollowUser(UserData targetUser);
 
     /**
      * Makes request to db and returns true if logged user follows targetStream.
      * False if not.
-     * @param targetStream {@link Stream} stream, relation to whom is checked
+     * @param targetUser {@link UserData} user, relation to whom is checked
      * @return Boolean value of follow existence
      */
-    Single<Boolean> isStreamFollowed(Stream targetStream);
+    Single<Boolean> isUserFollowed(UserData targetUser);
 
     /**
      * Synchronizes user follows list from remote to local repository.

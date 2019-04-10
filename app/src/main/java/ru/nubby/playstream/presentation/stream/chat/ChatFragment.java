@@ -62,15 +62,26 @@ public class ChatFragment extends BaseFragment implements ChatContract.View {
         return fragmentView;
     }
 
+    //TODO look for lifecycle
+    @Override
+    public void onStart() {
+        super.onStart();
+        mPresenter.subscribe(this, this.getLifecycle(), mCurrentStream);
+    }
+
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.subscribe(this, this.getLifecycle(), mCurrentStream);
     }
 
     @Override
     public void onPause() {
         super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
         mPresenter.unsubscribe();
     }
 

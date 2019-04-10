@@ -30,7 +30,6 @@ import ru.nubby.playstream.utils.RxSchedulersProvider;
  */
 @Singleton
 public class StreamsRepositoryImpl implements StreamsRepository {
-    private final String TAG = StreamsRepositoryImpl.class.getSimpleName();
 
     private final RemoteRepository mRemoteRepository;
     private final FollowsRepository mFollowsRepository;
@@ -70,9 +69,9 @@ public class StreamsRepositoryImpl implements StreamsRepository {
 
     @Override
     public Single<List<Stream>> getLiveStreamsFollowedByUser(UserData userData) {
-        return mRemoteRepository
-                .getLiveStreamsFromRelationList(
-                        mFollowsRepository.getUserFollows(userData.getId()))
+        return mFollowsRepository
+                .getUserFollows(userData.getId())
+                .flatMap(mRemoteRepository::getLiveStreamsFromRelationList)
                 .flatMap(this::fetchUserInfo)
                 .flatMap(this::fetchGameInfo)
                 .doOnSuccess(this::saveLiveStreamList);

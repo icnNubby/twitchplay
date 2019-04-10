@@ -32,6 +32,7 @@ import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.presentation.base.BaseFragment;
 import ru.nubby.playstream.presentation.base.PresenterFactory;
 import ru.nubby.playstream.presentation.stream.StreamChatActivity;
+import ru.nubby.playstream.presentation.user.UserActivity;
 import ru.nubby.playstream.utils.Constants;
 
 @ActivityScope
@@ -201,7 +202,7 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
 
 
     private class StreamListViewHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener {
+            implements View.OnClickListener, View.OnLongClickListener {
         private Stream mStream;
         private TextView mTextViewStreamDescription;
         private TextView mTextViewStreamerName;
@@ -250,6 +251,14 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
             startStream.putExtra(Constants.sStreamIntentKey, mGson.toJson(mStream)); // SLOW, YES
             startActivity(startStream);
         }
+
+        @Override
+        public boolean onLongClick(View v) {
+            Intent startStream = new Intent(getContext(), UserActivity.class);
+            startStream.putExtra(Constants.sUserIntentKey, mGson.toJson(mStream.getUserData())); // SLOW, YES
+            startActivity(startStream);
+            return true;
+        }
     }
 
     private class StreamListAdapter extends RecyclerView.Adapter<StreamListViewHolder> {
@@ -281,6 +290,7 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
                     .inflate(previewId, parent, false);
             StreamListViewHolder listViewHolder = new StreamListViewHolder(view);
             view.setOnClickListener(listViewHolder);
+            view.setOnLongClickListener(listViewHolder);
             return listViewHolder;
         }
 

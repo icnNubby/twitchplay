@@ -1,4 +1,4 @@
-package ru.nubby.playstream.data.sources.database;
+package ru.nubby.playstream.data.sources.database.dao;
 
 import java.util.List;
 
