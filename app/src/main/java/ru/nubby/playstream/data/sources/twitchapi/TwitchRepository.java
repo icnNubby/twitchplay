@@ -19,6 +19,7 @@ import ru.nubby.playstream.data.sources.twitchapi.services.RawJsonService;
 import ru.nubby.playstream.data.sources.twitchapi.services.TwitchApiService;
 import ru.nubby.playstream.data.sources.twitchapi.services.TwitchHelixService;
 import ru.nubby.playstream.data.sources.twitchapi.services.TwitchKrakenService;
+import ru.nubby.playstream.domain.entities.ChannelInfoV5;
 import ru.nubby.playstream.domain.entities.ChannelPanel;
 import ru.nubby.playstream.domain.entities.FollowRelations;
 import ru.nubby.playstream.domain.entities.Game;
@@ -257,6 +258,13 @@ public class TwitchRepository implements RemoteRepository {
     public Single<List<ChannelPanel>> getPanelsForUser(String userId) {
         return mTwitchApiService
                 .getChannelPanelsForUser(userId)
+                .subscribeOn(mIoScheduler);
+    }
+
+    @Override
+    public Single<ChannelInfoV5> getChannelInfoV5(String channelId) {
+        return mTwitchKrakenService
+                .getChannelInfo(channelId)
                 .subscribeOn(mIoScheduler);
     }
 

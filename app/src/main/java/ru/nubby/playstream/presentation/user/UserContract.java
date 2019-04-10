@@ -19,6 +19,10 @@ public interface UserContract {
 
         void displayUser(UserData user);
 
+        void setupBackground(String url);
+
+        void displayFollowersCount(int followers);
+
         void displayFollowStatus(boolean followed);
 
         void displayInfoMessage(StreamContract.View.InfoMessage message, String streamerName);

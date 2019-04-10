@@ -6,6 +6,7 @@ import java.util.List;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import ru.nubby.playstream.domain.entities.ChannelInfoV5;
 import ru.nubby.playstream.domain.entities.ChannelPanel;
 import ru.nubby.playstream.domain.entities.FollowRelations;
 import ru.nubby.playstream.domain.entities.Game;
@@ -53,4 +54,6 @@ public interface RemoteRepository {
     Single<List<Game>> getGamesByIds(List<String> gamesIds);
 
     Single<List<ChannelPanel>> getPanelsForUser(String userId);
+
+    Single<ChannelInfoV5> getChannelInfoV5(String channelId);
 }

@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import ru.nubby.playstream.domain.UsersRepository;
+import ru.nubby.playstream.domain.entities.ChannelInfoV5;
 import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.domain.entities.UserData;
 
@@ -47,6 +48,10 @@ public class UsersInteractor {
      */
     public Completable synchronizeUserData() {
         return mUsersRepository.synchronizeUserData();
+    }
+
+    public Single<ChannelInfoV5> getOldInfoForUser(String userId) {
+        return mUsersRepository.getOldChannelInfo(userId);
     }
 
 }

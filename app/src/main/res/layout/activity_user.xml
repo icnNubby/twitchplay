@@ -14,61 +14,83 @@
         android:fitsSystemWindows="true"
         android:theme="@style/AppTheme">
 
-        <com.google.android.material.appbar.CollapsingToolbarLayout
+
+        <ru.nubby.playstream.presentation.base.utils.BackgroundedCollapsingToolbarLayout
+            android:id="@+id/user_collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:fitsSystemWindows="true"
-            app:expandedTitleMarginEnd="64dp"
-            app:expandedTitleMarginStart="48dp"
             app:layout_scrollFlags="scroll|snap">
 
-            <ImageView
-                android:id="@+id/user_image"
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/streamer_info_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:fitsSystemWindows="true"
-                android:scaleType="centerCrop"
-                app:layout_collapseMode="parallax"
-                tools:ignore="ContentDescription" />
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/streamer_info_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:layout_collapseMode="pin" />
-
-        <LinearLayout
-            android:id="@+id/title_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:paddingTop="8dp"
-            app:layout_scrollFlags="scroll|enterAlways|snap">
-            <TextView
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="test text"
-                android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title" />
-            ​<TextView
-                android:layout_width="wrap_content"
+                android:background="@color/transparentDarkBlack"
+                android:minHeight="?attr/actionBarSize"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:text="test text"
-                android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle"
-                android:textColor="@android:color/white" />
-        </LinearLayout>
+                android:layout_gravity="bottom"
+                app:layout_collapseMode="parallax">
+
+                <ImageView
+                    android:id="@+id/user_image"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="8dp"
+                    android:fitsSystemWindows="true"
+                    android:scaleType="centerCrop"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="parent"
+                    tools:ignore="ContentDescription" />
+
+                <LinearLayout
+                    android:layout_gravity="bottom"
+                    android:layout_margin="8dp"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/user_followers"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="start"
+                            android:textColor="@color/colorWhite"
+                            tools:text="Follows: " />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/user_views"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/colorWhite"
+                            tools:text="Views: " />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </ru.nubby.playstream.presentation.base.utils.BackgroundedCollapsingToolbarLayout>
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            app:tabGravity="fill"
             app:tabIndicatorColor="?android:attr/textColorPrimaryInverse"
             app:tabIndicatorHeight="4dp"
+            app:tabMaxWidth="0dp"
+            app:tabMode="fixed"
             app:tabSelectedTextColor="?android:attr/textColorPrimaryInverse" />
     </com.google.android.material.appbar.AppBarLayout>
 

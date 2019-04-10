@@ -2,9 +2,11 @@ package ru.nubby.playstream.presentation.user;
 
 import android.os.Bundle;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -12,6 +14,7 @@ import com.squareup.picasso.Picasso;
 import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -21,6 +24,7 @@ import ru.nubby.playstream.R;
 import ru.nubby.playstream.domain.entities.UserData;
 import ru.nubby.playstream.presentation.base.BaseActivity;
 import ru.nubby.playstream.presentation.base.PresenterFactory;
+import ru.nubby.playstream.presentation.base.utils.BackgroundedCollapsingToolbarLayout;
 import ru.nubby.playstream.presentation.stream.streamplayer.StreamContract;
 import ru.nubby.playstream.presentation.user.panels.PanelsFragment;
 import ru.nubby.playstream.presentation.user.vods.VodsFragment;
@@ -49,7 +53,13 @@ public class UserActivity extends BaseActivity implements UserContract.View,
 
     @Inject
     VodsFragment mVodsFragment;
+
     private int mMaxScrollSize;
+    private BackgroundedCollapsingToolbarLayout mCollapsingToolbarLayout;
+    private AppBarLayout mAppBarLayout;
+    private Toolbar mToolbar;
+    private TextView mFollowers;
+    private TextView mViews;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,13 +72,24 @@ public class UserActivity extends BaseActivity implements UserContract.View,
 
         ViewPager viewPager = findViewById(R.id.user_contents);
         TabLayout tabLayout = findViewById(R.id.tab_layout);
-        AppBarLayout appBarLayout = findViewById(R.id.user_appbar);
+        mAppBarLayout = findViewById(R.id.user_appbar);
+        mCollapsingToolbarLayout = findViewById(R.id.user_collapsing_toolbar);
+        mToolbar = findViewById(R.id.streamer_info_toolbar);
 
-        appBarLayout.addOnOffsetChangedListener(this);
-        mMaxScrollSize = appBarLayout.getTotalScrollRange();
+        mFollowers = findViewById(R.id.user_followers);
+        mViews = findViewById(R.id.user_views);
 
+        mAppBarLayout.addOnOffsetChangedListener(this);
+        mMaxScrollSize = mAppBarLayout.getTotalScrollRange();
+        mToolbar.setTitle("");
+        setSupportActionBar(mToolbar);
         viewPager.setAdapter(new TabsAdapter(getSupportFragmentManager()));
         tabLayout.setupWithViewPager(viewPager);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
     }
 
     @Override
@@ -84,8 +105,23 @@ public class UserActivity extends BaseActivity implements UserContract.View,
 
     @Override
     public void displayUser(UserData user) {
-        mPicasso.load(user.getProfileImageUrl())
-                .into(mUserAvatar);
+        if (user.getProfileImageUrl() != null && !user.getProfileImageUrl().isEmpty()) {
+            mPicasso.load(user.getProfileImageUrl())
+                    .into(mUserAvatar);
+        }
+        mViews.setText(getString(R.string.user_views_label, user.getViewCount()));
+    }
+
+    @Override
+    public void setupBackground(String url) {
+        mPicasso.load(url)
+                .placeholder(R.drawable.banner_placeholder)
+                .into(mCollapsingToolbarLayout);
+    }
+
+    @Override
+    public void displayFollowersCount(int followers) {
+        mFollowers.setText(getString(R.string.user_follows_label, followers));
     }
 
     @Override
@@ -120,7 +156,7 @@ public class UserActivity extends BaseActivity implements UserContract.View,
 
             mUserAvatar.animate()
                     .scaleY(0).scaleX(0)
-                    .setDuration(200)
+                    .setDuration(300)
                     .start();
         }
 
@@ -131,6 +167,12 @@ public class UserActivity extends BaseActivity implements UserContract.View,
                     .scaleY(1).scaleX(1)
                     .start();
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
     private class TabsAdapter extends FragmentPagerAdapter {
@@ -149,9 +191,12 @@ public class UserActivity extends BaseActivity implements UserContract.View,
         public Fragment getItem(int i) {
             //todo fix after tests
             switch (i) {
-                case 0: return mPanelsFragment;
-                case 1: return mVodsFragment;
-                default: return  mPanelsFragment;
+                case 0:
+                    return mPanelsFragment;
+                case 1:
+                    return mVodsFragment;
+                default:
+                    return mPanelsFragment;
             }
         }
 
