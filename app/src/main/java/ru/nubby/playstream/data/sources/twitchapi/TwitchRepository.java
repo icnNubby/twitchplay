@@ -35,6 +35,10 @@ import ru.nubby.playstream.domain.entities.UserFollowsResponse;
 import ru.nubby.playstream.utils.M3U8Parser;
 import ru.nubby.playstream.utils.RxSchedulersProvider;
 
+/**
+ * In future probably split it on some feature-based APIs.
+ * If it grows really big.
+ */
 @Singleton
 public class TwitchRepository implements RemoteRepository {
 

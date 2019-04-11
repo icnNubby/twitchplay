@@ -1,4 +1,4 @@
-package ru.nubby.playstream.presentation.base.utils;
+package ru.nubby.playstream.presentation.base.custom.views;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

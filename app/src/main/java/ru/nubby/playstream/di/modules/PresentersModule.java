@@ -19,6 +19,7 @@ import ru.nubby.playstream.domain.UsersRepository;
 import ru.nubby.playstream.domain.interactors.AuthInteractor;
 import ru.nubby.playstream.domain.interactors.FollowsInteractor;
 import ru.nubby.playstream.domain.interactors.NavigationStateInteractor;
+import ru.nubby.playstream.domain.interactors.PanelsInteractor;
 import ru.nubby.playstream.domain.interactors.PreferencesInteractor;
 import ru.nubby.playstream.domain.interactors.StreamsInteractor;
 import ru.nubby.playstream.domain.interactors.UsersInteractor;
@@ -30,6 +31,7 @@ import ru.nubby.playstream.presentation.stream.streamplayer.StreamPresenter;
 import ru.nubby.playstream.presentation.streamlist.StreamListActivityPresenter;
 import ru.nubby.playstream.presentation.streamlist.streamlistfragment.StreamListPresenter;
 import ru.nubby.playstream.presentation.user.UserPresenter;
+import ru.nubby.playstream.presentation.user.panels.PanelsPresenter;
 import ru.nubby.playstream.utils.RxSchedulersProvider;
 
 @Module
@@ -106,7 +108,9 @@ public abstract class PresentersModule {
     @PresenterKey(value = LoginPresenter.class)
     static ViewModel loginPresenter(AuthInteractor authInteractor,
                                     RxSchedulersProvider rxSchedulersProvider) {
-        return new LoginPresenter(authInteractor, rxSchedulersProvider);
+        return new LoginPresenter(
+                authInteractor,
+                rxSchedulersProvider);
     }
 
     @Provides
@@ -118,6 +122,16 @@ public abstract class PresentersModule {
         return new UserPresenter(
                 followsInteractor,
                 usersInteractor,
+                rxSchedulersProvider);
+    }
+
+    @Provides
+    @IntoMap
+    @PresenterKey(value = PanelsPresenter.class)
+    static ViewModel panelsPresenter(PanelsInteractor panelsInteractor,
+                                   RxSchedulersProvider rxSchedulersProvider) {
+        return new PanelsPresenter(
+                panelsInteractor,
                 rxSchedulersProvider);
     }
 }

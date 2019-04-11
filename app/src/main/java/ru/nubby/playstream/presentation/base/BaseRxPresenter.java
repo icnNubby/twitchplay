@@ -28,8 +28,8 @@ public abstract class BaseRxPresenter<View> extends ViewModel implements Lifecyc
         mLifecycle.addObserver(this);
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    public void onViewPaused() {
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    public void onViewStopped() {
         if (mCompositeDisposable != null) {
             mCompositeDisposable.clear();
         }

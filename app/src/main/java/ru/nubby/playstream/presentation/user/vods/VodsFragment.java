@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import javax.inject.Inject;
 
@@ -19,6 +20,7 @@ import ru.nubby.playstream.di.scopes.ActivityScope;
 public class VodsFragment extends Fragment {
 
     private RecyclerView mPanelsRecyclerView;
+    private TextView mEmptyPanelsStub;
 
     @Inject
     public VodsFragment() {
@@ -27,10 +29,15 @@ public class VodsFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mPanelsRecyclerView = (RecyclerView) inflater.inflate(R.layout.fragment_user_panels, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_user_panels, container, false);
+        mEmptyPanelsStub = view.findViewById(R.id.panels_empty_stub);
+        mEmptyPanelsStub.setVisibility(View.GONE);
+        mPanelsRecyclerView = view.findViewById(R.id.panels_recycler_view);
         mPanelsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        return mPanelsRecyclerView;
+        return view;
     }
 
     @Override
@@ -53,7 +60,7 @@ public class VodsFragment extends Fragment {
         @Override
         public FakePageVH onCreateViewHolder(ViewGroup viewGroup, int i) {
             View itemView = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.panels_list_element, viewGroup, false);
+                    .inflate(R.layout.vods_list_element, viewGroup, false);
 
             return new FakePageVH(itemView);
         }

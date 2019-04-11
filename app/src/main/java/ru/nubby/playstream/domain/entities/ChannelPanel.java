@@ -2,11 +2,13 @@ package ru.nubby.playstream.domain.entities;
 
 import com.google.gson.annotations.SerializedName;
 
+import androidx.annotation.Nullable;
+
 /**
  * Undocumented feature of old api.
  * <a href = "https://api.twitch.tv/api/channels/gn_gg/panels">Some panels under the channel.</a>
  */
-public final class ChannelPanel {
+public final class ChannelPanel implements Comparable<ChannelPanel> {
 
     @SerializedName("_id")
     private Integer id;
@@ -21,7 +23,7 @@ public final class ChannelPanel {
     private String kind;
 
     @SerializedName("data")
-    private PanelAdditionalData data;
+    private ChannelPanelAdditionalData data;
 
     @SerializedName("html_description")
     private String htmlDescription;
@@ -33,56 +35,45 @@ public final class ChannelPanel {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
     public Integer getUserId() {
         return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
     }
 
     public Integer getDisplayOrder() {
         return displayOrder;
     }
 
-    public void setDisplayOrder(Integer displayOrder) {
-        this.displayOrder = displayOrder;
-    }
-
     public String getKind() {
         return kind;
     }
 
-    public void setKind(String kind) {
-        this.kind = kind;
-    }
-
-    public PanelAdditionalData getData() {
+    public ChannelPanelAdditionalData getData() {
         return data;
-    }
-
-    public void setData(PanelAdditionalData data) {
-        this.data = data;
     }
 
     public String getHtmlDescription() {
         return htmlDescription;
     }
 
-    public void setHtmlDescription(String htmlDescription) {
-        this.htmlDescription = htmlDescription;
-    }
-
     public String getChannel() {
         return channel;
     }
 
-    public void setChannel(String channel) {
-        this.channel = channel;
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof ChannelPanel)) {
+            return false;
+        }
+        return (((ChannelPanel) obj).userId.equals(this.id));
     }
 
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public int compareTo(ChannelPanel o) {
+        return this.displayOrder.compareTo(o.displayOrder);
+    }
 }

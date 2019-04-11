@@ -9,4 +9,11 @@
 
     </style>
 
+    <!-- Body Light Black 87%-->
+    <style name="text_body_light">
+        <item name="android:fontFamily">@string/font_sans_light</item>
+        <item name="android:textSize">@dimen/panel_body_size</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
 </resources>

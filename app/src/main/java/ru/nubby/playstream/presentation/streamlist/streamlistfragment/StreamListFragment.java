@@ -248,14 +248,14 @@ public class StreamListFragment extends BaseFragment implements StreamListContra
         @Override
         public void onClick(View v) {
             Intent startStream = new Intent(getContext(), StreamChatActivity.class);
-            startStream.putExtra(Constants.sStreamIntentKey, mGson.toJson(mStream)); // SLOW, YES
+            startStream.putExtra(Constants.sStreamIntentKey, mGson.toJson(mStream));
             startActivity(startStream);
         }
 
         @Override
         public boolean onLongClick(View v) {
             Intent startStream = new Intent(getContext(), UserActivity.class);
-            startStream.putExtra(Constants.sUserIntentKey, mGson.toJson(mStream.getUserData())); // SLOW, YES
+            startStream.putExtra(Constants.sUserIntentKey, mGson.toJson(mStream.getUserData()));
             startActivity(startStream);
             return true;
         }

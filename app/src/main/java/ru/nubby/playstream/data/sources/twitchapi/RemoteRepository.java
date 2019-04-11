@@ -17,7 +17,6 @@ import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.domain.entities.StreamsResponse;
 import ru.nubby.playstream.domain.entities.UserData;
 
-
 public interface RemoteRepository {
 
     Single<HashMap<Quality, String>> getQualityUrls(Stream stream);

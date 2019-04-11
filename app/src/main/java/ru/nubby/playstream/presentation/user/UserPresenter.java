@@ -11,9 +11,9 @@ import ru.nubby.playstream.domain.interactors.UsersInteractor;
 import ru.nubby.playstream.presentation.base.BaseRxPresenter;
 import ru.nubby.playstream.utils.RxSchedulersProvider;
 
-import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.ERROR_CHANNEL_FOLLOW_UNFOLLOW;
-import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.INFO_CHANNEL_FOLLOWED;
-import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.INFO_CHANNEL_UNFOLLOWED;
+import static ru.nubby.playstream.presentation.user.UserContract.View.InfoMessage.ERROR_CHANNEL_FOLLOW_UNFOLLOW;
+import static ru.nubby.playstream.presentation.user.UserContract.View.InfoMessage.INFO_CHANNEL_FOLLOWED;
+import static ru.nubby.playstream.presentation.user.UserContract.View.InfoMessage.INFO_CHANNEL_UNFOLLOWED;
 
 public class UserPresenter extends BaseRxPresenter<UserContract.View>
         implements UserContract.Presenter {
@@ -39,34 +39,19 @@ public class UserPresenter extends BaseRxPresenter<UserContract.View>
     @Override
     public void subscribe(UserContract.View view, Lifecycle lifecycle, UserData user) {
         super.subscribe(view, lifecycle);
+        //take ViewModel cached userData if possible
         if (user != null) {
             mUserData = user;
         }
         mView.displayUser(mUserData);
-        if (mChannelInfoV5 == null) {
-            Disposable getV5User = mUsersInteractor
-                    .getOldInfoForUser(mUserData.getId())
-                    .observeOn(mRxSchedulersProvider.getUiScheduler())
-                    .subscribe(
-                            channelInfo -> {
-                                mChannelInfoV5 = channelInfo;
-                                displayFetchedInfoV5();
-                            },
-                            error -> {
-                                Log.e(TAG, "Error while loading old user.", error);
-                            });
-            mCompositeDisposable.add(getV5User);
-        } else {
-            displayFetchedInfoV5();
-        }
+        startFollowDisplayTask();
+        getAdditionalInfo();
     }
-
 
     @Override
     public void unsubscribe() {
-        //todo
+        //todo?
     }
-
 
     @Override
     public void followOrUnfollowChannel() {
@@ -120,4 +105,44 @@ public class UserPresenter extends BaseRxPresenter<UserContract.View>
         }
         return url;
     }
+
+    private void getAdditionalInfo() {
+        if (mChannelInfoV5 == null) {
+            Disposable getV5User = mUsersInteractor
+                    .getOldInfoForUser(mUserData.getId())
+                    .observeOn(mRxSchedulersProvider.getUiScheduler())
+                    .subscribe(
+                            channelInfo -> {
+                                mChannelInfoV5 = channelInfo;
+                                displayFetchedInfoV5();
+                            },
+                            error -> {
+                                Log.e(TAG, "Error while loading old user.", error);
+                            });
+            mCompositeDisposable.add(getV5User);
+        } else {
+            displayFetchedInfoV5();
+        }
+    }
+
+    private void startFollowDisplayTask() {
+        Disposable followDisplayTask = mFollowsInteractor
+                .isUserFollowed(mUserData)
+                .observeOn(mRxSchedulersProvider.getUiScheduler())
+                .subscribe(
+                        followStatus -> {
+                            mView.displayFollowStatus(followStatus);
+                            mView.enableFollow(true);
+                        },
+                        error -> {
+                            Log.e(TAG, "Follow error " + error, error);
+                            mView.enableFollow(false);
+                            mView.displayInfoMessage(
+                                    ERROR_CHANNEL_FOLLOW_UNFOLLOW,
+                                    mUserData.getDisplayName());
+                        }
+                );
+        mCompositeDisposable.add(followDisplayTask);
+    }
+
 }

@@ -20,52 +20,43 @@
     <!-- Preferences-->
 
     <string name="defaults_category_title">Defaults</string>
-    <string name="defaults_category_key"
-        translatable="false">defaults_category</string>
+    <string name="defaults_category_key" translatable="false">defaults_category</string>
 
-        <string name="default_quality_summary">Stream playback quality</string>
-        <string name="default_quality_title">Quality</string>
-        <string name="default_quality_default_value">720x30</string>
-        <string name="default_quality_key"
-            translatable="false">default_quality</string>
+    <string name="default_quality_summary">Stream playback quality</string>
+    <string name="default_quality_title">Quality</string>
+    <string name="default_quality_default_value">720x30</string>
+    <string name="default_quality_key" translatable="false">default_quality</string>
 
-        <string name="default_stream_list_mode_summary">Main screen mode</string>
-        <string name="default_stream_list_mode_title">Navigation mode</string>
-        <string name="default_stream_list_mode_default_value">0</string>
-        <string name="default_stream_list_mode_key"
-            translatable="false">default_stream_list_mode</string>
+    <string name="default_stream_list_mode_summary">Main screen mode</string>
+    <string name="default_stream_list_mode_title">Navigation mode</string>
+    <string name="default_stream_list_mode_default_value">0</string>
+    <string name="default_stream_list_mode_key" translatable="false">default_stream_list_mode</string>
 
-        <string name="stream_list_item_size_summary">Size of stream preview on main screen</string>
-        <string name="stream_list_item_size_title">Preview size</string>
-        <string name="stream_list_item_size_default_value">1</string>
-        <string name="stream_list_item_size_key"
-            translatable="false">preview_size</string>
+    <string name="stream_list_item_size_summary">Size of stream preview on main screen</string>
+    <string name="stream_list_item_size_title">Preview size</string>
+    <string name="stream_list_item_size_default_value">1</string>
+    <string name="stream_list_item_size_key" translatable="false">preview_size</string>
 
     <string name="notifications_category_title">Notifications</string>
-    <string name="notifications_category_key"
-        translatable="false">notifications_category</string>
+    <string name="notifications_category_key" translatable="false">notifications_category</string>
 
-        <string name="notifications_are_on_title">Enable</string>
-        <string name="notifications_are_on_summary">Enable notifications about channels becoming live.</string>
-        <string name="notifications_are_on_key"
-            translatable="false">notifications_are_on</string>
+    <string name="notifications_are_on_title">Enable</string>
+    <string name="notifications_are_on_summary">Enable notifications about channels becoming live.</string>
+    <string name="notifications_are_on_key" translatable="false">notifications_are_on</string>
 
-        <string name="silent_hours_title">Silent hours</string>
-        <string name="silent_hours_summary">Enable silent hours, when notifications will be disabled.</string>
-        <string name="silent_hours_key"
-            translatable="false">silent_hours_are_on</string>
+    <string name="silent_hours_title">Silent hours</string>
+    <string name="silent_hours_summary">Enable silent hours, when notifications will be disabled.</string>
+    <string name="silent_hours_key" translatable="false">silent_hours_are_on</string>
 
-        <string name="silent_time_start_title">Start</string>
-        <string name="silent_time_start_summary">Starting time for silent hours</string>
-        <string name="silent_time_start_default_value">00:00</string>
-        <string name="silent_time_start_key"
-            translatable="false">silent_time_start</string>
+    <string name="silent_time_start_title">Start</string>
+    <string name="silent_time_start_summary">Starting time for silent hours</string>
+    <string name="silent_time_start_default_value">00:00</string>
+    <string name="silent_time_start_key" translatable="false">silent_time_start</string>
 
-        <string name="silent_time_finish_title">Finish</string>
-        <string name="silent_time_finish_summary">Ending time for silent hours</string>
-        <string name="silent_time_finish_default_value">00:00</string>
-        <string name="silent_time_finish_key"
-            translatable="false">silent_time_finish</string>
+    <string name="silent_time_finish_title">Finish</string>
+    <string name="silent_time_finish_summary">Ending time for silent hours</string>
+    <string name="silent_time_finish_default_value">00:00</string>
+    <string name="silent_time_finish_key" translatable="false">silent_time_finish</string>
 
     <!-- Notifications-->
     <string name="notification_stream_viewers">%s viewers</string>
@@ -74,12 +65,21 @@
     <string name="notification_new_streams_title">%d new stream online</string>
 
     <!-- Utilities-->
-    <string name="live_streamer_notification_id"
-        translatable="false">112121</string>>
+    <string name="live_streamer_notification_id" translatable="false">112121</string>>
 
     <!-- User screen-->
     <string name="user_follows_label">Follows: %d</string>
     <string name="user_views_label">Views: %d</string>
+
+    <string name="user_panels_tab_title">Additional info</string>
+    <string name="user_vods_tab_title">Recorded videos</string>
+
+    <string name="user_no_info_stub">This user is a mysterious stranger.</string>
+    <string name="user_no_panels_stub">No additional info )_(</string>
+
+
+    <!-- Fonts-->
+    <string name="font_sans_light">sans-serif-light</string>
 
     <string name="lorem">
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit.

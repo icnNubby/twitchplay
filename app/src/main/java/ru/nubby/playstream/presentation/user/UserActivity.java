@@ -6,7 +6,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -24,8 +24,7 @@ import ru.nubby.playstream.R;
 import ru.nubby.playstream.domain.entities.UserData;
 import ru.nubby.playstream.presentation.base.BaseActivity;
 import ru.nubby.playstream.presentation.base.PresenterFactory;
-import ru.nubby.playstream.presentation.base.utils.BackgroundedCollapsingToolbarLayout;
-import ru.nubby.playstream.presentation.stream.streamplayer.StreamContract;
+import ru.nubby.playstream.presentation.base.custom.views.BackgroundedCollapsingToolbarLayout;
 import ru.nubby.playstream.presentation.user.panels.PanelsFragment;
 import ru.nubby.playstream.presentation.user.vods.VodsFragment;
 import ru.nubby.playstream.utils.Constants;
@@ -60,13 +59,18 @@ public class UserActivity extends BaseActivity implements UserContract.View,
     private Toolbar mToolbar;
     private TextView mFollowers;
     private TextView mViews;
+    private TextView mAdditionalInfo;
+    private FloatingActionButton mFollowUnfollow;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user);
         mPresenter = ViewModelProviders.of(this, mPresenterFactory).get(UserPresenter.class);
+
+        setContentView(R.layout.activity_user);
         mUser = readUserDataFromExtras();
+        mPanelsFragment.setUser(mUser);
+
         mUserAvatar = findViewById(R.id.user_image);
         mPicasso = Picasso.get();
 
@@ -78,6 +82,10 @@ public class UserActivity extends BaseActivity implements UserContract.View,
 
         mFollowers = findViewById(R.id.user_followers);
         mViews = findViewById(R.id.user_views);
+        mAdditionalInfo = findViewById(R.id.user_info);
+
+        mFollowUnfollow = findViewById(R.id.user_follow_fab);
+        mFollowUnfollow.setOnClickListener(v -> mPresenter.followOrUnfollowChannel());
 
         mAppBarLayout.addOnOffsetChangedListener(this);
         mMaxScrollSize = mAppBarLayout.getTotalScrollRange();
@@ -110,6 +118,7 @@ public class UserActivity extends BaseActivity implements UserContract.View,
                     .into(mUserAvatar);
         }
         mViews.setText(getString(R.string.user_views_label, user.getViewCount()));
+        mAdditionalInfo.setText(user.getDescription());
     }
 
     @Override
@@ -126,17 +135,27 @@ public class UserActivity extends BaseActivity implements UserContract.View,
 
     @Override
     public void displayFollowStatus(boolean followed) {
-        //TODO
+        if (followed) {
+            mFollowUnfollow.setImageResource(R.drawable.ic_favorite_white);
+        } else {
+            mFollowUnfollow.setImageResource(R.drawable.ic_favorite_border_white);
+        }
     }
 
     @Override
-    public void displayInfoMessage(StreamContract.View.InfoMessage message, String streamerName) {
-        //TODO
+    public void displayInfoMessage(InfoMessage message, String streamerName) {
+        String infoMessage =
+                getResources().getStringArray(R.array.user_info_messages)[message.ordinal()];
+        if (message == InfoMessage.INFO_CHANNEL_FOLLOWED ||
+                message == InfoMessage.INFO_CHANNEL_UNFOLLOWED) {
+            infoMessage = infoMessage.concat(" " + streamerName);
+        }
+        Toast.makeText(this, infoMessage, Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void enableFollow(boolean enabled) {
-        //TODO
+        mFollowUnfollow.setEnabled(enabled);
     }
 
     @Override
@@ -156,10 +175,9 @@ public class UserActivity extends BaseActivity implements UserContract.View,
 
             mUserAvatar.animate()
                     .scaleY(0).scaleX(0)
-                    .setDuration(300)
+                    .setDuration(getResources().getInteger(R.integer.short_animation_duration))
                     .start();
         }
-
         if (percentage <= PERCENTAGE_TO_ANIMATE_AVATAR && !mIsAvatarShown) {
             mIsAvatarShown = true;
 
@@ -176,6 +194,7 @@ public class UserActivity extends BaseActivity implements UserContract.View,
     }
 
     private class TabsAdapter extends FragmentPagerAdapter {
+
         private static final int TAB_COUNT = 2;
 
         TabsAdapter(FragmentManager fm) {
@@ -202,7 +221,16 @@ public class UserActivity extends BaseActivity implements UserContract.View,
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return "Tab " + String.valueOf(position);
+            String tabName = "";
+            switch (position) {
+                case 0:
+                    tabName = getString(R.string.user_panels_tab_title);
+                    break;
+                case 1:
+                    tabName = getString(R.string.user_vods_tab_title);
+                    break;
+            }
+            return tabName;
         }
     }
 

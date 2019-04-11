@@ -33,7 +33,19 @@
     </string-array>
 
     <!-- ORDER MATTERS!                                 -->
+    <string-array name="user_info_messages">
+        <item name="info_channel_followed">Now you follow </item>
+        <item name="info_channel_unfollowed">You stop to follow </item>
+        <item name="error_channel_follow_unfollow">Can not follow this channel, please retry later.</item>
+    </string-array>
+
+    <!-- ORDER MATTERS!                                 -->
     <string-array name="streams_list_errors">
+        <item name="error_bad_connection">No internet connection, please retry later.</item>
+    </string-array>
+
+    <!-- ORDER MATTERS!                                 -->
+    <string-array name="panels_list_errors">
         <item name="error_bad_connection">No internet connection, please retry later.</item>
     </string-array>
 

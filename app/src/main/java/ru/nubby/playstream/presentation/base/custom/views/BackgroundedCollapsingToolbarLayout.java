@@ -1,4 +1,4 @@
-package ru.nubby.playstream.presentation.base.utils;
+package ru.nubby.playstream.presentation.base.custom.views;
 
 import android.content.Context;
 import android.graphics.Bitmap;

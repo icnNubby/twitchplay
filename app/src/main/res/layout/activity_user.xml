@@ -14,8 +14,7 @@
         android:fitsSystemWindows="true"
         android:theme="@style/AppTheme">
 
-
-        <ru.nubby.playstream.presentation.base.utils.BackgroundedCollapsingToolbarLayout
+        <ru.nubby.playstream.presentation.base.custom.views.BackgroundedCollapsingToolbarLayout
             android:id="@+id/user_collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="200dp"
@@ -38,9 +37,9 @@
 
                 <ImageView
                     android:id="@+id/user_image"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="8dp"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_margin="@dimen/user_screen_default_margin"
                     android:fitsSystemWindows="true"
                     android:scaleType="centerCrop"
                     app:layout_constraintStart_toStartOf="parent"
@@ -48,11 +47,27 @@
                     tools:ignore="ContentDescription" />
 
                 <LinearLayout
-                    android:layout_gravity="bottom"
-                    android:layout_margin="8dp"
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_margin="@dimen/user_screen_default_margin"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/user_info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/user_info_font_size"
+                            android:ellipsize="end"
+                            android:maxLines="5"
+                            android:gravity="start"
+                            android:textColor="@color/colorWhite"
+                            tools:text="Additional user information." />
+                    </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -61,9 +76,10 @@
                         <TextView
                             android:id="@+id/user_followers"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_height="match_parent"
                             android:gravity="start"
                             android:textColor="@color/colorWhite"
+                            android:textSize="@dimen/user_follow_view_font_size"
                             tools:text="Follows: " />
                     </LinearLayout>
 
@@ -74,13 +90,14 @@
                         <TextView
                             android:id="@+id/user_views"
                             android:layout_width="wrap_content"
+                            android:textSize="@dimen/user_follow_view_font_size"
                             android:layout_height="wrap_content"
                             android:textColor="@color/colorWhite"
                             tools:text="Views: " />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
-        </ru.nubby.playstream.presentation.base.utils.BackgroundedCollapsingToolbarLayout>
+        </ru.nubby.playstream.presentation.base.custom.views.BackgroundedCollapsingToolbarLayout>
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
@@ -99,4 +116,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/user_follow_fab"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:elevation="8dp"
+        android:layout_gravity="bottom|end"
+        android:src="@drawable/ic_favorite_border_white"
+        android:layout_margin="@dimen/user_screen_default_margin"
+        android:clickable="true"
+        android:focusable="true" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

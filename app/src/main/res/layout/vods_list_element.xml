@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:cardCornerRadius="@dimen/vods_element_corner_radius"
+    app:cardElevation="@dimen/vods_element_elevation"
+    android:layout_margin="@dimen/user_screen_default_margin">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/lorem"
+        tools:text="@string/lorem"/>
+</androidx.cardview.widget.CardView>
