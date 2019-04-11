@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!--todo fix unscrollable bug-->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/panels_recycler_view"
         android:layout_width="match_parent"
@@ -11,13 +12,14 @@
         android:scrollbars="vertical"
         android:visibility="visible"
         tools:listitem="@layout/panels_list_element" />
+
     <TextView
         android:id="@+id/panels_empty_stub"
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center"
         android:text="@string/user_no_panels_stub"
-        android:gravity="center"
-        android:layout_gravity="center"
-        android:textSize="@dimen/user_panels_no_panels_stub_font_size"/>
+        android:textAlignment="center"
+        android:textSize="@dimen/user_panels_no_panels_stub_font_size"
+        android:visibility="gone" />
 </FrameLayout>

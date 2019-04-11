@@ -32,10 +32,10 @@ public class VodsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_user_panels, container, false);
-        mEmptyPanelsStub = view.findViewById(R.id.panels_empty_stub);
+        View view = inflater.inflate(R.layout.fragment_user_vods, container, false);
+        mEmptyPanelsStub = view.findViewById(R.id.vods_empty_stub);
         mEmptyPanelsStub.setVisibility(View.GONE);
-        mPanelsRecyclerView = view.findViewById(R.id.panels_recycler_view);
+        mPanelsRecyclerView = view.findViewById(R.id.vods_recycler_view);
         mPanelsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         return view;
     }

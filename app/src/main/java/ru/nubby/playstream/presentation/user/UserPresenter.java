@@ -88,14 +88,12 @@ public class UserPresenter extends BaseRxPresenter<UserContract.View>
 
     private void displayFetchedInfoV5() {
         String url = extractBannerUrl(mChannelInfoV5);
-        if (!url.isEmpty()) {
-            mView.setupBackground(url);
-        }
+        mView.setupBackground(url);
         mView.displayFollowersCount(mChannelInfoV5.getFollowers());
     }
 
     private String extractBannerUrl(ChannelInfoV5 channelInfo) {
-        String url = "";
+        String url = "https://nopath.jpg";
         if (channelInfo.getProfileBanner() != null &&
                 !channelInfo.getProfileBanner().isEmpty()) {
             url = channelInfo.getProfileBanner();

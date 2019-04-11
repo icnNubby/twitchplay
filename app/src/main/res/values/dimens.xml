@@ -3,10 +3,12 @@
     <!--User screen-->
     <dimen name="toolbar_padding">0dp</dimen>
     <dimen name="user_screen_default_margin">8dp</dimen>
+    <dimen name="user_screen_double_margin">16dp</dimen>
     <dimen name="user_screen_default_padding">8dp</dimen>
 
+    <dimen name="user_title_font_size">16sp</dimen>
     <dimen name="panel_body_size">14sp</dimen>
-    <dimen name="user_info_font_size">10sp</dimen>
+    <dimen name="user_info_font_size">14sp</dimen>
     <dimen name="user_follow_view_font_size">12sp</dimen>
     <dimen name="user_panels_no_panels_stub_font_size">26sp</dimen>
 

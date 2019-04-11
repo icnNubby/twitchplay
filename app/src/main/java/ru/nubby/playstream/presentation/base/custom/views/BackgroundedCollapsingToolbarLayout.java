@@ -25,7 +25,7 @@ public class BackgroundedCollapsingToolbarLayout extends CollapsingToolbarLayout
     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
         BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), bitmap);
         bitmapDrawable.setGravity(Gravity.CENTER);
-        bitmapDrawable.setGravity(Gravity.DISPLAY_CLIP_VERTICAL);
+        bitmapDrawable.setGravity(Gravity.FILL);
         setBackground(bitmapDrawable);
     }
 

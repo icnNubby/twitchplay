@@ -2,28 +2,18 @@
 Bugs
     fix displaying appsecret at failed load in login activity
     exclude unfollowed channel from online stream list, when returned
-    fix schedulers everywhere, think how to separate responsibilities between views and repo
-    add schedulers dependencies in presenters by di
-
-Architecture
-    think how to implement presenters interaction one with another
-    ex:
-        fullscreen mode might be Observable<Boolean>
-    etc.
-    links:
-        http://hannesdorfmann.com/android/mosby3-mvi-4
-        https://www.reddit.com/r/androiddev/comments/60neon/how_to_share_data_between_two_presenters_in_mvp/
-
-    think how to make states abit prettier (enums?)
+    fix unscrollable bug
+    look why notifications arent firing with proper rate.
 
 More features gradually from nearest to farthest:
+
     ?add games to db and to main screen
+    add pref for notification check rate
     sleep mode and setup to it
     backnav!
     chat answers
     chat emodzi displays
     emodzi update and storage locally
-    user view screen (prob with possibilities to edit urself)
     suggestions
     subscriptions workaround (? figure out how it works)
     animations (learning some ui stuff)

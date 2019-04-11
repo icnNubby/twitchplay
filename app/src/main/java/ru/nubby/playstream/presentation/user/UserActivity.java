@@ -2,6 +2,7 @@ package ru.nubby.playstream.presentation.user;
 
 import android.os.Bundle;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +30,10 @@ import ru.nubby.playstream.presentation.user.panels.PanelsFragment;
 import ru.nubby.playstream.presentation.user.vods.VodsFragment;
 import ru.nubby.playstream.utils.Constants;
 
+/**
+ * This activity should be called with UserData extras.
+ * Watch {@link #readUserDataFromExtras}
+ */
 public class UserActivity extends BaseActivity implements UserContract.View,
         AppBarLayout.OnOffsetChangedListener {
 
@@ -60,7 +65,9 @@ public class UserActivity extends BaseActivity implements UserContract.View,
     private TextView mFollowers;
     private TextView mViews;
     private TextView mAdditionalInfo;
+    private TextView mUserName;
     private FloatingActionButton mFollowUnfollow;
+    private LinearLayout mAnimate;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -83,13 +90,17 @@ public class UserActivity extends BaseActivity implements UserContract.View,
         mFollowers = findViewById(R.id.user_followers);
         mViews = findViewById(R.id.user_views);
         mAdditionalInfo = findViewById(R.id.user_info);
+        mUserName = findViewById(R.id.user_name);
 
         mFollowUnfollow = findViewById(R.id.user_follow_fab);
         mFollowUnfollow.setOnClickListener(v -> mPresenter.followOrUnfollowChannel());
 
+        mAnimate = findViewById(R.id.user_animate_layout);
+
         mAppBarLayout.addOnOffsetChangedListener(this);
         mMaxScrollSize = mAppBarLayout.getTotalScrollRange();
         mToolbar.setTitle("");
+
         setSupportActionBar(mToolbar);
         viewPager.setAdapter(new TabsAdapter(getSupportFragmentManager()));
         tabLayout.setupWithViewPager(viewPager);
@@ -117,6 +128,7 @@ public class UserActivity extends BaseActivity implements UserContract.View,
             mPicasso.load(user.getProfileImageUrl())
                     .into(mUserAvatar);
         }
+        mUserName.setText(mUser.getDisplayName());
         mViews.setText(getString(R.string.user_views_label, user.getViewCount()));
         mAdditionalInfo.setText(user.getDescription());
     }
@@ -125,6 +137,7 @@ public class UserActivity extends BaseActivity implements UserContract.View,
     public void setupBackground(String url) {
         mPicasso.load(url)
                 .placeholder(R.drawable.banner_placeholder)
+                .error(R.drawable.banner_placeholder)
                 .into(mCollapsingToolbarLayout);
     }
 
@@ -173,7 +186,7 @@ public class UserActivity extends BaseActivity implements UserContract.View,
         if (percentage >= PERCENTAGE_TO_ANIMATE_AVATAR && mIsAvatarShown) {
             mIsAvatarShown = false;
 
-            mUserAvatar.animate()
+            mAnimate.animate()
                     .scaleY(0).scaleX(0)
                     .setDuration(getResources().getInteger(R.integer.short_animation_duration))
                     .start();
@@ -181,7 +194,7 @@ public class UserActivity extends BaseActivity implements UserContract.View,
         if (percentage <= PERCENTAGE_TO_ANIMATE_AVATAR && !mIsAvatarShown) {
             mIsAvatarShown = true;
 
-            mUserAvatar.animate()
+            mAnimate.animate()
                     .scaleY(1).scaleX(1)
                     .start();
         }

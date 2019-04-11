@@ -17,19 +17,32 @@
         <ru.nubby.playstream.presentation.base.custom.views.BackgroundedCollapsingToolbarLayout
             android:id="@+id/user_collapsing_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="180dp"
             android:fitsSystemWindows="true"
             app:layout_scrollFlags="scroll|snap">
+
+            <TextView
+                android:id="@+id/user_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center|top"
+                android:textSize="@dimen/user_title_font_size"
+                android:layout_margin="@dimen/user_screen_double_margin"
+                android:textColor="@color/colorWhite" />
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/streamer_info_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center|top"
                 android:background="@color/transparentDarkBlack"
+                android:gravity="center|top"
                 android:minHeight="?attr/actionBarSize"
-                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:titleTextAppearance="@android:style/TextAppearance" />
 
             <LinearLayout
+                android:id="@+id/user_animate_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
@@ -63,7 +76,7 @@
                             android:layout_height="wrap_content"
                             android:textSize="@dimen/user_info_font_size"
                             android:ellipsize="end"
-                            android:maxLines="5"
+                            android:maxLines="4"
                             android:gravity="start"
                             android:textColor="@color/colorWhite"
                             tools:text="Additional user information." />
@@ -103,11 +116,12 @@
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:textAllCaps="false"
             app:tabGravity="fill"
             app:tabIndicatorColor="?android:attr/textColorPrimaryInverse"
-            app:tabIndicatorHeight="4dp"
+            app:tabIndicatorHeight="1dp"
             app:tabMaxWidth="0dp"
-            app:tabMode="fixed"
+            app:textAllCaps="false"
             app:tabSelectedTextColor="?android:attr/textColorPrimaryInverse" />
     </com.google.android.material.appbar.AppBarLayout>
 

@@ -145,7 +145,7 @@ public class NotificationService extends JobService {
                     .setContentText(freshStream.getTitle())
                     .setSubText(mContext.getString(R.string.notification_stream_viewers,
                             freshStream.getViewerCount()))
-                    .setSmallIcon(R.mipmap.ic_launcher_round)
+                    .setSmallIcon(R.drawable.ic_new_stream_notification)
                     .setGroup(NOTIFICATION_GROUP_KEY);
             newNotifications.put(streamingUser.getId(), notification);
         }
@@ -160,7 +160,7 @@ public class NotificationService extends JobService {
                 .setContentIntent(constructMainIntent())
                 .setContentTitle(mContext.getString(R.string.notification_streams_live,
                         newNotifications.size()))
-                .setSmallIcon(R.mipmap.ic_launcher_round)
+                .setSmallIcon(R.drawable.ic_new_stream_notification)
                 .setGroup(NOTIFICATION_GROUP_KEY)
                 .setGroupSummary(true)
                 .build();

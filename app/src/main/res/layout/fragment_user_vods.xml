@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:scrollbars="vertical"
         android:visibility="visible"
-        tools:listitem="@layout/panels_list_element" />
+        tools:listitem="@layout/vods_list_element" />
     <TextView
         android:id="@+id/vods_empty_stub"
         android:visibility="gone"
