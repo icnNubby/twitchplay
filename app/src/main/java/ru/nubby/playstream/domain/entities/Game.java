@@ -30,7 +30,7 @@ public final class Game implements Serializable {
 
     }
 
-    public Game(Game game) {
+    public Game(@NonNull Game game) {
         this.id = game.getId();
         this.name = game.getName();
         this.boxArtUrl = game.getBoxArtUrl();

@@ -1,4 +1,4 @@
-package ru.nubby.playstream.presentation.stream.streamplayer;
+package ru.nubby.playstream.presentation.stream.player;
 
 import android.content.Context;
 import android.graphics.PixelFormat;

@@ -20,7 +20,7 @@ import ru.nubby.playstream.R;
 import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.presentation.base.BaseActivity;
 import ru.nubby.playstream.presentation.stream.chat.ChatFragment;
-import ru.nubby.playstream.presentation.stream.streamplayer.StreamFragment;
+import ru.nubby.playstream.presentation.stream.player.StreamFragment;
 import ru.nubby.playstream.presentation.base.custom.OnSwipeTouchListener;
 import ru.nubby.playstream.utils.Constants;
 

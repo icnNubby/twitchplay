@@ -9,6 +9,9 @@ import ru.nubby.playstream.domain.FollowsRepository;
 import ru.nubby.playstream.domain.entities.Stream;
 import ru.nubby.playstream.domain.entities.UserData;
 
+/**
+ * Follows bisiness logic.
+ */
 @Singleton
 public class FollowsInteractor {
 

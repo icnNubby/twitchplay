@@ -52,7 +52,7 @@ public final class UserData implements Serializable {
 
     }
 
-    public UserData(UserData userData){
+    public UserData(@NonNull UserData userData){
         this.id = userData.getId();
         this.login = userData.getLogin();
         this.displayName = userData.getDisplayName();

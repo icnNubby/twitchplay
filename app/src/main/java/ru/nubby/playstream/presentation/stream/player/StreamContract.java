@@ -1,4 +1,4 @@
-package ru.nubby.playstream.presentation.stream.streamplayer;
+package ru.nubby.playstream.presentation.stream.player;
 
 import java.util.List;
 

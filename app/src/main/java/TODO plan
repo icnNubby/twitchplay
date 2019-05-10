@@ -2,8 +2,9 @@
 Bugs
     fix displaying appsecret at failed load in login activity
     exclude unfollowed channel from online stream list, when returned
-    fix unscrollable bug
     look why notifications arent firing with proper rate.
+    fix token issues ?
+    limit displaying notifications to 5 (we cant show more)
 
 More features gradually from nearest to farthest:
 
@@ -14,13 +15,17 @@ More features gradually from nearest to farthest:
     chat answers
     chat emodzi displays
     emodzi update and storage locally
-    suggestions
     subscriptions workaround (? figure out how it works)
     animations (learning some ui stuff)
-    launcher icon and overall beautify
+    night theme.
+    launcher icon and overall beautify (gradient colors, try them!)
+    service to play audio-only in background
+    (!) tracking time, spent on watching concrete streamers, statistics screen
+    rethink design and navigation
+    handle empty states everywhere
 
 Development stuff:
-    add atleast unittests
+    add abit of unittests
     add CI
 
 

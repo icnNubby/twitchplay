@@ -1,4 +1,4 @@
-package ru.nubby.playstream.presentation.stream.streamplayer;
+package ru.nubby.playstream.presentation.stream.player;
 
 import android.util.Log;
 
@@ -16,10 +16,10 @@ import ru.nubby.playstream.domain.interactors.StreamsInteractor;
 import ru.nubby.playstream.presentation.base.BaseRxPresenter;
 import ru.nubby.playstream.utils.RxSchedulersProvider;
 
-import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.ERROR_CHANNEL_FOLLOW_UNFOLLOW;
-import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.ERROR_FETCHING_ADDITIONAL_INFO;
-import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.INFO_CHANNEL_FOLLOWED;
-import static ru.nubby.playstream.presentation.stream.streamplayer.StreamContract.View.InfoMessage.INFO_CHANNEL_UNFOLLOWED;
+import static ru.nubby.playstream.presentation.stream.player.StreamContract.View.InfoMessage.ERROR_CHANNEL_FOLLOW_UNFOLLOW;
+import static ru.nubby.playstream.presentation.stream.player.StreamContract.View.InfoMessage.ERROR_FETCHING_ADDITIONAL_INFO;
+import static ru.nubby.playstream.presentation.stream.player.StreamContract.View.InfoMessage.INFO_CHANNEL_FOLLOWED;
+import static ru.nubby.playstream.presentation.stream.player.StreamContract.View.InfoMessage.INFO_CHANNEL_UNFOLLOWED;
 
 public class StreamPresenter extends BaseRxPresenter<StreamContract.View>
         implements StreamContract.Presenter {
