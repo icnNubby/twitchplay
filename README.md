@@ -25,5 +25,7 @@ That class has to contain several methods:
     public static String getHeaderClientId()
 
     
-  You can obtain first four of those at https://dev.twitch.tv/docs/api/. 
+  You can obtain first four of those at https://dev.twitch.tv/docs/api/.
+
+  Just changed
   
